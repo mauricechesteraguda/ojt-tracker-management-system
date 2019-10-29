@@ -1,0 +1,94 @@
+
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+.navbar-laravel {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+html,
+body, container { height: 100%; }
+ 
+body, container {
+  display: table;
+  width: 100%;
+}
+
+header {
+  background-color:#333;
+  color:#fff;
+}
+
+.sidebar {
+  background-color:#EEE;
+  display:table-cell;
+  height:100%;
+}
+
+.main {
+  background-color:#999;
+  height:100%;
+}
+ 
+.page-row {
+  display: table-row;
+  height: 1px;
+}
+ 
+.page-row-expanded { height: 100%; }
+
+.list-group {
+     
+  margin:auto;
+  float:left;
+  padding-top:20px;
+ }
+ .lead {
+  
+  margin:auto;
+  left:0;
+  right:0;
+  padding-top:10%;
+ }
+ 
+
+ .just-padding {
+  padding: 15px;
+}
+
+.list-group.list-group-root {
+  padding: 0;
+  overflow: hidden;
+}
+
+.list-group.list-group-root .list-group {
+  margin-bottom: 0;
+}
+
+.list-group.list-group-root .list-group-item {
+  border-radius: 0;
+  border-width: 1px 0 0 0;
+}
+
+.list-group.list-group-root > .list-group-item:first-child {
+  border-top-width: 0;
+}
+
+.list-group.list-group-root > .list-group > .list-group-item {
+  padding-left: 30px;
+}
+
+.list-group.list-group-root > .list-group > .list-group > .list-group-item {
+  padding-left: 45px;
+}
+
+.list-group-item .glyphicon {
+  margin-right: 5px;
+}

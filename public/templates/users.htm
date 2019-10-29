@@ -1,0 +1,178 @@
+<div class="card" ng-controller="UserController">
+    <div class="card-header text-white bg-primary mb-3">Users
+            <div class="panel-heading float-right">
+                    <button class="btn btn-warning btn-sm " ng-click="initUser()">Add User</button>
+                </div>
+    </div>
+
+    <div class="card-body">
+        <div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                       
+     
+                        <div class=" container-fluid">
+                                <div class="table-responsive">
+                                <table datatable="ng" class="table table-bordered table-striped table-condensed container-fluid" >
+                                    <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>Created at</th>
+                                            <th>Updated at</th>
+                                            <th>Actions</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="(index, user) in users.data | orderBy:'name'" >
+                                            <td>
+                                                <% index + 1 %>
+                                            </td>
+                                            <td><% user.name %></td>
+                                            <td><% user.email %></td>
+                                            <td><% user.role %></td>
+                                            <td><% user.created_at.date %></td>
+                                            <td><% user.updated_at.date %></td>
+                                            <td>
+                                                    <div class="btn-group-vertical" role="group" >
+                                                <button class="btn btn-success btn-sm" ng-click="initEdit(index)">View/Edit</button>
+                                                <button class="btn btn-danger btn-sm" ng-click="deleteUser(index)" >Delete</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    </table>
+                                    </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+	
+         <div class="modal fade" tabindex="-1" role="dialog" id="edit_user">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                            <h4 class="modal-title">Update User</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                        
+                    </div>
+                    <div class="modal-body">
+ 
+                        <div class="alert alert-danger" ng-if="errors.length > 0">
+                            <ul>
+                                <li ng-repeat="error in errors"><% error %></li>
+                            </ul>
+                        </div>
+ 
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" name="name" class="form-control" ng-model="edit_user.name">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">New Password (Leave blank to retain old password)</label>
+                            <input type="password" name="password" class="form-control" ng-model="edit_user.password">
+                        </div>
+                        <div class="form-group">
+                            <label for="role">Role</label>
+                                      <select name="role" class="form-control"
+                                      ng-model="edit_user.role">
+                                      
+                                    <option value="Administrator">Administrator</option>
+                                    <option value="bfpcfseu">bfpcfseu</option>
+                                    <option value="bfpcmfm">bfpcmfm</option>
+                                    <option value="bfpcro">bfpcro</option>
+                                    <option value="bfpfca">bfpfca</option>
+                                    <option value="bfpfcaa">bfpfcaa</option>
+                                    <option value="bploadminaide3">bploadminaide3</option>
+                                    <option value="bploadminjo">bploadminjo</option>
+                                    <option value="bploencoder">bploencoder</option>
+                                    <option value="municipalmayor">municipalmayor</option>
+                                    <option value="rhuadminaide">rhuadminaide</option>
+                                    <option value="rhuencoder">rhuencoder</option>
+                                    <option value="treasureradminaide">treasureradminaide</option>
+                                    <option value="treasurerencoder">treasurerencoder</option>
+                                    <option value="engineering">engineering</option>
+                                    
+                                    </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" ng-click="updateUser()">Submit</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="add_new_user">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Add User</h4>
+                            <button type="button" class="close float-right" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        </div>
+                        <div class="modal-body">
+     
+                            <div class="alert alert-danger" ng-if="errors.length > 0">
+                                <ul>
+                                    <li ng-repeat="error in errors"><% error %></li>
+                                </ul>
+                            </div>
+     
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" name="name" class="form-control" ng-model="user.name">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" name="email" class="form-control" ng-model="user.email">
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" name="password" class="form-control" ng-model="user.password">
+                            </div>
+                            <div class="form-group">
+                                <label for="role">Role</label>
+
+                                <select name="role" class="form-control"
+                                ng-model="user.role">
+                                
+                              <option value="Administrator">Administrator</option>
+                              <option value="bfpcfseu">bfpcfseu</option>
+                              <option value="bfpcmfm">bfpcmfm</option>
+                              <option value="bfpcro">bfpcro</option>
+                              <option value="bfpfca">bfpfca</option>
+                              <option value="bfpfcaa">bfpfcaa</option>
+                              <option value="bploadminaide3">bploadminaide3</option>
+                              <option value="bploadminjo">bploadminjo</option>
+                              <option value="bploencoder">bploencoder</option>
+                              <option value="municipalmayor">municipalmayor</option>
+                              <option value="rhuadminaide">rhuadminaide</option>
+                              <option value="rhuencoder">rhuencoder</option>
+                              <option value="treasureradminaide">treasureradminaide</option>
+                              <option value="treasurerencoder">treasurerencoder</option>
+                              <option value="engineering">engineering</option>
+                              
+                              </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" ng-click="addUser()">Submit</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+
+    </div>
+</div>
