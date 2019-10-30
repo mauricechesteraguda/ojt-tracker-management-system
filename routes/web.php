@@ -26,7 +26,7 @@ Route::get('/', function () {
         $user = \Auth::user();
         return view('home',['user'=>$user]);
     } else {
-        return view('welcome');
+        return view('auth/login');
     }
 });
 
