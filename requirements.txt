@@ -1,0 +1,4 @@
+composer install
+php artisan preset react
+php artisan key:generate
+php artisan migrate
