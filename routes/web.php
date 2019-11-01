@@ -1,15 +1,5 @@
 <?php
-use App\BusinessPermit;
-use App\BusinessTransaction;
-use App\TricyclePermit;
-use App\TricycleTransaction;
-use App\BoatPermit;
-use App\BoatTransaction;
-use App\Medical;
-use App\Food;
-use App\Wet;
-use App\FireInspection;
-use App\FireTransaction;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -20,6 +10,20 @@ use App\FireTransaction;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+
+
+Route::get('/login', function () {
+    
+    return view('auth/login');
+
+});
+
+Route::get('/register', function () {
+    
+    return view('auth/register');
+
+});
 
 Route::get('/', function () {
     if(Auth::check()) {
