@@ -88,10 +88,11 @@
                                     {{ __('Login') }}
                                 </button>
 
-
-                                <!-- <a class="btn btn-link" href="{{ route('password.request') }}">
-                                    {{ __('Forgot Your Password?') }}
-                                </a> -->
+                                <span>
+                                        <a class="btn btn-link" href="{{ route('password.request') }}">
+                                                {{ __('Forgot Your Password?') }}
+                                            </a>  
+                                </span>
                             </div>
                         </div>
                         <div class="form-group row mb-0">
@@ -99,13 +100,12 @@
                                     <span>Don't have an account? <a href="/register">
                                         {{ __(' Register here!') }}
                                 </a></span>
+                               
                                         
-                                    
-    
-    
                                     
                                 </div>
                             </div>
+                            
                     </form>
 
                 </div>
