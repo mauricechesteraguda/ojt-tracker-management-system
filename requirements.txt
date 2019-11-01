@@ -1,5 +1,8 @@
 composer install
 php artisan preset react
+npm install && npm run dev
+npm install -g @storybook/cli
+getstorybook
 php artisan key:generate
 php artisan migrate
 php artisan tinker
