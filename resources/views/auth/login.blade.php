@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
                 <div id="myModal" class="modal fade" role="dialog">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog modal-lg">
                       
                           <!-- Modal content-->
                           <div class="modal-content">
@@ -14,20 +14,19 @@
             
             
                                 <div class="card ">
-                <div class="card-header text-white bg-primary mb-3">{{ __('Login') }}</div>
+                <div class="card-header">
+                    <h4 class="modal-title ng-binding" id="myModalLabel">Batangas State University Login - OJT PORTAL</h4>    
+                </div>
 
                 <div class="card-body">
 
                         <div class="login-container animated fadeInDown" ng-init="login.init()">
 
                                 <div class="widget">
-                                    <center>
-                                        <span class="widget-caption themeprimary"><b>Republic of the Philippines</b></span><br>
-                                        <span class="widget-caption themeprimary"><b>Province of Batangas</b></span><br>
-                                        <span class="widget-caption themeprimary" style="font-size: 30px"><b>Municipality of Mabini</b></span><br>
-                                    </center>
+                                    
+                                    
                                      <center>
-                                        <img style="width: 150px; height:150px;" src="img/MabiniLogo.png">
+                                        <img style="width: 150px; height:150px;" src="https://upload.wikimedia.org/wikipedia/en/a/ad/Official_Seal_of_Batangas_State_University.png">
                                     </center>
                                 </div>
                             
@@ -84,15 +83,29 @@
 
                         <div class="form-group row mb-0">
                             <div class="col-md-8 offset-md-4">
+                                    
                                 <button type="submit" class="btn btn-primary">
                                     {{ __('Login') }}
                                 </button>
+
 
                                 <!-- <a class="btn btn-link" href="{{ route('password.request') }}">
                                     {{ __('Forgot Your Password?') }}
                                 </a> -->
                             </div>
                         </div>
+                        <div class="form-group row mb-0">
+                                <div class="col-md-8 offset-md-4">
+                                    <span>Don't have an account? <a href="/register">
+                                        {{ __(' Register here!') }}
+                                </a></span>
+                                        
+                                    
+    
+    
+                                    
+                                </div>
+                            </div>
                     </form>
 
                 </div>
