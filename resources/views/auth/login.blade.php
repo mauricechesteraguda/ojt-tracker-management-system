@@ -26,7 +26,7 @@
                                     
                                     
                                      <center>
-                                        <img style="width: 150px; height:150px;" src="https://upload.wikimedia.org/wikipedia/en/a/ad/Official_Seal_of_Batangas_State_University.png">
+                                        <img style="width: 150px; height:150px;" src='img/brand/logo.png'>
                                     </center>
                                 </div>
                             
