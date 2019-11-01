@@ -23661,3 +23661,12 @@ hr.transparent {
   border-right-color: #536c79;
 }
 
+.brand_icon {
+  width: 50%;
+  height: 100%;
+  display: 'flex';
+  -webkit-box-pack: 'center';
+      -ms-flex-pack: 'center';
+          justify-content: 'center';
+}
+

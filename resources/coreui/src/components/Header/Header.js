@@ -42,7 +42,7 @@ class Header extends Component {
         <NavbarToggler className="d-lg-none" onClick={this.mobileSidebarToggle}>
           <span className="navbar-toggler-icon"></span>
         </NavbarToggler>
-        <NavbarBrand href="/"><img className="align-center container-fluid img-avatar" src={"img/brand/logo.svg"}></img></NavbarBrand>
+        <NavbarBrand href="/"><img className="img-avatar brand_icon text-center" src={'img/brand/logo.png'}></img></NavbarBrand>
         <NavbarToggler className="d-md-down-none" onClick={this.sidebarToggle}>
           <span className="navbar-toggler-icon"></span>
         </NavbarToggler>
