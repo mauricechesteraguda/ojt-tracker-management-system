@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import axios from 'axios';
 import {
   Badge,
   DropdownItem,
@@ -24,6 +25,29 @@ class HeaderDropdown extends Component {
     });
   }
 
+  logout(){
+    if(confirm("Are you sure you want to log out?")) {
+     
+      axios.post('/logout', {
+        _token: $('meta[name="csrf-token"]').attr('content'),
+        
+      })
+      .then(function (response) {
+        console.log('Logout!')
+        console.log(response)
+        window.location.href='/'
+      })
+     .catch(error => {
+       // If the api request failed then you still might want to remove
+       // the same data from localStorage anyways
+       // perhaps this code should go in a finally method instead of then and catch
+       // methods to avoid duplication.
+       console.log('error logout')
+     });       
+    }
+   
+  }
+
   dropAccnt() {
     return (
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
@@ -43,7 +67,7 @@ class HeaderDropdown extends Component {
           <DropdownItem><i className="fa fa-file"></i> Projects<Badge color="primary">42</Badge></DropdownItem>
           <DropdownItem divider/>
           <DropdownItem><i className="fa fa-shield"></i> Lock Account</DropdownItem>
-          <DropdownItem><i className="fa fa-lock"></i> Logout</DropdownItem>
+          <DropdownItem onClick={this.logout}><i className="fa fa-lock"></i> Logout</DropdownItem>
         </DropdownMenu>
       </Dropdown>
     );
