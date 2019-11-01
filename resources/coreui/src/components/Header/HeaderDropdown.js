@@ -15,13 +15,20 @@ class HeaderDropdown extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.state = {
-      dropdownOpen: false
+      dropdownOpen: false,
+      user_name: window.user_name,
     };
   }
 
   toggle() {
     this.setState({
       dropdownOpen: !this.state.dropdownOpen
+    });
+  }
+
+  componentDidMount(){
+    this.setState({
+      user_name: window.user_name
     });
   }
 
@@ -52,7 +59,8 @@ class HeaderDropdown extends Component {
     return (
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
         <DropdownToggle nav>
-          <img src={'img/avatars/6.jpg'} className="img-avatar" alt="admin@bootstrapmaster.com"/>
+          <img src={'img/avatars/6.jpg'} className="img-avatar" alt=""/>
+          {this.state.user_name}
         </DropdownToggle>
         <DropdownMenu right>
           <DropdownItem header tag="div" className="text-center"><strong>Account</strong></DropdownItem>

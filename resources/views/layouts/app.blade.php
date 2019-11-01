@@ -29,6 +29,16 @@
             'csrfToken' => csrf_token(),
         ]) !!};
     </script>
+        @guest
+        {{-- pass --}}
+       @else
+       <script>
+             window.user_name='{{ Auth::user()->name }}';
+             console.log(window.user_name)
+       </script>
+                
+   @endguest
+   
 
 <!-- BODY options, add following classes to body to change options
 
@@ -53,7 +63,6 @@
 </head>
 <body class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
     
-        
 
         <main >
             @yield('content')
