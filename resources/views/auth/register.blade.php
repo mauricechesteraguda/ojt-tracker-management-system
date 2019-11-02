@@ -40,14 +40,14 @@
                         </div>
 
                         <div class="form-group row">
-                                <label for="role" class="col-md-4 col-form-label text-md-right">{{ __('Role') }}</label>
+                                <label for="sr_code" class="col-md-4 col-form-label text-md-right">{{ __('SRCODE') }}</label>
     
                                 <div class="col-md-6">
-                                    <input id="role" type="text" class="form-control{{ $errors->has('role') ? ' is-invalid' : '' }}" name="role" value="{{ old('role') }}" required autofocus>
+                                    <input id="sr_code" type="text" class="form-control{{ $errors->has('sr_code') ? ' is-invalid' : '' }}" name="sr_code" value="{{ old('sr_code') }}" required autofocus>
     
-                                    @if ($errors->has('role'))
+                                    @if ($errors->has('sr_code'))
                                         <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $errors->first('role') }}</strong>
+                                            <strong>{{ $errors->first('sr_code') }}</strong>
                                         </span>
                                     @endif
                                 </div>
