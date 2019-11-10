@@ -9,6 +9,12 @@ export default {
         text: 'NEW'
       }
     },
+    {
+            name: 'Users',
+            url: '/users',
+            icon: 'icon-puzzle'
+          },
+    
     // {
     //   title: true,
     //   name: 'Theme',
