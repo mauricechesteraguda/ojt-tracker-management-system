@@ -16,7 +16,7 @@ class HeaderDropdown extends Component {
     this.toggle = this.toggle.bind(this);
     this.state = {
       dropdownOpen: false,
-      user_name: window.user_name,
+      user_name: '',
     };
   }
 
