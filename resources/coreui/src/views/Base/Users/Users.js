@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   Badge,
   Row,
@@ -11,9 +11,35 @@ import {
   PaginationItem,
   PaginationLink
 } from 'reactstrap';
-
+import axios from 'axios';
 
 class Users extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      users: []
+    }
+  }
+
+  storeUsersToState(data){
+    // console.log(data)
+    this.setState({users:data})
+  }
+
+  getUsers() {
+    
+    axios.get('/api/users')
+      .then(res => {
+        this.storeUsersToState(res.data.data)
+      }).catch(err => {
+        console.log(err)
+      })
+  }
+  componentWillMount() {
+    
+    this.getUsers()
+    
+  }
   render() {
     return (
       <div className="animated fadeIn">
@@ -21,59 +47,38 @@ class Users extends Component {
           <Col xs="12" lg="12">
             <Card>
               <CardHeader>
-                <i className="fa fa-align-justify"></i> Simple Table
+                <i className="fa fa-align-justify"></i> Users
               </CardHeader>
               <CardBody>
                 <Table responsive>
                   <thead>
-                  <tr>
-                    <th>Username</th>
-                    <th>Date registered</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                  </tr>
+                    <tr>
+                      <th>SRCODE</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                    </tr>
                   </thead>
                   <tbody>
-                  <tr>
-                    <td>Samppa Nori</td>
-                    <td>2012/01/01</td>
-                    <td>Member</td>
-                    <td>
-                      <Badge color="success">Active</Badge>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Estavan Lykos</td>
-                    <td>2012/02/01</td>
-                    <td>Staff</td>
-                    <td>
-                      <Badge color="danger">Banned</Badge>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Chetan Mohamed</td>
-                    <td>2012/02/01</td>
-                    <td>Admin</td>
-                    <td>
-                      <Badge color="secondary">Inactive</Badge>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Derick Maximinus</td>
-                    <td>2012/03/01</td>
-                    <td>Member</td>
-                    <td>
-                      <Badge color="warning">Pending</Badge>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Friderik Dávid</td>
-                    <td>2012/01/21</td>
-                    <td>Staff</td>
-                    <td>
-                      <Badge color="success">Active</Badge>
-                    </td>
-                  </tr>
+                    {this.state.users.map((data, i) => {
+                      return (
+                        <tr key={i}>
+                          <td>{data.sr_code}</td>
+                          <td>{data.name}</td>
+                          <td>{data.email}</td>
+                          <td>{data.role}</td>
+                        </tr>
+                      )
+                    })}
+                    {/* <tr>
+                      <td>Samppa Nori</td>
+                      <td>2012/01/01</td>
+                      <td>Member</td>
+                      <td>
+                        <Badge color="success">Active</Badge>
+                      </td>
+                    </tr> */}
+
                   </tbody>
                 </Table>
                 <Pagination>
