@@ -29,13 +29,27 @@ class Users extends Component {
     super(props)
     this.state = {
       users: [],
-      primary: false,
+      addForm: false,
+      code: '',
+      name: '',
+      role: '',
+      email: '',
+      password: '',
+      confirm_password: '',
+      process_type: 'create',
     }
-    this.togglePrimary = this.togglePrimary.bind(this);
+    this.toggleAddForm = this.toggleAddForm.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
   }
-  togglePrimary() {
+
+  handleInputChange(e){
+    console.log(e.target.name)
+    this.setState({[e.target.name]:e.target.value});
+  }
+
+  toggleAddForm() {
     this.setState({
-      primary: !this.state.primary
+      addForm: !this.state.addForm
     });
   }
 
@@ -70,14 +84,14 @@ class Users extends Component {
                     <i className="fa fa-align-justify"></i> Users
                 </Col>
                   <Col xs="6" lg="6">
-                    <Button className="float-right fa fa-plus-circle" color="primary" onClick={this.togglePrimary}> Add</Button>
+                    <Button className="float-right fa fa-plus-circle" color="primary" onClick={this.toggleAddForm}> Add</Button>
                   </Col>
                 </Row>
               </CardHeader>
               <CardBody>
-                <Modal isOpen={this.state.primary} toggle={this.togglePrimary}
+                <Modal isOpen={this.state.addForm} toggle={this.toggleAddForm}
                   className={'modal-primary ' + this.props.className}>
-                  <ModalHeader toggle={this.togglePrimary}>Add New User</ModalHeader>
+                  <ModalHeader toggle={this.toggleAddForm}>Add New User</ModalHeader>
                   <ModalBody>
 
                     <Row>
@@ -91,7 +105,7 @@ class Users extends Component {
                                   <Label htmlFor="code">SRCODE / ID</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input type="text" id="code" name="text-input" placeholder="Text" />
+                                  <Input value={this.state.code} onChange={this.handleInputChange} type="text" id="code" name="code" placeholder="Text" />
                                   <FormText color="muted">Student / Faculty Code</FormText>
                                 </Col>
                               </FormGroup>
@@ -100,7 +114,7 @@ class Users extends Component {
                                   <Label htmlFor="name">Name</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input type="text" id="name" name="text-input" placeholder="Text" />
+                                  <Input type="text" id="name" name="name" placeholder="Text" />
                                   <FormText color="muted">Write your name</FormText>
                                 </Col>
                               </FormGroup>
@@ -141,7 +155,7 @@ class Users extends Component {
                                   <Label htmlFor="confirm_password">Confirm Password</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input type="password" id="confirm_password" name="password-input" placeholder="Confirm Password" />
+                                  <Input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" />
                                   <FormText className="help-block">Please confirm complex password</FormText>
                                 </Col>
                               </FormGroup>
@@ -156,8 +170,8 @@ class Users extends Component {
 
                   </ModalBody>
                   <ModalFooter>
-                    <Button color="primary" onClick={this.togglePrimary}>Save</Button>{' '}
-                    <Button color="secondary" onClick={this.togglePrimary}>Cancel</Button>
+                    <Button color="primary" onClick={this.toggleAddForm}>Save</Button>{' '}
+                    <Button color="secondary" onClick={this.toggleAddForm}>Cancel</Button>
                   </ModalFooter>
                 </Modal>
                 <Table responsive>
@@ -167,6 +181,7 @@ class Users extends Component {
                       <th>Name</th>
                       <th>Email</th>
                       <th>Role</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -177,6 +192,10 @@ class Users extends Component {
                           <td>{data.name}</td>
                           <td>{data.email}</td>
                           <td>{data.role}</td>
+                          <td>
+                            <Button color="primary">Update</Button>
+                            <Button color="danger">Delete</Button>
+                          </td>
                         </tr>
                       )
                     })}
