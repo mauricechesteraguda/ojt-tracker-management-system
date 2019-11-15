@@ -37,14 +37,25 @@ class Users extends Component {
       password: '',
       confirm_password: '',
       process_type: 'create',
+      saveButtonIsDisabled: true,
     }
     this.toggleAddForm = this.toggleAddForm.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
   }
 
   handleInputChange(e){
-    console.log(e.target.name)
+    // console.log(e.target.name)
     this.setState({[e.target.name]:e.target.value});
+    
+    
+      if (this.state.password != this.state.confirm_password) {
+        console.log('Password mismatch!')
+        this.state.saveButtonIsDisabled = true
+        
+      }else{
+        this.state.saveButtonIsDisabled = false
+      }
+    
   }
 
   toggleAddForm() {
@@ -114,7 +125,7 @@ class Users extends Component {
                                   <Label htmlFor="name">Name</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input type="text" id="name" name="name" placeholder="Text" />
+                                  <Input value={this.state.name} onChange={this.handleInputChange} type="text" id="name" name="name" placeholder="Text" />
                                   <FormText color="muted">Write your name</FormText>
                                 </Col>
                               </FormGroup>
@@ -123,7 +134,7 @@ class Users extends Component {
                                   <Label htmlFor="role">Role</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input type="select" name="role" id="role">
+                                  <Input value={this.state.role} onChange={this.handleInputChange} type="select" name="role" id="role">
                                   <option></option>
                                   <option>admin</option>
                                     <option>coordinator</option>
@@ -137,7 +148,7 @@ class Users extends Component {
                                   <Label htmlFor="email-input">Email</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input type="email" id="email" name="email" placeholder="Enter Email" />
+                                  <Input value={this.state.email} onChange={this.handleInputChange} type="email" id="email" name="email" placeholder="Enter Email" />
                                   <FormText className="help-block">Please enter your email</FormText>
                                 </Col>
                               </FormGroup>
@@ -146,7 +157,7 @@ class Users extends Component {
                                   <Label htmlFor="password">Password</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input type="password" id="password" name="password" placeholder="Password" />
+                                  <Input value={this.state.password} onChange={this.handleInputChange} type="password" id="password" name="password" placeholder="Password" />
                                   <FormText className="help-block">Please enter a complex password</FormText>
                                 </Col>
                               </FormGroup>
@@ -155,7 +166,7 @@ class Users extends Component {
                                   <Label htmlFor="confirm_password">Confirm Password</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" />
+                                  <Input value={this.state.confirm_password} onChange={this.handleInputChange} type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" />
                                   <FormText className="help-block">Please confirm complex password</FormText>
                                 </Col>
                               </FormGroup>
@@ -170,7 +181,7 @@ class Users extends Component {
 
                   </ModalBody>
                   <ModalFooter>
-                    <Button color="primary" onClick={this.toggleAddForm}>Save</Button>{' '}
+                    <Button disabled={!this.state.saveButtonIsDisabled} color="primary" onClick={this.toggleAddForm}>Save</Button>{' '}
                     <Button color="secondary" onClick={this.toggleAddForm}>Cancel</Button>
                   </ModalFooter>
                 </Modal>
