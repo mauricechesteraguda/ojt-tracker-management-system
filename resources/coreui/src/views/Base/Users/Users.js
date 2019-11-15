@@ -41,6 +41,26 @@ class Users extends Component {
     }
     this.toggleAddForm = this.toggleAddForm.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.saveItem = this.saveItem.bind(this);
+  }
+
+  saveItem(){
+    let payload = {
+      sr_code:this.state.code,
+      name:this.state.name,
+      role:this.state.role,
+      email:this.state.email,
+      password:this.state.password,
+    }
+    axios.post('/api/users', payload)
+    .then(function (response) {
+      console.log(response);
+      this.getUsers()
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+
   }
 
   handleInputChange(e) {
@@ -213,7 +233,7 @@ class Users extends Component {
 
                   </ModalBody>
                   <ModalFooter>
-                    <Button disabled={this.state.saveButtonIsDisabled} color="primary" onClick={this.toggleAddForm}>Save</Button>{' '}
+                    <Button disabled={this.state.saveButtonIsDisabled} color="primary" onClick={this.saveItem}>Save</Button>{' '}
                     <Button color="secondary" onClick={this.toggleAddForm}>Cancel</Button>
                   </ModalFooter>
                 </Modal>

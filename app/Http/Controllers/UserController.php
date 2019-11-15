@@ -58,7 +58,7 @@ class UserController extends Controller
             
             $user->name = request('name');
             $user->role = request('role');
-            $user->role = request('sr_code');
+            $user->sr_code = request('sr_code');
             if (request('password')) {
                 $user->password = Hash::make(request('password'));
             }
