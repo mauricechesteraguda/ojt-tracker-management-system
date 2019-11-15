@@ -46,6 +46,16 @@ class Users extends Component {
   handleInputChange(e) {
     // console.log(e.target.name)
     this.setState({ [e.target.name]: e.target.value });
+    if ( e.target.value== '' ) {
+      console.log('Incomplete form values!')
+      this.state.saveButtonIsDisabled = true
+          
+    }else{
+     
+          console.log('Complete form values!')
+          this.state.saveButtonIsDisabled = false
+     
+    }
 
     if (e.target.name == 'confirm_password') {
       if (this.state.password != e.target.value) {
@@ -74,6 +84,8 @@ class Users extends Component {
         }
       }
     } 
+
+    
 
 
   }
