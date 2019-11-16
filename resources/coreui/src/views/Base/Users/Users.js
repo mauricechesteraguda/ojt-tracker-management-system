@@ -76,42 +76,7 @@ class Users extends Component {
         }
 
         break;
-        // case 'password':
-        //   passwordValid = value.length >= 6;
-        //   if(passwordValid){
-        //     this.setState({
-        //       alert_message: '',
-        //       alert_type: 'primary',
-        //       has_alert_hidden: true,
-        //     })
-        //   }else{
-        //     this.setState({
-        //       alert_message: 'Password is too short.',
-        //       alert_type: 'danger',
-        //       has_alert_hidden: false,
-        //     })
-        //     this.state.saveButtonIsDisabled = true
-        //     this.state.updateButtonIsDisabled = true
-        //   }
-        //   break;
-        //   case 'confirm_password':
-        // passwordValid = value.length >= 6;
-        // if(passwordValid){
-        //   this.setState({
-        //     alert_message: '',
-        //     alert_type: 'primary',
-        //     has_alert_hidden: true,
-        //   })
-        // }else{
-        //   this.setState({
-        //     alert_message: 'Password is too short.',
-        //     alert_type: 'danger',
-        //     has_alert_hidden: false,
-        //   })
-        //   this.state.saveButtonIsDisabled = true
-        //   this.state.updateButtonIsDisabled = true
-        // }
-        // break;
+
       default:
         break;
     }
@@ -207,7 +172,7 @@ class Users extends Component {
     })
 
     this.setState({ [e.target.name]: e.target.value });
-    if (e.target.value == '') {
+    if (this.state.name =='' || this.state.role == '' || this.state.email == '' || this.state.password == '' || this.state.confirm_password == '' ) {
       console.log('Incomplete form values!')
       this.state.saveButtonIsDisabled = true
       this.state.updateButtonIsDisabled = true
@@ -225,6 +190,8 @@ class Users extends Component {
 
 
     }
+
+    this.validateField(e.target.name, e.target.value);
 
     if (e.target.name == 'confirm_password') {
       if (this.state.password != e.target.value) {
@@ -299,7 +266,7 @@ class Users extends Component {
       }
     }
 
-    this.validateField(e.target.name, e.target.value);
+    
 
 
 
@@ -313,9 +280,14 @@ class Users extends Component {
       name: '',
       role: '',
       email: '',
+      password:'',
+      confirm_password: '',
       updateButtonIsDisabled: true,
       addForm: !this.state.addForm,
-      isAddProcessType: true
+      isAddProcessType: true,
+      alert_message: '',
+      alert_type: 'primary',
+      has_alert_hidden: true,
     });
 
   }
