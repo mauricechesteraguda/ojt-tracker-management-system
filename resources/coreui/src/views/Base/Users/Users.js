@@ -53,6 +53,69 @@ class Users extends Component {
     this.getUsers = this.getUsers.bind(this);
   }
 
+  validateField(fieldName, value) {
+   var emailValid = false
+   var passwordValid = false
+    switch(fieldName) {
+      case 'email':
+        emailValid = value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i);
+        if(emailValid){
+          this.setState({
+            alert_message: '',
+            alert_type: 'primary',
+            has_alert_hidden: true,
+          })
+        }else{
+          this.setState({
+            alert_message: 'Email is invalid.',
+            alert_type: 'danger',
+            has_alert_hidden: false,
+          })
+          this.state.saveButtonIsDisabled = true
+          this.state.updateButtonIsDisabled = true
+        }
+
+        break;
+        // case 'password':
+        //   passwordValid = value.length >= 6;
+        //   if(passwordValid){
+        //     this.setState({
+        //       alert_message: '',
+        //       alert_type: 'primary',
+        //       has_alert_hidden: true,
+        //     })
+        //   }else{
+        //     this.setState({
+        //       alert_message: 'Password is too short.',
+        //       alert_type: 'danger',
+        //       has_alert_hidden: false,
+        //     })
+        //     this.state.saveButtonIsDisabled = true
+        //     this.state.updateButtonIsDisabled = true
+        //   }
+        //   break;
+        //   case 'confirm_password':
+        // passwordValid = value.length >= 6;
+        // if(passwordValid){
+        //   this.setState({
+        //     alert_message: '',
+        //     alert_type: 'primary',
+        //     has_alert_hidden: true,
+        //   })
+        // }else{
+        //   this.setState({
+        //     alert_message: 'Password is too short.',
+        //     alert_type: 'danger',
+        //     has_alert_hidden: false,
+        //   })
+        //   this.state.saveButtonIsDisabled = true
+        //   this.state.updateButtonIsDisabled = true
+        // }
+        // break;
+      default:
+        break;
+    }
+  }
   deleteItem(i) {
     var self = this;
     axios.delete('api/users/' + this.state.users[i].id)
@@ -68,7 +131,7 @@ class Users extends Component {
   }
   updateItem(e) {
     e.preventDefault();
-    
+
     var self = this;
     let payload = {
       sr_code: this.state.code,
@@ -174,7 +237,16 @@ class Users extends Component {
         this.state.saveButtonIsDisabled = true
         this.state.updateButtonIsDisabled = true
 
-      } else if (this.state.password == '' && e.target.value == '') {
+      } else if (this.state.confirm_password.length <=6 || this.state.password.length <=6){
+        console.log('Password is too short!')
+        self.setState({
+          alert_message: 'Password is too short!',
+          alert_type: 'danger',
+          has_alert_hidden: false,
+        })
+        this.state.saveButtonIsDisabled = true
+        this.state.updateButtonIsDisabled = true
+      }else if (this.state.password == '' && e.target.value == '') {
         this.state.saveButtonIsDisabled = true
         this.state.updateButtonIsDisabled = true
         console.log('Password empty!')
@@ -199,7 +271,16 @@ class Users extends Component {
         })
         this.state.saveButtonIsDisabled = true
         this.state.updateButtonIsDisabled = true
-      } else {
+      } else if (this.state.confirm_password.length <=6 || this.state.password.length <=6){
+        console.log('Password is too short!')
+        self.setState({
+          alert_message: 'Password is too short!',
+          alert_type: 'danger',
+          has_alert_hidden: false,
+        })
+        this.state.saveButtonIsDisabled = true
+        this.state.updateButtonIsDisabled = true
+      }else {
         if (this.state.confirm_password == '' && e.target.value == '') {
           this.state.saveButtonIsDisabled = true
           this.state.updateButtonIsDisabled = true
@@ -217,6 +298,8 @@ class Users extends Component {
         }
       }
     }
+
+    this.validateField(e.target.name, e.target.value);
 
 
 
