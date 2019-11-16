@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+  Alert,
   Badge,
   Row,
   Col,
@@ -15,6 +16,7 @@ import {
   Form,
   FormGroup,
   FormText,
+  FormFeedback,
   Label,
   Input,
   InputGroup,
@@ -40,6 +42,9 @@ class Users extends Component {
       isAddProcessType: true,
       saveButtonIsDisabled: true,
       updateButtonIsDisabled: true,
+      has_alert_hidden: true,
+      alert_type: 'danger',
+      alert_message: '',
     }
     this.toggleAddForm = this.toggleAddForm.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -48,40 +53,43 @@ class Users extends Component {
     this.getUsers = this.getUsers.bind(this);
   }
 
-  deleteItem(i){
+  deleteItem(i) {
     var self = this;
-    axios.delete('api/users/'+this.state.users[i].id)
-    .then(function (response) {
-      console.log(response);
-      self.getUsers()
-      
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+    axios.delete('api/users/' + this.state.users[i].id)
+      .then(function (response) {
+        console.log(response);
+        self.getUsers()
+
+      })
+      .catch(function (error) {
+        console.log(error);
+
+      });
   }
-  updateItem(){
+  updateItem(e) {
+    e.preventDefault();
+    
     var self = this;
     let payload = {
-      sr_code:this.state.code,
-      name:this.state.name,
-      role:this.state.role,
-      email:this.state.email,
-      password:this.state.password,
+      sr_code: this.state.code,
+      name: this.state.name,
+      role: this.state.role,
+      email: this.state.email,
+      password: this.state.password,
     }
-    axios.post('/api/users/'+this.state.id, payload)
-    .then(function (response) {
-      console.log(response);
-      self.getUsers()
-      self.toggleAddForm()
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+    axios.post('/api/users/' + this.state.id, payload)
+      .then(function (response) {
+        console.log(response);
+        self.getUsers()
+        self.toggleAddForm()
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
 
   }
 
-  loadItem(i){
+  loadItem(i) {
     this.toggleAddForm();
     this.setState({
       id: this.state.users[i].id,
@@ -92,67 +100,106 @@ class Users extends Component {
       updateButtonIsDisabled: true,
 
     })
-    
-    this.setState({isAddProcessType: false});
+
+    this.setState({ isAddProcessType: false });
   }
 
-  saveItem(){
+  saveItem(e) {
+    e.preventDefault();
+    
+    var self = this;
     let payload = {
-      sr_code:this.state.code,
-      name:this.state.name,
-      role:this.state.role,
-      email:this.state.email,
-      password:this.state.password,
+      sr_code: this.state.code,
+      name: this.state.name,
+      role: this.state.role,
+      email: this.state.email,
+      password: this.state.password,
     }
     axios.post('/api/users', payload)
-    .then(function (response) {
-      console.log(response);
-      this.getUsers()
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+      .then(function (response) {
+        console.log(response);
+        self.getUsers()
+        self.toggleAddForm();
+      })
+      .catch(function (error) {
+        console.log(error.response.status);
+        self.setState({
+          alert_message: 'Email already exist.',
+          alert_type: 'danger',
+          has_alert_hidden: false,
+        })
+
+      });
 
   }
 
   handleInputChange(e) {
-    // console.log(e.target.name)
+    var self = this;
+
+    // clear alert status
+    self.setState({
+      alert_message: '',
+      alert_type: 'primary',
+      has_alert_hidden: true,
+    })
+
     this.setState({ [e.target.name]: e.target.value });
-    if ( e.target.value== '' ) {
+    if (e.target.value == '') {
       console.log('Incomplete form values!')
       this.state.saveButtonIsDisabled = true
       this.state.updateButtonIsDisabled = true
-          
-    }else{
-     
-          console.log('Complete form values!')
-          this.state.saveButtonIsDisabled = false
-          this.state.updateButtonIsDisabled = true
-     
+
+    } else {
+
+      console.log('Complete form values!')
+      if (this.state.isAddProcessType) {
+        this.state.saveButtonIsDisabled = false
+        this.state.updateButtonIsDisabled = true
+      } else {
+        this.state.saveButtonIsDisabled = true
+        this.state.updateButtonIsDisabled = false
+      }
+
+
     }
 
     if (e.target.name == 'confirm_password') {
       if (this.state.password != e.target.value) {
         console.log('Password mismatch!')
+        self.setState({
+          alert_message: 'Password mismatch!',
+          alert_type: 'danger',
+          has_alert_hidden: false,
+        })
         this.state.saveButtonIsDisabled = true
         this.state.updateButtonIsDisabled = true
 
-      }else if (this.state.password == '' && e.target.value == '') {
+      } else if (this.state.password == '' && e.target.value == '') {
         this.state.saveButtonIsDisabled = true
         this.state.updateButtonIsDisabled = true
         console.log('Password empty!')
       }
       else {
         console.log('Password matched!')
+        self.setState({
+          alert_message: 'Password matched!',
+          alert_type: 'success',
+          has_alert_hidden: false,
+        })
         this.state.saveButtonIsDisabled = false
         this.state.updateButtonIsDisabled = false
       }
     } else if (e.target.name == 'password') {
       if (this.state.confirm_password != e.target.value) {
         console.log('Password mismatch!')
+        self.setState({
+          alert_message: 'Password mismatch!',
+          alert_type: 'danger',
+          has_alert_hidden: false,
+        })
         this.state.saveButtonIsDisabled = true
         this.state.updateButtonIsDisabled = true
-      }else{
+      } else {
         if (this.state.confirm_password == '' && e.target.value == '') {
           this.state.saveButtonIsDisabled = true
           this.state.updateButtonIsDisabled = true
@@ -160,13 +207,18 @@ class Users extends Component {
         }
         else {
           console.log('Password matched!')
+          self.setState({
+            alert_message: 'Password matched!',
+            alert_type: 'success',
+            has_alert_hidden: false,
+          })
           this.state.saveButtonIsDisabled = false
           this.state.updateButtonIsDisabled = false
         }
       }
-    } 
+    }
 
-    
+
 
 
   }
@@ -182,7 +234,7 @@ class Users extends Component {
       addForm: !this.state.addForm,
       isAddProcessType: true
     });
-    
+
   }
 
   storeUsersToState(data) {
@@ -191,10 +243,10 @@ class Users extends Component {
   }
 
   getUsers() {
-
+    var self = this;
     axios.get('/api/users')
       .then(res => {
-        this.storeUsersToState(res.data.data)
+        self.storeUsersToState(res.data.data)
       }).catch(err => {
         console.log(err)
       })
@@ -247,7 +299,7 @@ class Users extends Component {
                                   <Label htmlFor="name">Name</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input value={this.state.name} onChange={this.handleInputChange} type="text" id="name" name="name" placeholder="Text" />
+                                  <Input required value={this.state.name} onChange={this.handleInputChange} type="text" id="name" name="name" placeholder="Text" />
                                   <FormText color="muted">Write your name</FormText>
                                 </Col>
                               </FormGroup>
@@ -256,7 +308,7 @@ class Users extends Component {
                                   <Label htmlFor="role">Role</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input value={this.state.role} onChange={this.handleInputChange} type="select" name="role" id="role">
+                                  <Input required value={this.state.role} onChange={this.handleInputChange} type="select" name="role" id="role">
                                     <option></option>
                                     <option>superuser</option>
                                     <option>coordinator</option>
@@ -270,7 +322,7 @@ class Users extends Component {
                                   <Label htmlFor="email-input">Email</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input value={this.state.email} onChange={this.handleInputChange} type="email" id="email" name="email" placeholder="Enter Email" />
+                                  <Input required value={this.state.email} onChange={this.handleInputChange} type="email" id="email" name="email" placeholder="Enter Email" />
                                   <FormText className="help-block">Please enter your email</FormText>
                                 </Col>
                               </FormGroup>
@@ -279,7 +331,7 @@ class Users extends Component {
                                   <Label htmlFor="password">Password</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input value={this.state.password} onChange={this.handleInputChange} type="password" id="password" name="password" placeholder="Password" />
+                                  <Input required value={this.state.password} onChange={this.handleInputChange} type="password" id="password" name="password" placeholder="Password" />
                                   <FormText className="help-block">Please enter a complex password</FormText>
                                 </Col>
                               </FormGroup>
@@ -288,8 +340,11 @@ class Users extends Component {
                                   <Label htmlFor="confirm_password">Confirm Password</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input value={this.state.confirm_password} onChange={this.handleInputChange} type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" />
+                                  <Input required value={this.state.confirm_password} onChange={this.handleInputChange} type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" />
                                   <FormText className="help-block">Please confirm complex password</FormText>
+                                  <Alert hidden={this.state.has_alert_hidden} color={this.state.alert_type}>
+                                    {this.state.alert_message}
+                                  </Alert>
                                 </Col>
                               </FormGroup>
 
@@ -303,8 +358,8 @@ class Users extends Component {
 
                   </ModalBody>
                   <ModalFooter>
-                    <Button hidden={!this.state.isAddProcessType} disabled={this.state.saveButtonIsDisabled} color="primary" onClick={this.saveItem}>Save</Button>{' '}
-                    <Button hidden={this.state.isAddProcessType} disabled={this.state.updateButtonIsDisabled} color="primary" onClick={this.updateItem}>Update</Button>{' '}
+                    <Button type='submit' hidden={!this.state.isAddProcessType} disabled={this.state.saveButtonIsDisabled} color="primary" onClick={this.saveItem}>Save</Button>{' '}
+                    <Button type='submit' hidden={this.state.isAddProcessType} disabled={this.state.updateButtonIsDisabled} color="primary" onClick={this.updateItem}>Update</Button>{' '}
                     <Button color="secondary" onClick={this.toggleAddForm}>Cancel</Button>
                   </ModalFooter>
                 </Modal>
@@ -327,8 +382,8 @@ class Users extends Component {
                           <td>{data.email}</td>
                           <td>{data.role}</td>
                           <td>
-                            <Button color="primary" onClick={()=>this.loadItem(i)}>Update</Button>
-                            <Button onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.deleteItem(i) } } color="danger">Delete</Button>
+                            <Button color="primary" onClick={() => this.loadItem(i)}>Update</Button>
+                            <Button onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.deleteItem(i) }} color="danger">Delete</Button>
                           </td>
                         </tr>
                       )
