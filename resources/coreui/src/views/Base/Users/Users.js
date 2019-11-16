@@ -30,18 +30,70 @@ class Users extends Component {
     this.state = {
       users: [],
       addForm: false,
+      id: '',
       code: '',
       name: '',
       role: '',
       email: '',
       password: '',
       confirm_password: '',
-      process_type: 'create',
+      isAddProcessType: true,
       saveButtonIsDisabled: true,
+      updateButtonIsDisabled: true,
     }
     this.toggleAddForm = this.toggleAddForm.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.saveItem = this.saveItem.bind(this);
+    this.updateItem = this.updateItem.bind(this);
+    this.getUsers = this.getUsers.bind(this);
+  }
+
+  deleteItem(i){
+    var self = this;
+    axios.delete('api/users/'+this.state.users[i].id)
+    .then(function (response) {
+      console.log(response);
+      self.getUsers()
+      
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+  updateItem(){
+    var self = this;
+    let payload = {
+      sr_code:this.state.code,
+      name:this.state.name,
+      role:this.state.role,
+      email:this.state.email,
+      password:this.state.password,
+    }
+    axios.post('/api/users/'+this.state.id, payload)
+    .then(function (response) {
+      console.log(response);
+      self.getUsers()
+      self.toggleAddForm()
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+
+  }
+
+  loadItem(i){
+    this.toggleAddForm();
+    this.setState({
+      id: this.state.users[i].id,
+      code: this.state.users[i].sr_code,
+      name: this.state.users[i].name,
+      role: this.state.users[i].role,
+      email: this.state.users[i].email,
+      updateButtonIsDisabled: true,
+
+    })
+    
+    this.setState({isAddProcessType: false});
   }
 
   saveItem(){
@@ -69,11 +121,13 @@ class Users extends Component {
     if ( e.target.value== '' ) {
       console.log('Incomplete form values!')
       this.state.saveButtonIsDisabled = true
+      this.state.updateButtonIsDisabled = true
           
     }else{
      
           console.log('Complete form values!')
           this.state.saveButtonIsDisabled = false
+          this.state.updateButtonIsDisabled = true
      
     }
 
@@ -81,26 +135,33 @@ class Users extends Component {
       if (this.state.password != e.target.value) {
         console.log('Password mismatch!')
         this.state.saveButtonIsDisabled = true
+        this.state.updateButtonIsDisabled = true
+
       }else if (this.state.password == '' && e.target.value == '') {
         this.state.saveButtonIsDisabled = true
+        this.state.updateButtonIsDisabled = true
         console.log('Password empty!')
       }
       else {
         console.log('Password matched!')
         this.state.saveButtonIsDisabled = false
+        this.state.updateButtonIsDisabled = false
       }
     } else if (e.target.name == 'password') {
       if (this.state.confirm_password != e.target.value) {
         console.log('Password mismatch!')
         this.state.saveButtonIsDisabled = true
+        this.state.updateButtonIsDisabled = true
       }else{
         if (this.state.confirm_password == '' && e.target.value == '') {
           this.state.saveButtonIsDisabled = true
+          this.state.updateButtonIsDisabled = true
           console.log('Password empty!')
         }
         else {
           console.log('Password matched!')
           this.state.saveButtonIsDisabled = false
+          this.state.updateButtonIsDisabled = false
         }
       }
     } 
@@ -112,8 +173,16 @@ class Users extends Component {
 
   toggleAddForm() {
     this.setState({
-      addForm: !this.state.addForm
+      id: '',
+      code: '',
+      name: '',
+      role: '',
+      email: '',
+      updateButtonIsDisabled: true,
+      addForm: !this.state.addForm,
+      isAddProcessType: true
     });
+    
   }
 
   storeUsersToState(data) {
@@ -168,7 +237,8 @@ class Users extends Component {
                                   <Label htmlFor="code">SRCODE / ID</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input value={this.state.code} onChange={this.handleInputChange} type="text" id="code" name="code" placeholder="Text" />
+                                  <Label hidden={this.state.isAddProcessType}>{this.state.code}</Label>
+                                  <Input hidden={!this.state.isAddProcessType} value={this.state.code} onChange={this.handleInputChange} type="text" id="code" name="code" placeholder="Text" />
                                   <FormText color="muted">Student / Faculty Code</FormText>
                                 </Col>
                               </FormGroup>
@@ -188,7 +258,7 @@ class Users extends Component {
                                 <Col xs="12" md="9">
                                   <Input value={this.state.role} onChange={this.handleInputChange} type="select" name="role" id="role">
                                     <option></option>
-                                    <option>admin</option>
+                                    <option>superuser</option>
                                     <option>coordinator</option>
                                     <option>student</option>
 
@@ -233,7 +303,8 @@ class Users extends Component {
 
                   </ModalBody>
                   <ModalFooter>
-                    <Button disabled={this.state.saveButtonIsDisabled} color="primary" onClick={this.saveItem}>Save</Button>{' '}
+                    <Button hidden={!this.state.isAddProcessType} disabled={this.state.saveButtonIsDisabled} color="primary" onClick={this.saveItem}>Save</Button>{' '}
+                    <Button hidden={this.state.isAddProcessType} disabled={this.state.updateButtonIsDisabled} color="primary" onClick={this.updateItem}>Update</Button>{' '}
                     <Button color="secondary" onClick={this.toggleAddForm}>Cancel</Button>
                   </ModalFooter>
                 </Modal>
@@ -256,8 +327,8 @@ class Users extends Component {
                           <td>{data.email}</td>
                           <td>{data.role}</td>
                           <td>
-                            <Button color="primary">Update</Button>
-                            <Button color="danger">Delete</Button>
+                            <Button color="primary" onClick={()=>this.loadItem(i)}>Update</Button>
+                            <Button onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.deleteItem(i) } } color="danger">Delete</Button>
                           </td>
                         </tr>
                       )
