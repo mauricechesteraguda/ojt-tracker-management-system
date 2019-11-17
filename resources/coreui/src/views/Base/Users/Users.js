@@ -133,7 +133,7 @@ class Users extends Component {
         alert('Deletion Failed. Contact your System Administrator')
       });
   }
-  
+
   updateItem(e) {
     e.preventDefault();
 
@@ -192,11 +192,20 @@ class Users extends Component {
       })
       .catch(function (error) {
         console.log(error.response.status);
-        self.setState({
-          alert_message: 'Email already exist.',
-          alert_type: 'danger',
-          has_alert_hidden: false,
-        })
+        if (error.response.data.message.includes('Username')) {
+          self.setState({
+            alert_message: error.response.data.message,
+            alert_type: 'danger',
+            has_alert_hidden: false,
+          })
+        }else{
+          self.setState({
+            alert_message: 'Email already exist.',
+            alert_type: 'danger',
+            has_alert_hidden: false,
+          })
+        }
+        
 
       });
 
@@ -318,7 +327,7 @@ class Users extends Component {
       id: '',
       code: '',
       name: '',
-      role: '',
+      role: 'student',
       email: '',
       password:'',
       confirm_password: '',
@@ -383,7 +392,7 @@ class Users extends Component {
                             <Form action="" method="post" encType="multipart/form-data" className="form-horizontal">
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="code">SRCODE / ID</Label>
+                                  <Label htmlFor="code">SRCODE / Username</Label>
                                 </Col>
                                 <Col xs="12" md="9">
                                   <Label hidden={this.state.isAddProcessType}>{this.state.code}</Label>

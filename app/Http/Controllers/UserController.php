@@ -28,14 +28,22 @@ class UserController extends Controller
             'name' => 'required|max:255',
             'role' => 'required|max:255',
         ]);
+        $current_sr_code = $request->input('sr_code');
+        $users = User::where('sr_code', '=', $current_sr_code)->first();
+        if (!$users) {
+            $user = User::create($request->all());
+            $user->password = Hash::make($request['password']);
+            $user->save();
 
-        $user = User::create($request->all());
-        $user->password = Hash::make($request['password']);
-        $user->save();
+            return (new UserResource($user))
+                    ->response()
+                    ->setStatusCode(201);
+        }
+        return response()->json([
+            'message' => 'Username already exists!'
+        ], 500);
 
-        return (new UserResource($user))
-                ->response()
-                ->setStatusCode(201);
+        
     }
 
     public function delete($id)
