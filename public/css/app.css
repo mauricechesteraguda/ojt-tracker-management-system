@@ -4132,7 +4132,7 @@ section {
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  font-size: 0.875rem;
+  font-size: 0.775rem;
   font-weight: 400;
   line-height: 1.5;
   color: #151b1e;
@@ -4458,36 +4458,36 @@ h6,
 
 h1,
 .h1 {
-  font-size: 2.1875rem;
+  font-size: 1.9375rem;
 }
 
 h2,
 .h2 {
-  font-size: 1.75rem;
+  font-size: 1.55rem;
 }
 
 h3,
 .h3 {
-  font-size: 1.53125rem;
+  font-size: 1.35625rem;
 }
 
 h4,
 .h4 {
-  font-size: 1.3125rem;
+  font-size: 1.1625rem;
 }
 
 h5,
 .h5 {
-  font-size: 1.09375rem;
+  font-size: 0.96875rem;
 }
 
 h6,
 .h6 {
-  font-size: 0.875rem;
+  font-size: 0.775rem;
 }
 
 .lead {
-  font-size: 1.09375rem;
+  font-size: 0.96875rem;
   font-weight: 300;
 }
 
@@ -4559,7 +4559,7 @@ mark,
 
 .blockquote {
   margin-bottom: 1rem;
-  font-size: 1.09375rem;
+  font-size: 0.96875rem;
 }
 
 .blockquote-footer {
@@ -6564,7 +6564,7 @@ pre code {
   display: block;
   width: 100%;
   padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
+  font-size: 0.775rem;
   line-height: 1.5;
   color: #3e515b;
   background-color: #fff;
@@ -6618,7 +6618,7 @@ pre code {
 }
 
 select.form-control:not([size]):not([multiple]) {
-  height: calc(2.0625rem + 2px);
+  height: calc(1.9125rem + 2px);
 }
 
 select.form-control:focus::-ms-value {
@@ -6643,14 +6643,14 @@ select.form-control:focus::-ms-value {
 .col-form-label-lg {
   padding-top: calc(0.5rem + 1px);
   padding-bottom: calc(0.5rem + 1px);
-  font-size: 1.09375rem;
+  font-size: 0.96875rem;
   line-height: 1.5;
 }
 
 .col-form-label-sm {
   padding-top: calc(0.25rem + 1px);
   padding-bottom: calc(0.25rem + 1px);
-  font-size: 0.765625rem;
+  font-size: 0.678125rem;
   line-height: 1.5;
 }
 
@@ -6689,7 +6689,7 @@ select.form-control:focus::-ms-value {
 .input-group-sm > .input-group-prepend > .btn,
 .input-group-sm > .input-group-append > .btn {
   padding: 0.25rem 0.5rem;
-  font-size: 0.765625rem;
+  font-size: 0.678125rem;
   line-height: 1.5;
 }
 
@@ -6699,7 +6699,7 @@ select.form-control-sm:not([size]):not([multiple]),
 .input-group-sm > .input-group-append > select.input-group-text:not([size]):not([multiple]),
 .input-group-sm > .input-group-prepend > select.btn:not([size]):not([multiple]),
 .input-group-sm > .input-group-append > select.btn:not([size]):not([multiple]) {
-  height: calc(1.6484375rem + 2px);
+  height: calc(1.5171875rem + 2px);
 }
 
 .form-control-lg,
@@ -6709,7 +6709,7 @@ select.form-control-sm:not([size]):not([multiple]),
 .input-group-lg > .input-group-prepend > .btn,
 .input-group-lg > .input-group-append > .btn {
   padding: 0.5rem 1rem;
-  font-size: 1.09375rem;
+  font-size: 0.96875rem;
   line-height: 1.5;
 }
 
@@ -6719,7 +6719,7 @@ select.form-control-lg:not([size]):not([multiple]),
 .input-group-lg > .input-group-append > select.input-group-text:not([size]):not([multiple]),
 .input-group-lg > .input-group-prepend > select.btn:not([size]):not([multiple]),
 .input-group-lg > .input-group-append > select.btn:not([size]):not([multiple]) {
-  height: calc(2.640625rem + 2px);
+  height: calc(2.453125rem + 2px);
 }
 
 .form-group {
@@ -7128,7 +7128,7 @@ select.form-control-lg:not([size]):not([multiple]),
           user-select: none;
   border: 1px solid transparent;
   padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
+  font-size: 0.775rem;
   line-height: 1.5;
   border-radius: 0;
   -webkit-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
@@ -9357,7 +9357,7 @@ fieldset:disabled a.btn {
 .btn-lg,
 .btn-group-lg > .btn {
   padding: 0.5rem 1rem;
-  font-size: 1.09375rem;
+  font-size: 0.96875rem;
   line-height: 1.5;
   border-radius: 0;
 }
@@ -9365,7 +9365,7 @@ fieldset:disabled a.btn {
 .btn-sm,
 .btn-group-sm > .btn {
   padding: 0.25rem 0.5rem;
-  font-size: 0.765625rem;
+  font-size: 0.678125rem;
   line-height: 1.5;
   border-radius: 0;
 }
@@ -9451,7 +9451,7 @@ tbody.collapse.show {
   min-width: 10rem;
   padding: 0 0;
   margin: 0.125rem 0 0;
-  font-size: 0.875rem;
+  font-size: 0.775rem;
   color: #151b1e;
   text-align: left;
   list-style: none;
@@ -9593,7 +9593,7 @@ tbody.collapse.show {
   display: block;
   padding: 0 1.5rem;
   margin-bottom: 0;
-  font-size: 0.765625rem;
+  font-size: 0.678125rem;
   color: #536c79;
   white-space: nowrap;
 }
@@ -9812,7 +9812,7 @@ tbody.collapse.show {
           align-items: center;
   padding: 0.375rem 0.75rem;
   margin-bottom: 0;
-  font-size: 0.875rem;
+  font-size: 0.775rem;
   font-weight: 400;
   line-height: 1.5;
   color: #3e515b;
@@ -9946,7 +9946,7 @@ tbody.collapse.show {
 .custom-select {
   display: inline-block;
   width: 100%;
-  height: calc(2.0625rem + 2px);
+  height: calc(1.9125rem + 2px);
   padding: 0.375rem 1.75rem 0.375rem 0.75rem;
   line-height: 1.5;
   color: #3e515b;
@@ -9989,14 +9989,14 @@ tbody.collapse.show {
 }
 
 .custom-select-sm {
-  height: calc(1.6484375rem + 2px);
+  height: calc(1.5171875rem + 2px);
   padding-top: 0.375rem;
   padding-bottom: 0.375rem;
   font-size: 75%;
 }
 
 .custom-select-lg {
-  height: calc(2.640625rem + 2px);
+  height: calc(2.453125rem + 2px);
   padding-top: 0.375rem;
   padding-bottom: 0.375rem;
   font-size: 125%;
@@ -10006,7 +10006,7 @@ tbody.collapse.show {
   position: relative;
   display: inline-block;
   width: 100%;
-  height: calc(2.0625rem + 2px);
+  height: calc(1.9125rem + 2px);
   margin-bottom: 0;
 }
 
@@ -10014,7 +10014,7 @@ tbody.collapse.show {
   position: relative;
   z-index: 2;
   width: 100%;
-  height: calc(2.0625rem + 2px);
+  height: calc(1.9125rem + 2px);
   margin: 0;
   opacity: 0;
 }
@@ -10039,7 +10039,7 @@ tbody.collapse.show {
   right: 0;
   left: 0;
   z-index: 1;
-  height: calc(2.0625rem + 2px);
+  height: calc(1.9125rem + 2px);
   padding: 0.375rem 0.75rem;
   line-height: 1.5;
   color: #3e515b;
@@ -10054,7 +10054,7 @@ tbody.collapse.show {
   bottom: 0;
   z-index: 3;
   display: block;
-  height: calc(calc(2.0625rem + 2px) - 1px * 2);
+  height: calc(calc(1.9125rem + 2px) - 1px * 2);
   padding: 0.375rem 0.75rem;
   line-height: 1.5;
   color: #3e515b;
@@ -10205,10 +10205,10 @@ tbody.collapse.show {
 
 .navbar-brand {
   display: inline-block;
-  padding-top: 0.3359375rem;
-  padding-bottom: 0.3359375rem;
+  padding-top: 0.3546875rem;
+  padding-bottom: 0.3546875rem;
   margin-right: 1rem;
-  font-size: 1.09375rem;
+  font-size: 0.96875rem;
   line-height: inherit;
   white-space: nowrap;
 }
@@ -10262,7 +10262,7 @@ tbody.collapse.show {
 
 .navbar-toggler {
   padding: 0.25rem 0.75rem;
-  font-size: 1.09375rem;
+  font-size: 0.96875rem;
   line-height: 1;
   background-color: transparent;
   border: 1px solid transparent;
@@ -11069,7 +11069,7 @@ tbody.collapse.show {
 .pagination-lg .pagination li a,
 .pagination li .pagination-lg a {
   padding: 0.75rem 1.5rem;
-  font-size: 1.09375rem;
+  font-size: 0.96875rem;
   line-height: 1.5;
 }
 
@@ -11079,7 +11079,7 @@ tbody.collapse.show {
 .pagination-sm .pagination li a,
 .pagination li .pagination-sm a {
   padding: 0.25rem 0.5rem;
-  font-size: 0.765625rem;
+  font-size: 0.678125rem;
   line-height: 1.5;
 }
 
@@ -11465,7 +11465,7 @@ tbody.collapse.show {
 }
 
 .alert-dismissible {
-  padding-right: 3.8125rem;
+  padding-right: 3.6625rem;
 }
 
 .alert-dismissible .close {
@@ -11880,7 +11880,7 @@ tbody.collapse.show {
   display: flex;
   height: 1rem;
   overflow: hidden;
-  font-size: 0.65625rem;
+  font-size: 0.58125rem;
   background-color: #f0f3f5;
 }
 
@@ -12463,7 +12463,7 @@ tbody.collapse.show {
 
 .close {
   float: right;
-  font-size: 1.3125rem;
+  font-size: 1.1625rem;
   font-weight: 700;
   line-height: 1;
   color: #000;
@@ -12678,7 +12678,7 @@ button.close {
   word-spacing: normal;
   white-space: normal;
   line-break: auto;
-  font-size: 0.765625rem;
+  font-size: 0.678125rem;
   word-wrap: break-word;
   opacity: 0;
 }
@@ -12802,7 +12802,7 @@ button.close {
   word-spacing: normal;
   white-space: normal;
   line-break: auto;
-  font-size: 0.765625rem;
+  font-size: 0.678125rem;
   word-wrap: break-word;
   background-color: #fff;
   background-clip: padding-box;
@@ -12963,7 +12963,7 @@ button.close {
 .popover-header {
   padding: 0.5rem 0.75rem;
   margin-bottom: 0;
-  font-size: 0.875rem;
+  font-size: 0.775rem;
   color: inherit;
   background-color: #f7f7f7;
   border-bottom: 1px solid #ebebeb;
@@ -17360,7 +17360,7 @@ button {
   color: #fff !important;
   text-align: center;
   padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
+  font-size: 0.775rem;
   line-height: 1.5;
   border: 0;
 }
@@ -17538,10 +17538,10 @@ button {
 .btn-vine::before,
 .btn-foursquare::before,
 .btn-vimeo::before {
-  width: 2.0625rem;
-  height: 2.0625rem;
+  width: 1.9125rem;
+  height: 1.9125rem;
   padding: 0.375rem 0;
-  font-size: 0.875rem;
+  font-size: 0.775rem;
   line-height: 1.5;
 }
 
@@ -17570,7 +17570,7 @@ button {
 .btn-vine span,
 .btn-foursquare span,
 .btn-vimeo span {
-  margin-left: 2.0625rem;
+  margin-left: 1.9125rem;
 }
 
 .btn-facebook.icon,
@@ -17598,8 +17598,8 @@ button {
 .btn-vine.icon,
 .btn-foursquare.icon,
 .btn-vimeo.icon {
-  width: 2.0625rem;
-  height: 2.0625rem;
+  width: 1.9125rem;
+  height: 1.9125rem;
 }
 
 .btn-facebook.btn-lg,
@@ -17653,7 +17653,7 @@ button {
 .btn-vimeo.btn-lg,
 .btn-group-lg > .btn-vimeo.btn {
   padding: 0.5rem 1rem;
-  font-size: 1.09375rem;
+  font-size: 0.96875rem;
   line-height: 1.5;
   border: 0;
 }
@@ -17708,10 +17708,10 @@ button {
 .btn-group-lg > .btn-foursquare.btn::before,
 .btn-vimeo.btn-lg::before,
 .btn-group-lg > .btn-vimeo.btn::before {
-  width: 2.640625rem;
-  height: 2.640625rem;
+  width: 2.453125rem;
+  height: 2.453125rem;
   padding: 0.5rem 0;
-  font-size: 1.09375rem;
+  font-size: 0.96875rem;
   line-height: 1.5;
 }
 
@@ -17765,7 +17765,7 @@ button {
 .btn-group-lg > .btn-foursquare.btn span,
 .btn-vimeo.btn-lg span,
 .btn-group-lg > .btn-vimeo.btn span {
-  margin-left: 2.640625rem;
+  margin-left: 2.453125rem;
 }
 
 .btn-facebook.btn-lg.icon,
@@ -17818,8 +17818,8 @@ button {
 .btn-group-lg > .btn-foursquare.icon.btn,
 .btn-vimeo.btn-lg.icon,
 .btn-group-lg > .btn-vimeo.icon.btn {
-  width: 2.640625rem;
-  height: 2.640625rem;
+  width: 2.453125rem;
+  height: 2.453125rem;
 }
 
 .btn-facebook.btn-sm,
@@ -17873,7 +17873,7 @@ button {
 .btn-vimeo.btn-sm,
 .btn-group-sm > .btn-vimeo.btn {
   padding: 0.25rem 0.5rem;
-  font-size: 0.765625rem;
+  font-size: 0.678125rem;
   line-height: 1.5;
   border: 0;
 }
@@ -17928,10 +17928,10 @@ button {
 .btn-group-sm > .btn-foursquare.btn::before,
 .btn-vimeo.btn-sm::before,
 .btn-group-sm > .btn-vimeo.btn::before {
-  width: 1.6484375rem;
-  height: 1.6484375rem;
+  width: 1.5171875rem;
+  height: 1.5171875rem;
   padding: 0.25rem 0;
-  font-size: 0.765625rem;
+  font-size: 0.678125rem;
   line-height: 1.5;
 }
 
@@ -17985,7 +17985,7 @@ button {
 .btn-group-sm > .btn-foursquare.btn span,
 .btn-vimeo.btn-sm span,
 .btn-group-sm > .btn-vimeo.btn span {
-  margin-left: 1.6484375rem;
+  margin-left: 1.5171875rem;
 }
 
 .btn-facebook.btn-sm.icon,
@@ -18038,8 +18038,8 @@ button {
 .btn-group-sm > .btn-foursquare.icon.btn,
 .btn-vimeo.btn-sm.icon,
 .btn-group-sm > .btn-vimeo.icon.btn {
-  width: 1.6484375rem;
-  height: 1.6484375rem;
+  width: 1.5171875rem;
+  height: 1.5171875rem;
 }
 
 .btn-facebook {
@@ -22766,7 +22766,7 @@ base-chart.chart {
   display: inline-block;
   width: auto;
   margin-top: -9px;
-  font-size: 0.875rem;
+  font-size: 0.775rem;
   font-weight: normal;
   line-height: 40px;
   color: #151b1e;
@@ -23040,7 +23040,7 @@ app-root {
 }
 
 .aside-menu-fixed .aside-menu .tab-content {
-  height: calc(100vh - 2.375rem - 55px);
+  height: calc(100vh - 2.275rem - 55px);
 }
 
 .aside-menu-fixed .main,
@@ -23061,11 +23061,11 @@ app-root {
 }
 
 .aside-menu-off-canvas .aside-menu .tab-content {
-  height: calc(100vh - 2.375rem - 55px);
+  height: calc(100vh - 2.275rem - 55px);
 }
 
 .breadcrumb-fixed .main {
-  padding-top: 3.875rem;
+  padding-top: 3.775rem;
 }
 
 .breadcrumb-fixed .breadcrumb {
@@ -23420,7 +23420,7 @@ hr.transparent {
 }
 
 *[dir="rtl"] .aside-menu-off-canvas .aside-menu .tab-content {
-  height: calc(100vh - 2.375rem - 55px);
+  height: calc(100vh - 2.275rem - 55px);
 }
 
 *[dir="rtl"] .sidebar .sidebar-nav .nav .nav-item .nav-link,
