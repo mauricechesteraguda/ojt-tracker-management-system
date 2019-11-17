@@ -51,11 +51,23 @@ class Users extends Component {
     this.saveItem = this.saveItem.bind(this);
     this.updateItem = this.updateItem.bind(this);
     this.getUsers = this.getUsers.bind(this);
+    this.validateField = this.validateField.bind(this);
+    this.deleteItem = this.deleteItem.bind(this);
+    this.disableButtons = this.disableButtons.bind(this);
+  }
+
+  disableButtons(){
+    this.setState(
+      {
+        saveButtonIsDisabled: true,
+        updateButtonIsDisabled: true,
+      }
+    ) 
   }
 
   validateField(fieldName, value) {
    var emailValid = false
-   var passwordValid = false
+
     switch(fieldName) {
       case 'email':
         emailValid = value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i);
@@ -65,20 +77,54 @@ class Users extends Component {
             alert_type: 'primary',
             has_alert_hidden: true,
           })
+          if (this.state.password != this.state.confirm_password) {
+            console.log('Password mismatch!')
+            this.setState({
+              alert_message: 'Password mismatch!',
+              alert_type: 'danger',
+              has_alert_hidden: false,
+            })
+            this.disableButtons()
+    
+          } else if (this.state.confirm_password.length <=6 || this.state.password.length <=6){
+            console.log('Password is too short!')
+            this.setState({
+              alert_message: 'Password is too short!',
+              alert_type: 'danger',
+              has_alert_hidden: false,
+            })
+            this.disableButtons()
+          }else if (this.state.password == '' && this.state.confirm_password == '') {
+            this.disableButtons()
+            console.log('Password empty!')
+          }
+          else {
+            console.log('Password matched!')
+            this.setState({
+              alert_message: 'Password matched!',
+              alert_type: 'success',
+              has_alert_hidden: false,
+            })
+            this.state.saveButtonIsDisabled = false
+            this.state.updateButtonIsDisabled = false
+          }
         }else{
           this.setState({
             alert_message: 'Email is invalid.',
             alert_type: 'danger',
             has_alert_hidden: false,
           })
-          this.state.saveButtonIsDisabled = true
-          this.state.updateButtonIsDisabled = true
+          this.disableButtons()
         }
 
         break;
 
       default:
         break;
+    }
+    if (this.state.name =='' || this.state.role == '' || this.state.email == '' || this.state.password == '' || this.state.confirm_password == '' ) {
+      console.log('Incomplete form values!')
+      this.disableButtons()
     }
   }
   deleteItem(i) {
@@ -172,26 +218,34 @@ class Users extends Component {
     })
 
     this.setState({ [e.target.name]: e.target.value });
-    if (this.state.name =='' || this.state.role == '' || this.state.email == '' || this.state.password == '' || this.state.confirm_password == '' ) {
+    if (e.target.value == '' || (this.state.name =='' && this.state.role == '' && this.state.email == '' && this.state.password == '' && this.state.confirm_password == '' )) {
       console.log('Incomplete form values!')
-      this.state.saveButtonIsDisabled = true
-      this.state.updateButtonIsDisabled = true
+      this.disableButtons()
 
     } else {
 
       console.log('Complete form values!')
       if (this.state.isAddProcessType) {
-        this.state.saveButtonIsDisabled = false
-        this.state.updateButtonIsDisabled = true
+        this.setState(
+          {
+            saveButtonIsDisabled: false,
+            updateButtonIsDisabled: true,
+          }
+        ) 
+        
       } else {
-        this.state.saveButtonIsDisabled = true
-        this.state.updateButtonIsDisabled = false
+        this.setState(
+          {
+            saveButtonIsDisabled: true,
+            updateButtonIsDisabled: false,
+          }
+        ) 
       }
 
 
     }
 
-    this.validateField(e.target.name, e.target.value);
+
 
     if (e.target.name == 'confirm_password') {
       if (this.state.password != e.target.value) {
@@ -201,8 +255,7 @@ class Users extends Component {
           alert_type: 'danger',
           has_alert_hidden: false,
         })
-        this.state.saveButtonIsDisabled = true
-        this.state.updateButtonIsDisabled = true
+        this.disableButtons()
 
       } else if (this.state.confirm_password.length <=6 || this.state.password.length <=6){
         console.log('Password is too short!')
@@ -211,11 +264,11 @@ class Users extends Component {
           alert_type: 'danger',
           has_alert_hidden: false,
         })
-        this.state.saveButtonIsDisabled = true
-        this.state.updateButtonIsDisabled = true
+        this.disableButtons()
+
       }else if (this.state.password == '' && e.target.value == '') {
-        this.state.saveButtonIsDisabled = true
-        this.state.updateButtonIsDisabled = true
+        this.disableButtons()
+
         console.log('Password empty!')
       }
       else {
@@ -236,8 +289,8 @@ class Users extends Component {
           alert_type: 'danger',
           has_alert_hidden: false,
         })
-        this.state.saveButtonIsDisabled = true
-        this.state.updateButtonIsDisabled = true
+        this.disableButtons()
+
       } else if (this.state.confirm_password.length <=6 || this.state.password.length <=6){
         console.log('Password is too short!')
         self.setState({
@@ -245,12 +298,11 @@ class Users extends Component {
           alert_type: 'danger',
           has_alert_hidden: false,
         })
-        this.state.saveButtonIsDisabled = true
-        this.state.updateButtonIsDisabled = true
+        this.disableButtons()
+
       }else {
         if (this.state.confirm_password == '' && e.target.value == '') {
-          this.state.saveButtonIsDisabled = true
-          this.state.updateButtonIsDisabled = true
+          this.disableButtons()
           console.log('Password empty!')
         }
         else {
@@ -267,7 +319,7 @@ class Users extends Component {
     }
 
     
-
+    this.validateField(e.target.name, e.target.value);
 
 
 
@@ -354,7 +406,7 @@ class Users extends Component {
                                   <Label htmlFor="name">Name</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input required value={this.state.name} onChange={this.handleInputChange} type="text" id="name" name="name" placeholder="Text" />
+                                  <Input value={this.state.name} onChange={this.handleInputChange} type="text" id="name" name="name" placeholder="Text" />
                                   <FormText color="muted">Write your name</FormText>
                                 </Col>
                               </FormGroup>
@@ -363,11 +415,11 @@ class Users extends Component {
                                   <Label htmlFor="role">Role</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input required value={this.state.role} onChange={this.handleInputChange} type="select" name="role" id="role">
-                                    <option></option>
+                                  <Input  value={this.state.role} onChange={this.handleInputChange} type="select" name="role" id="role">
+                                  <option>student</option>
                                     <option>superuser</option>
                                     <option>coordinator</option>
-                                    <option>student</option>
+                                    
 
                                   </Input>
                                 </Col>
@@ -377,7 +429,7 @@ class Users extends Component {
                                   <Label htmlFor="email-input">Email</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input required value={this.state.email} onChange={this.handleInputChange} type="email" id="email" name="email" placeholder="Enter Email" />
+                                  <Input  value={this.state.email} onChange={this.handleInputChange} type="email" id="email" name="email" placeholder="Enter Email" />
                                   <FormText className="help-block">Please enter your email</FormText>
                                 </Col>
                               </FormGroup>
@@ -386,7 +438,7 @@ class Users extends Component {
                                   <Label htmlFor="password">Password</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input required value={this.state.password} onChange={this.handleInputChange} type="password" id="password" name="password" placeholder="Password" />
+                                  <Input  value={this.state.password} onChange={this.handleInputChange} type="password" id="password" name="password" placeholder="Password" />
                                   <FormText className="help-block">Please enter a complex password</FormText>
                                 </Col>
                               </FormGroup>
@@ -395,7 +447,7 @@ class Users extends Component {
                                   <Label htmlFor="confirm_password">Confirm Password</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input required value={this.state.confirm_password} onChange={this.handleInputChange} type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" />
+                                  <Input  value={this.state.confirm_password} onChange={this.handleInputChange} type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" />
                                   <FormText className="help-block">Please confirm complex password</FormText>
                                   <Alert hidden={this.state.has_alert_hidden} color={this.state.alert_type}>
                                     {this.state.alert_message}
