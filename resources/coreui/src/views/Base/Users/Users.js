@@ -381,7 +381,7 @@ class Users extends Component {
               <CardBody>
                 <Modal isOpen={this.state.addForm} toggle={this.toggleAddForm}
                   className={'modal-primary ' + this.props.className}>
-                  <ModalHeader toggle={this.toggleAddForm}>Add New User</ModalHeader>
+                  <ModalHeader toggle={this.toggleAddForm}>{this.state.isAddProcessType ? 'Add New' : 'Update'} User</ModalHeader>
                   <ModalBody>
 
                     <Row>
