@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {
   Alert,
-  Badge,
   Row,
   Col,
   Card,
@@ -16,12 +15,9 @@ import {
   Form,
   FormGroup,
   FormText,
-  FormFeedback,
   Label,
   Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton
+
 } from 'reactstrap';
 import axios from 'axios';
 
@@ -94,11 +90,7 @@ class Users extends Component {
               has_alert_hidden: false,
             })
             this.disableButtons()
-          }else if (this.state.password == '' && this.state.confirm_password == '') {
-            this.disableButtons()
-            console.log('Password empty!')
-          }
-          else {
+          }else {
             console.log('Password matched!')
             this.setState({
               alert_message: 'Password matched!',
@@ -127,6 +119,7 @@ class Users extends Component {
       this.disableButtons()
     }
   }
+
   deleteItem(i) {
     var self = this;
     axios.delete('api/users/' + this.state.users[i].id)
@@ -137,9 +130,10 @@ class Users extends Component {
       })
       .catch(function (error) {
         console.log(error);
-
+        alert('Deletion Failed. Contact your System Administrator')
       });
   }
+  
   updateItem(e) {
     e.preventDefault();
 
@@ -159,6 +153,7 @@ class Users extends Component {
       })
       .catch(function (error) {
         console.log(error);
+        alert('Deletion Failed. Contact your System Administrator')
       });
 
   }
@@ -221,9 +216,7 @@ class Users extends Component {
     if (e.target.value == '' || (this.state.name =='' && this.state.role == '' && this.state.email == '' && this.state.password == '' && this.state.confirm_password == '' )) {
       console.log('Incomplete form values!')
       this.disableButtons()
-
     } else {
-
       console.log('Complete form values!')
       if (this.state.isAddProcessType) {
         this.setState(
@@ -232,7 +225,6 @@ class Users extends Component {
             updateButtonIsDisabled: true,
           }
         ) 
-        
       } else {
         this.setState(
           {
@@ -241,11 +233,7 @@ class Users extends Component {
           }
         ) 
       }
-
-
     }
-
-
 
     if (e.target.name == 'confirm_password') {
       if (this.state.password != e.target.value) {
@@ -356,8 +344,10 @@ class Users extends Component {
         self.storeUsersToState(res.data.data)
       }).catch(err => {
         console.log(err)
+        alert('Server disconnected.')
       })
   }
+
   componentWillMount() {
 
     this.getUsers()
@@ -495,14 +485,7 @@ class Users extends Component {
                         </tr>
                       )
                     })}
-                    {/* <tr>
-                      <td>Samppa Nori</td>
-                      <td>2012/01/01</td>
-                      <td>Member</td>
-                      <td>
-                        <Badge color="success">Active</Badge>
-                      </td>
-                    </tr> */}
+
 
                   </tbody>
                 </Table>
