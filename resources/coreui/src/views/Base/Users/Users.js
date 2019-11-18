@@ -42,6 +42,7 @@ class Users extends Component {
       activePage:1,
       itemsCountPerPage:1,
       totalItemsCount:1,
+      userDetailModal: false,
       
     }
     this.toggleAddForm = this.toggleAddForm.bind(this);
@@ -53,6 +54,8 @@ class Users extends Component {
     this.deleteItem = this.deleteItem.bind(this);
     this.disableButtons = this.disableButtons.bind(this);
     this.handlePageChange = this.handlePageChange.bind(this);
+    this.toggleUserDetailModal = this.toggleUserDetailModal.bind(this);
+    
   }
 
   disableButtons(){
@@ -343,6 +346,25 @@ class Users extends Component {
     });
 
   }
+  toggleUserDetailModal(i=undefined){
+    
+    if (i >= 0 ) {
+      this.setState({
+        userDetailModal: !this.state.userDetailModal,
+        id: this.state.users[i].id,
+        code: this.state.users[i].sr_code,
+        name: this.state.users[i].name,
+        role: this.state.users[i].role,
+        email: this.state.users[i].email,
+        password:'********',
+      });
+    }else{
+      this.setState({
+        userDetailModal: !this.state.userDetailModal,
+      });
+    }
+    
+  }
 
   storeUsersToState(data) {
     // console.log(data)
@@ -373,7 +395,6 @@ class Users extends Component {
 
   handlePageChange(pageNumber) {
     console.log(`active page is ${pageNumber}`);
-    // this.setState({activePage: pageNumber});
     this.getUsers(pageNumber)
   }
 
@@ -484,6 +505,72 @@ class Users extends Component {
                     <Button color="secondary" onClick={this.toggleAddForm}>Cancel</Button>
                   </ModalFooter>
                 </Modal>
+                <Modal size='lg' isOpen={this.state.userDetailModal} toggle={this.toggleUserDetailModal}
+                  className={'modal-primary ' + this.props.className}>
+                  <ModalHeader toggle={this.toggleUserDetailModal}>User Detail</ModalHeader>
+                  <ModalBody>
+
+                    <Row>
+                      <Col xs="12" md="12">
+                        <Card>
+
+                          <CardBody>
+                            <Form action="" method="post" encType="multipart/form-data" className="form-horizontal">
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="code">SRCODE / Username</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                  <Label>{this.state.code}</Label>
+                                  
+                                </Col>
+                              </FormGroup>
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="name">Name</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <Label>{this.state.name}</Label>
+                                  
+                                </Col>
+                              </FormGroup>
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="role">Role</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <Label>{this.state.role}</Label>
+                                </Col>
+                              </FormGroup>
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="email">Email</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <Label>{this.state.email}</Label>
+                                </Col>
+                              </FormGroup>
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="password">Password</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <Label>{this.state.password}</Label>
+                                </Col>
+                              </FormGroup>
+                              
+                            </Form>
+
+                          </CardBody>
+                        </Card>
+                      </Col>
+                    </Row>
+
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button color="secondary" onClick={this.toggleUserDetailModal}>Cancel</Button>
+                  </ModalFooter>
+                </Modal>
                 <Table responsive>
                   <thead>
                     <tr>
@@ -503,6 +590,7 @@ class Users extends Component {
                           <td>{data.email}</td>
                           <td>{data.role}</td>
                           <td>
+                          <Button className='text-white' color="info" onClick={() => this.toggleUserDetailModal(i)}>View Details</Button>
                             <Button color="primary" onClick={() => this.loadItem(i)}>Update</Button>
                             <Button onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.deleteItem(i) }} color="danger">Delete</Button>
                           </td>
