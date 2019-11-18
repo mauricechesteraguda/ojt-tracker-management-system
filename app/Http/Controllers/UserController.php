@@ -14,7 +14,7 @@ class UserController extends Controller
 
     public function index()
     {
-        return new UserCollection(User::orderBy('name', 'ASC')->get());
+        return new UserCollection(User::orderBy('name', 'ASC')->paginate(5));
     }
 
     public function show($id)

@@ -7,9 +7,6 @@ import {
   CardHeader,
   CardBody,
   Table,
-  Pagination,
-  PaginationItem,
-  PaginationLink,
   Button,
   Modal, ModalHeader, ModalBody, ModalFooter,
   Form,
@@ -20,6 +17,7 @@ import {
 
 } from 'reactstrap';
 import axios from 'axios';
+import Paginations from "react-js-pagination";
 
 
 class Users extends Component {
@@ -41,6 +39,10 @@ class Users extends Component {
       has_alert_hidden: true,
       alert_type: 'danger',
       alert_message: '',
+      activePage:1,
+      itemsCountPerPage:1,
+      totalItemsCount:1,
+      
     }
     this.toggleAddForm = this.toggleAddForm.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -50,6 +52,7 @@ class Users extends Component {
     this.validateField = this.validateField.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
     this.disableButtons = this.disableButtons.bind(this);
+    this.handlePageChange = this.handlePageChange.bind(this);
   }
 
   disableButtons(){
@@ -343,14 +346,19 @@ class Users extends Component {
 
   storeUsersToState(data) {
     // console.log(data)
-    this.setState({ users: data })
+    this.setState({ 
+      users: data.data,
+      activePage: data.meta.current_page,
+      itemsCountPerPage:data.meta.per_page,
+      totalItemsCount:data.meta.total,
+     })
   }
 
-  getUsers() {
+  getUsers(pageNumber) {
     var self = this;
-    axios.get('/api/users')
+    axios.get('/api/users/?page='+ pageNumber)
       .then(res => {
-        self.storeUsersToState(res.data.data)
+        self.storeUsersToState(res.data)
       }).catch(err => {
         console.log(err)
         alert('Server disconnected.')
@@ -362,6 +370,13 @@ class Users extends Component {
     this.getUsers()
 
   }
+
+  handlePageChange(pageNumber) {
+    console.log(`active page is ${pageNumber}`);
+    // this.setState({activePage: pageNumber});
+    this.getUsers(pageNumber)
+  }
+
   render() {
     return (
       <div className="animated fadeIn">
@@ -498,26 +513,14 @@ class Users extends Component {
 
                   </tbody>
                 </Table>
-                <Pagination>
-                  <PaginationItem>
-                    <PaginationLink previous href="#"></PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem active>
-                    <PaginationLink href="#">1</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#">2</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#">3</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#">4</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink next href="#"></PaginationLink>
-                  </PaginationItem>
-                </Pagination>
+                <Paginations
+                    activePage={this.state.activePage}
+                    itemsCountPerPage={this.state.itemsCountPerPage}
+                    totalItemsCount={this.state.totalItemsCount}
+                    pageRangeDisplayed={5}
+                    onChange={this.handlePageChange}
+                />
+                
               </CardBody>
             </Card>
           </Col>
