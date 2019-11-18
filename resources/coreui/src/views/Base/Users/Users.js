@@ -25,7 +25,8 @@ class Users extends Component {
     super(props)
     this.state = {
       users: [],
-      addForm: false,
+
+      add_form: false,
       id: '',
       code: '',
       name: '',
@@ -33,36 +34,38 @@ class Users extends Component {
       email: '',
       password: '',
       confirm_password: '',
-      isAddProcessType: true,
-      saveButtonIsDisabled: true,
-      updateButtonIsDisabled: true,
+
+      is_add_process_type: true,
+      save_button_is_disabled: true,
+      update_button_is_disabled: true,
       has_alert_hidden: true,
       alert_type: 'danger',
       alert_message: '',
-      activePage:1,
-      itemsCountPerPage:1,
-      totalItemsCount:1,
-      userDetailModal: false,
+
+      active_page:1,
+      items_count_per_page:1,
+      total_items_count:1,
+      detail_modal: false,
       
     }
-    this.toggleAddForm = this.toggleAddForm.bind(this);
-    this.handleInputChange = this.handleInputChange.bind(this);
-    this.saveItem = this.saveItem.bind(this);
-    this.updateItem = this.updateItem.bind(this);
-    this.getUsers = this.getUsers.bind(this);
+    this.toggle_add_form = this.toggle_add_form.bind(this);
+    this.handle_input_change = this.handle_input_change.bind(this);
+    this.save_item = this.save_item.bind(this);
+    this.update_item = this.update_item.bind(this);
+    this.get_data = this.get_data.bind(this);
     this.validateField = this.validateField.bind(this);
-    this.deleteItem = this.deleteItem.bind(this);
-    this.disableButtons = this.disableButtons.bind(this);
-    this.handlePageChange = this.handlePageChange.bind(this);
-    this.toggleUserDetailModal = this.toggleUserDetailModal.bind(this);
+    this.delete_item = this.delete_item.bind(this);
+    this.disable_buttons = this.disable_buttons.bind(this);
+    this.handle_page_change = this.handle_page_change.bind(this);
+    this.toggle_detail_modal = this.toggle_detail_modal.bind(this);
     
   }
 
-  disableButtons(){
+  disable_buttons(){
     this.setState(
       {
-        saveButtonIsDisabled: true,
-        updateButtonIsDisabled: true,
+        save_button_is_disabled: true,
+        update_button_is_disabled: true,
       }
     ) 
   }
@@ -86,7 +89,7 @@ class Users extends Component {
               alert_type: 'danger',
               has_alert_hidden: false,
             })
-            this.disableButtons()
+            this.disable_buttons()
     
           } else if (this.state.confirm_password.length <=6 || this.state.password.length <=6){
             console.log('Password is too short!')
@@ -95,7 +98,7 @@ class Users extends Component {
               alert_type: 'danger',
               has_alert_hidden: false,
             })
-            this.disableButtons()
+            this.disable_buttons()
           }else {
             console.log('Password matched!')
             this.setState({
@@ -103,8 +106,8 @@ class Users extends Component {
               alert_type: 'success',
               has_alert_hidden: false,
             })
-            this.state.saveButtonIsDisabled = false
-            this.state.updateButtonIsDisabled = false
+            this.state.save_button_is_disabled = false
+            this.state.update_button_is_disabled = false
           }
         }else{
           this.setState({
@@ -112,7 +115,7 @@ class Users extends Component {
             alert_type: 'danger',
             has_alert_hidden: false,
           })
-          this.disableButtons()
+          this.disable_buttons()
         }
 
         break;
@@ -122,16 +125,16 @@ class Users extends Component {
     }
     if (this.state.name =='' || this.state.role == '' || this.state.email == '' || this.state.password == '' || this.state.confirm_password == '' ) {
       console.log('Incomplete form values!')
-      this.disableButtons()
+      this.disable_buttons()
     }
   }
 
-  deleteItem(i) {
+  delete_item(i) {
     var self = this;
     axios.delete('api/users/' + this.state.users[i].id)
       .then(function (response) {
         console.log(response);
-        self.getUsers()
+        self.get_data()
 
       })
       .catch(function (error) {
@@ -140,7 +143,7 @@ class Users extends Component {
       });
   }
 
-  updateItem(e) {
+  update_item(e) {
     e.preventDefault();
 
     var self = this;
@@ -154,32 +157,32 @@ class Users extends Component {
     axios.post('/api/users/' + this.state.id, payload)
       .then(function (response) {
         console.log(response);
-        self.getUsers()
-        self.toggleAddForm()
+        self.get_data()
+        self.toggle_add_form()
       })
       .catch(function (error) {
         console.log(error);
-        alert('Deletion Failed. Contact your System Administrator')
+        alert('Update Failed. Contact your System Administrator')
       });
 
   }
 
-  loadItem(i) {
-    this.toggleAddForm();
+  load_item(i) {
+    this.toggle_add_form();
     this.setState({
       id: this.state.users[i].id,
       code: this.state.users[i].sr_code,
       name: this.state.users[i].name,
       role: this.state.users[i].role,
       email: this.state.users[i].email,
-      updateButtonIsDisabled: true,
+      update_button_is_disabled: true,
 
     })
 
-    this.setState({ isAddProcessType: false });
+    this.setState({ is_add_process_type: false });
   }
 
-  saveItem(e) {
+  save_item(e) {
     e.preventDefault();
     
     var self = this;
@@ -193,8 +196,8 @@ class Users extends Component {
     axios.post('/api/users', payload)
       .then(function (response) {
         console.log(response);
-        self.getUsers()
-        self.toggleAddForm();
+        self.get_data()
+        self.toggle_add_form();
       })
       .catch(function (error) {
         console.log(error.response.status);
@@ -217,34 +220,37 @@ class Users extends Component {
 
   }
 
-  handleInputChange(e) {
-    var self = this;
-
-    // clear alert status
-    self.setState({
+  handle_input_change(e) {
+     // clear alert status
+    this.setState({
       alert_message: '',
       alert_type: 'primary',
       has_alert_hidden: true,
     })
 
     this.setState({ [e.target.name]: e.target.value });
-    if (e.target.value == '' || (this.state.name =='' && this.state.role == '' && this.state.email == '' && this.state.password == '' && this.state.confirm_password == '' )) {
+    if (e.target.value == '' || 
+      (this.state.name =='' && 
+      this.state.role == '' && 
+      this.state.email == '' && 
+      this.state.password == '' 
+      && this.state.confirm_password == '' )) {
       console.log('Incomplete form values!')
-      this.disableButtons()
+      this.disable_buttons()
     } else {
       console.log('Complete form values!')
-      if (this.state.isAddProcessType) {
+      if (this.state.is_add_process_type) {
         this.setState(
           {
-            saveButtonIsDisabled: false,
-            updateButtonIsDisabled: true,
+            save_button_is_disabled: false,
+            update_button_is_disabled: true,
           }
         ) 
       } else {
         this.setState(
           {
-            saveButtonIsDisabled: true,
-            updateButtonIsDisabled: false,
+            save_button_is_disabled: true,
+            update_button_is_disabled: false,
           }
         ) 
       }
@@ -253,70 +259,70 @@ class Users extends Component {
     if (e.target.name == 'confirm_password') {
       if (this.state.password != e.target.value) {
         console.log('Password mismatch!')
-        self.setState({
+        this.setState({
           alert_message: 'Password mismatch!',
           alert_type: 'danger',
           has_alert_hidden: false,
         })
-        this.disableButtons()
+        this.disable_buttons()
 
       } else if (this.state.confirm_password.length <=6 || this.state.password.length <=6){
         console.log('Password is too short!')
-        self.setState({
+        this.setState({
           alert_message: 'Password is too short!',
           alert_type: 'danger',
           has_alert_hidden: false,
         })
-        this.disableButtons()
+        this.disable_buttons()
 
       }else if (this.state.password == '' && e.target.value == '') {
-        this.disableButtons()
+        this.disable_buttons()
 
         console.log('Password empty!')
       }
       else {
         console.log('Password matched!')
-        self.setState({
+        this.setState({
           alert_message: 'Password matched!',
           alert_type: 'success',
           has_alert_hidden: false,
         })
-        this.state.saveButtonIsDisabled = false
-        this.state.updateButtonIsDisabled = false
+        this.state.save_button_is_disabled = false
+        this.state.update_button_is_disabled = false
       }
     } else if (e.target.name == 'password') {
       if (this.state.confirm_password != e.target.value) {
         console.log('Password mismatch!')
-        self.setState({
+        this.setState({
           alert_message: 'Password mismatch!',
           alert_type: 'danger',
           has_alert_hidden: false,
         })
-        this.disableButtons()
+        this.disable_buttons()
 
       } else if (this.state.confirm_password.length <=6 || this.state.password.length <=6){
         console.log('Password is too short!')
-        self.setState({
+        this.setState({
           alert_message: 'Password is too short!',
           alert_type: 'danger',
           has_alert_hidden: false,
         })
-        this.disableButtons()
+        this.disable_buttons()
 
       }else {
         if (this.state.confirm_password == '' && e.target.value == '') {
-          this.disableButtons()
+          this.disable_buttons()
           console.log('Password empty!')
         }
         else {
           console.log('Password matched!')
-          self.setState({
+          this.setState({
             alert_message: 'Password matched!',
             alert_type: 'success',
             has_alert_hidden: false,
           })
-          this.state.saveButtonIsDisabled = false
-          this.state.updateButtonIsDisabled = false
+          this.state.save_button_is_disabled = false
+          this.state.update_button_is_disabled = false
         }
       }
     }
@@ -328,7 +334,7 @@ class Users extends Component {
 
   }
 
-  toggleAddForm() {
+  toggle_add_form() {
     this.setState({
       id: '',
       code: '',
@@ -337,20 +343,22 @@ class Users extends Component {
       email: '',
       password:'',
       confirm_password: '',
-      updateButtonIsDisabled: true,
-      addForm: !this.state.addForm,
-      isAddProcessType: true,
+
+      update_button_is_disabled: true,
+      add_form: !this.state.add_form,
+      is_add_process_type: true,
+
       alert_message: '',
       alert_type: 'primary',
       has_alert_hidden: true,
     });
 
   }
-  toggleUserDetailModal(i=undefined){
+  toggle_detail_modal(i=undefined){
     
     if (i >= 0 ) {
       this.setState({
-        userDetailModal: !this.state.userDetailModal,
+        detail_modal: !this.state.detail_modal,
         id: this.state.users[i].id,
         code: this.state.users[i].sr_code,
         name: this.state.users[i].name,
@@ -360,27 +368,28 @@ class Users extends Component {
       });
     }else{
       this.setState({
-        userDetailModal: !this.state.userDetailModal,
+        detail_modal: !this.state.detail_modal,
       });
     }
     
   }
 
-  storeUsersToState(data) {
+  store_data_to_state(data) {
     // console.log(data)
     this.setState({ 
       users: data.data,
-      activePage: data.meta.current_page,
-      itemsCountPerPage:data.meta.per_page,
-      totalItemsCount:data.meta.total,
+
+      active_page: data.meta.current_page,
+      items_count_per_page:data.meta.per_page,
+      total_items_count:data.meta.total,
      })
   }
 
-  getUsers(pageNumber) {
+  get_data(page_number) {
     var self = this;
-    axios.get('/api/users/?page='+ pageNumber)
+    axios.get('/api/users/?page='+ page_number)
       .then(res => {
-        self.storeUsersToState(res.data)
+        self.store_data_to_state(res.data)
       }).catch(err => {
         console.log(err)
         alert('Server disconnected.')
@@ -389,13 +398,13 @@ class Users extends Component {
 
   componentWillMount() {
 
-    this.getUsers()
+    this.get_data()
 
   }
 
-  handlePageChange(pageNumber) {
-    console.log(`active page is ${pageNumber}`);
-    this.getUsers(pageNumber)
+  handle_page_change(page_number) {
+    console.log(`active page is ${page_number}`);
+    this.get_data(page_number)
   }
 
   render() {
@@ -410,14 +419,14 @@ class Users extends Component {
                     <i className="fa fa-align-justify"></i> Users
                 </Col>
                   <Col xs="6" lg="6">
-                    <Button className="float-right fa fa-plus-circle" color="primary" onClick={this.toggleAddForm}> Add</Button>
+                    <Button className="float-right fa fa-plus-circle" color="primary" onClick={this.toggle_add_form}> Add</Button>
                   </Col>
                 </Row>
               </CardHeader>
               <CardBody>
-                <Modal isOpen={this.state.addForm} toggle={this.toggleAddForm}
+                <Modal isOpen={this.state.add_form} toggle={this.toggle_add_form}
                   className={'modal-primary ' + this.props.className}>
-                  <ModalHeader toggle={this.toggleAddForm}>{this.state.isAddProcessType ? 'Add New' : 'Update'} User</ModalHeader>
+                  <ModalHeader toggle={this.toggle_add_form}>{this.state.is_add_process_type ? 'Add New' : 'Update'} User</ModalHeader>
                   <ModalBody>
 
                     <Row>
@@ -431,8 +440,8 @@ class Users extends Component {
                                   <Label htmlFor="code">SRCODE / Username</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Label hidden={this.state.isAddProcessType}>{this.state.code}</Label>
-                                  <Input hidden={!this.state.isAddProcessType} value={this.state.code} onChange={this.handleInputChange} type="text" id="code" name="code" placeholder="Text" />
+                                  <Label hidden={this.state.is_add_process_type}>{this.state.code}</Label>
+                                  <Input hidden={!this.state.is_add_process_type} value={this.state.code} onChange={this.handle_input_change} type="text" id="code" name="code" placeholder="Text" />
                                   <FormText color="muted">Student / Faculty Code</FormText>
                                 </Col>
                               </FormGroup>
@@ -441,7 +450,7 @@ class Users extends Component {
                                   <Label htmlFor="name">Name</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input value={this.state.name} onChange={this.handleInputChange} type="text" id="name" name="name" placeholder="Text" />
+                                  <Input value={this.state.name} onChange={this.handle_input_change} type="text" id="name" name="name" placeholder="Text" />
                                   <FormText color="muted">Write your name</FormText>
                                 </Col>
                               </FormGroup>
@@ -450,7 +459,7 @@ class Users extends Component {
                                   <Label htmlFor="role">Role</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input  value={this.state.role} onChange={this.handleInputChange} type="select" name="role" id="role">
+                                  <Input  value={this.state.role} onChange={this.handle_input_change} type="select" name="role" id="role">
                                   <option>student</option>
                                     <option>superuser</option>
                                     <option>coordinator</option>
@@ -464,7 +473,7 @@ class Users extends Component {
                                   <Label htmlFor="email-input">Email</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input  value={this.state.email} onChange={this.handleInputChange} type="email" id="email" name="email" placeholder="Enter Email" />
+                                  <Input  value={this.state.email} onChange={this.handle_input_change} type="email" id="email" name="email" placeholder="Enter Email" />
                                   <FormText className="help-block">Please enter your email</FormText>
                                 </Col>
                               </FormGroup>
@@ -473,7 +482,7 @@ class Users extends Component {
                                   <Label htmlFor="password">Password</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input  value={this.state.password} onChange={this.handleInputChange} type="password" id="password" name="password" placeholder="Password" />
+                                  <Input  value={this.state.password} onChange={this.handle_input_change} type="password" id="password" name="password" placeholder="Password" />
                                   <FormText className="help-block">Please enter a complex password</FormText>
                                 </Col>
                               </FormGroup>
@@ -482,7 +491,7 @@ class Users extends Component {
                                   <Label htmlFor="confirm_password">Confirm Password</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input  value={this.state.confirm_password} onChange={this.handleInputChange} type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" />
+                                  <Input  value={this.state.confirm_password} onChange={this.handle_input_change} type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" />
                                   <FormText className="help-block">Please confirm complex password</FormText>
                                   <Alert hidden={this.state.has_alert_hidden} color={this.state.alert_type}>
                                     {this.state.alert_message}
@@ -500,14 +509,14 @@ class Users extends Component {
 
                   </ModalBody>
                   <ModalFooter>
-                    <Button type='submit' hidden={!this.state.isAddProcessType} disabled={this.state.saveButtonIsDisabled} color="primary" onClick={this.saveItem}>Save</Button>{' '}
-                    <Button type='submit' hidden={this.state.isAddProcessType} disabled={this.state.updateButtonIsDisabled} color="primary" onClick={this.updateItem}>Update</Button>{' '}
-                    <Button color="secondary" onClick={this.toggleAddForm}>Cancel</Button>
+                    <Button type='submit' hidden={!this.state.is_add_process_type} disabled={this.state.save_button_is_disabled} color="primary" onClick={this.save_item}>Save</Button>{' '}
+                    <Button type='submit' hidden={this.state.is_add_process_type} disabled={this.state.update_button_is_disabled} color="primary" onClick={this.update_item}>Update</Button>{' '}
+                    <Button color="secondary" onClick={this.toggle_add_form}>Cancel</Button>
                   </ModalFooter>
                 </Modal>
-                <Modal size='lg' isOpen={this.state.userDetailModal} toggle={this.toggleUserDetailModal}
+                <Modal size='lg' isOpen={this.state.detail_modal} toggle={this.toggle_detail_modal}
                   className={'modal-primary ' + this.props.className}>
-                  <ModalHeader toggle={this.toggleUserDetailModal}>User Detail</ModalHeader>
+                  <ModalHeader toggle={this.toggle_detail_modal}>User Detail</ModalHeader>
                   <ModalBody>
 
                     <Row>
@@ -568,13 +577,13 @@ class Users extends Component {
 
                   </ModalBody>
                   <ModalFooter>
-                    <Button color="secondary" onClick={this.toggleUserDetailModal}>Cancel</Button>
+                    <Button color="secondary" onClick={this.toggle_detail_modal}>Close</Button>
                   </ModalFooter>
                 </Modal>
                 <Table responsive>
                   <thead>
                     <tr>
-                      <th>SRCODE</th>
+                      <th>SRCODE/Username</th>
                       <th>Name</th>
                       <th>Email</th>
                       <th>Role</th>
@@ -590,9 +599,9 @@ class Users extends Component {
                           <td>{data.email}</td>
                           <td>{data.role}</td>
                           <td>
-                          <Button className='text-white' color="info" onClick={() => this.toggleUserDetailModal(i)}>View Details</Button>
-                            <Button color="primary" onClick={() => this.loadItem(i)}>Update</Button>
-                            <Button onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.deleteItem(i) }} color="danger">Delete</Button>
+                          <Button className='text-white' color="info" onClick={() => this.toggle_detail_modal(i)}>View Details</Button>
+                            <Button color="primary" onClick={() => this.load_item(i)}>Update</Button>
+                            <Button onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.delete_item(i) }} color="danger">Delete</Button>
                           </td>
                         </tr>
                       )
@@ -602,11 +611,11 @@ class Users extends Component {
                   </tbody>
                 </Table>
                 <Paginations
-                    activePage={this.state.activePage}
-                    itemsCountPerPage={this.state.itemsCountPerPage}
-                    totalItemsCount={this.state.totalItemsCount}
+                    activePage={this.state.active_page}
+                    itemsCountPerPage={this.state.items_count_per_page}
+                    totalItemsCount={this.state.total_items_count}
                     pageRangeDisplayed={5}
-                    onChange={this.handlePageChange}
+                    onChange={this.handle_page_change}
                 />
                 
               </CardBody>
