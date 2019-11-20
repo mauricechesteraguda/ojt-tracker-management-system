@@ -240,7 +240,7 @@ class Users extends Component {
    var value = 'xxxxxxxxxx';
    if(e.target.value){
     value = e.target.value
-   }
+   
    axios.get('/api/users/search/'+value)
       .then(function (response) {
         console.log(response);
@@ -250,8 +250,11 @@ class Users extends Component {
         console.log(error);
         alert('Search Failed. Contact your System Administrator.')
       });
+  
+    }else{
+      this.get_data()
+    }
   }
-
 
   handle_input_change(e) {
      // clear alert status
