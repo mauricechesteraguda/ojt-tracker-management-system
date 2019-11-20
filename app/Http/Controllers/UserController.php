@@ -16,6 +16,10 @@ class UserController extends Controller
     {
         return new UserCollection(User::orderBy('name', 'ASC')->paginate(5));
     }
+    public function search($value)
+    {
+        return new UserCollection(User::where('name', 'LIKE', '%'.$value.'%')->orWhere('sr_code', 'LIKE', '%'.$value.'%')->orderBy('name', 'ASC')->paginate(20));
+    }
 
     public function show($id)
     {

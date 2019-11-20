@@ -14,6 +14,8 @@ import {
   FormText,
   Label,
   Input,
+  InputGroup,
+  InputGroupAddon
 
 } from 'reactstrap';
 import axios from 'axios';
@@ -38,6 +40,7 @@ class Users extends Component {
       is_add_process_type: true,
       save_button_is_disabled: true,
       update_button_is_disabled: true,
+
       has_alert_hidden: true,
       alert_type: 'danger',
       alert_message: '',
@@ -46,6 +49,11 @@ class Users extends Component {
       items_count_per_page:1,
       total_items_count:1,
       detail_modal: false,
+
+      search_loading: false,
+      search_message: '',
+      search_alert_type: 'primary',
+      search_value:''
       
     }
     this.toggle_add_form = this.toggle_add_form.bind(this);
@@ -58,6 +66,7 @@ class Users extends Component {
     this.disable_buttons = this.disable_buttons.bind(this);
     this.handle_page_change = this.handle_page_change.bind(this);
     this.toggle_detail_modal = this.toggle_detail_modal.bind(this);
+    this.handle_search_input_change = this.handle_search_input_change.bind(this);
     
   }
 
@@ -219,6 +228,30 @@ class Users extends Component {
       });
 
   }
+  handle_search_input_change(e) {
+    // clear alert status
+    var self = this;
+    self.setState({
+     search_message: '',
+     search_alert_type: 'primary',
+     has_alert_hidden: true,
+     search_value: e.target.value
+   })
+   var value = 'xxxxxxxxxx';
+   if(e.target.value){
+    value = e.target.value
+   }
+   axios.get('/api/users/search/'+value)
+      .then(function (response) {
+        console.log(response);
+        self.store_data_to_state(response.data)
+      })
+      .catch(function (error) {
+        console.log(error);
+        alert('Search Failed. Contact your System Administrator.')
+      });
+  }
+
 
   handle_input_change(e) {
      // clear alert status
@@ -228,7 +261,7 @@ class Users extends Component {
       has_alert_hidden: true,
     })
 
-    this.setState({ [e.target.name]: e.target.value });
+    this.setState({ [e.target.name]: e.target.valuee.target.value });
     if (e.target.value == '' || 
       (this.state.name =='' && 
       this.state.role == '' && 
@@ -416,7 +449,23 @@ class Users extends Component {
               <CardHeader>
                 <Row>
                   <Col xs="6" lg="6">
+                  <Row>
+                  <Col xs="2" lg="2">
                     <i className="fa fa-align-justify"></i> Users
+                    </Col>
+                    <Col xs="10" lg="10">
+                    <InputGroup>
+                      <Input 
+                      type="text"
+                      value={this.state.search_value}
+                      id="search"
+                      name="search"
+                      placeholder="Search..."
+                      onChange={this.handle_search_input_change}
+                      />
+                    </InputGroup>
+                    </Col>
+                </Row>
                 </Col>
                   <Col xs="6" lg="6">
                     <Button className="float-right fa fa-plus-circle" color="primary" onClick={this.toggle_add_form}> Add</Button>
