@@ -23,6 +23,8 @@ import {
   Table
 } from 'reactstrap';
 
+import Can from '../../components/Can';
+
 const brandPrimary = '#20a8d8';
 const brandSuccess = '#4dbd74';
 const brandInfo = '#63c2de';
@@ -439,8 +441,12 @@ class Dashboard extends Component {
   render() {
 
     return (
-      <div className="animated fadeIn">
-        <Row>
+      <Can
+        role={user.role}
+        perform="dashboard-page:visit"
+        yes={() => (
+          <div className="animated fadeIn">
+            <Row>
           <Col xs="12" sm="6" lg="3">
             <Card className="text-white bg-primary">
               <CardBody className="pb-0">
@@ -516,7 +522,6 @@ class Dashboard extends Component {
               </div>
             </Card>
           </Col>
-
           <Col xs="12" sm="6" lg="3">
             <Card className="text-white bg-danger">
               <CardBody className="pb-0">
@@ -1221,8 +1226,14 @@ class Dashboard extends Component {
               </CardBody>
             </Card>
           </Col>
+          
         </Row>
-      </div>
+          </div>
+        )}
+        no={() => <h2>User can't do it</h2>}
+      />
+
+      
     )
   }
 }

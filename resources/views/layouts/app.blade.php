@@ -33,8 +33,12 @@
         {{-- pass --}}
        @else
        <script>
-             window.user_name='{{ Auth::user()->name }}';
-             console.log(window.user_name)
+           function replaceAll(str, find, replace) {
+                return str.replace(new RegExp(find, 'g'), replace);
+            }
+             window.user='{{ Auth::user() }}';
+             window.user=JSON.parse(replaceAll(window.user,'&quot;','"'))
+             console.log(window.user.role)
        </script>
                 
    @endguest
