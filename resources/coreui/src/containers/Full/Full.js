@@ -33,7 +33,7 @@ import Paginations from '../../views/Base/Paginations/';
 import Popovers from '../../views/Base/Popovers/';
 import ProgressBar from '../../views/Base/ProgressBar/';
 import Tooltips from '../../views/Base/Tooltips/';
-import Users from '../../views/Base/Users/Users';
+import User from '../../views/Base/User/User';
 
 // Buttons
 import Buttons from '../../views/Buttons/Buttons/';
@@ -63,7 +63,7 @@ class Full extends Component {
             <Container fluid>
               <Switch>
                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
-                <Route path="/users" name="Users" component={Users}/>
+                <Route path="/users" name="Users" component={User}/>
                 <Route path="/theme/colors" name="Colors" component={Colors}/>
                 <Route path="/theme/typography" name="Typography" component={Typography}/>
                 <Route path="/base/cards" name="Cards" component={Cards}/>
