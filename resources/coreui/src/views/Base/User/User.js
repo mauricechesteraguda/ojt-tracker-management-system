@@ -432,7 +432,7 @@ class Users extends Component {
       })
   }
 
-  componentWillMount() {
+  componentDidMount() {
 
     this.get_data()
 
@@ -451,27 +451,28 @@ class Users extends Component {
             <Card>
               <CardHeader>
                 <Row>
-                  <Col xs="6" lg="6">
-                  <Row>
-                  <Col xs="2" lg="2">
-                    <i className="fa fa-align-justify"></i> Users
+                <Col xs="4" lg="4">
+                  
+                  <i className="fa fa-align-justify"></i> Users
+                  </Col>
+                  <Col xs="4" lg="4">
+                  
+                  <Input
+                          type="text"
+                          value={this.state.search_value}
+                          
+                          name="search"
+                          placeholder="Search..."
+                          onChange={this.handle_search_input_change}
+                          />
                     </Col>
-                    <Col xs="10" lg="10">
-                    <InputGroup>
-                      <Input 
-                      type="text"
-                      value={this.state.search_value}
-                      id="search"
-                      name="search"
-                      placeholder="Search..."
-                      onChange={this.handle_search_input_change}
-                      />
-                    </InputGroup>
-                    </Col>
-                </Row>
-                </Col>
-                  <Col xs="6" lg="6">
-                    <Button className="float-right fa fa-plus-circle" color="primary" onClick={this.toggle_add_form}> Add</Button>
+                    
+                
+                
+                  <Col xs="4" lg="4">
+                        
+                        <Button className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-plus-circle"></i> Add</Button>
+                        
                   </Col>
                 </Row>
               </CardHeader>
@@ -561,8 +562,8 @@ class Users extends Component {
 
                   </ModalBody>
                   <ModalFooter>
-                    <Button type='submit' hidden={!this.state.is_add_process_type} disabled={this.state.save_button_is_disabled} color="primary" onClick={this.save_item}>Save</Button>{' '}
-                    <Button type='submit' hidden={this.state.is_add_process_type} disabled={this.state.update_button_is_disabled} color="primary" onClick={this.update_item}>Update</Button>{' '}
+                    <Button type='submit' hidden={!this.state.is_add_process_type} disabled={this.state.save_button_is_disabled} color="primary" onClick={this.save_item}><i className="fa fa-save"></i> Save</Button>{' '}
+                    <Button type='submit' hidden={this.state.is_add_process_type} disabled={this.state.update_button_is_disabled} color="primary" onClick={this.update_item}><i className="fa fa-edit"></i>Update</Button>{' '}
                     <Button color="secondary" onClick={this.toggle_add_form}>Cancel</Button>
                   </ModalFooter>
                 </Modal>
@@ -632,6 +633,7 @@ class Users extends Component {
                     <Button color="secondary" onClick={this.toggle_detail_modal}>Close</Button>
                   </ModalFooter>
                 </Modal>
+                
                 <Table responsive>
                   <thead>
                     <tr>
@@ -651,9 +653,9 @@ class Users extends Component {
                           <td>{data.email}</td>
                           <td>{data.role}</td>
                           <td>
-                          <Button className='text-white' color="info" onClick={() => this.toggle_detail_modal(i)}>View Details</Button>
-                            <Button color="primary" onClick={() => this.load_item(i)}>Update</Button>
-                            <Button onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.delete_item(i) }} color="danger">Delete</Button>
+                          <Button size="sm" className='text-white' color="info" onClick={() => this.toggle_detail_modal(i)}><i className="fa fa-book"></i> Details</Button>
+                            <Button size="sm" color="primary" onClick={() => this.load_item(i)}><i className="fa fa-pencil"></i></Button>
+                            <Button size="sm" onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.delete_item(i) }} color="danger"><i className="fa fa-trash"></i></Button>
                           </td>
                         </tr>
                       )
