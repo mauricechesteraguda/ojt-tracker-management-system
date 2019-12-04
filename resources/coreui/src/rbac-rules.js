@@ -1,5 +1,9 @@
 const rules = {
-    student: {
+  guest: {
+    static: [],
+    dynamic: {}
+  },
+  student: {
       static: [
         "dashboard-page:visit"
       ],

@@ -23,7 +23,7 @@ import {
   Table
 } from 'reactstrap';
 
-import Can from '../../components/Can';
+import Can from '../../Can';
 
 const brandPrimary = '#20a8d8';
 const brandSuccess = '#4dbd74';
