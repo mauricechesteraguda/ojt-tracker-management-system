@@ -168,6 +168,11 @@ class Users extends Component {
         console.log(response);
         self.get_data()
         self.toggle_add_form()
+        self.setState({
+          alert_message: 'Update Successful.',
+          alert_type: 'success',
+          has_alert_hidden: false,
+        })
       })
       .catch(function (error) {
         console.log(error);
@@ -264,7 +269,7 @@ class Users extends Component {
       has_alert_hidden: true,
     })
 
-    this.setState({ [e.target.name]: e.target.valuee.target.value });
+    this.setState({ [e.target.name]: e.target.value });
     if (e.target.value == '' || 
       (this.state.name =='' && 
       this.state.role == '' && 
@@ -633,7 +638,9 @@ class Users extends Component {
                     <Button color="secondary" onClick={this.toggle_detail_modal}>Close</Button>
                   </ModalFooter>
                 </Modal>
-                
+                <Alert hidden={this.state.has_alert_hidden} color={this.state.alert_type}>
+                                    {this.state.alert_message}
+                                  </Alert>
                 <Table responsive>
                   <thead>
                     <tr>
