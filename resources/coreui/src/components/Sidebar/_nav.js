@@ -10,10 +10,15 @@ export default {
       // }
     },
     {
-            name: 'Users',
-            url: '/users',
-            icon: 'icon-people'
-          },
+      name: 'Users',
+      url: '/users',
+      icon: 'icon-people'
+    },
+    {
+      name: 'Company',
+      url: '/companies',
+      icon: 'icon-grid'
+    },
     
     // {
     //   title: true,

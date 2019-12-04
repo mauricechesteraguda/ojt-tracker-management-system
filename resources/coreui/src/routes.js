@@ -37,5 +37,6 @@ const routes = {
   '/theme/typography': 'Typography',
   '/widgets': 'Widgets',
   '/users': 'Users',
+  '/companies': 'Company',
 };
 export default routes;
