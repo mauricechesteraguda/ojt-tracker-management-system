@@ -144,7 +144,11 @@ class Users extends Component {
       .then(function (response) {
         console.log(response);
         self.get_data()
-
+        self.setState({
+          alert_message: 'Delete Successful.',
+          alert_type: 'success',
+          has_alert_hidden: false,
+        })
       })
       .catch(function (error) {
         console.log(error);
