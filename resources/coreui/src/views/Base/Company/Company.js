@@ -26,16 +26,15 @@ class Company extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      users: [],
+      companies: [],
 
       add_form: false,
       id: '',
-      code: '',
       name: '',
-      role: '',
-      email: '',
-      password: '',
-      confirm_password: '',
+      country: '',
+      city: '',
+      address: '',
+      location_map: '',
 
       is_add_process_type: true,
       save_button_is_disabled: true,
@@ -61,7 +60,7 @@ class Company extends Component {
     this.save_item = this.save_item.bind(this);
     this.update_item = this.update_item.bind(this);
     this.get_data = this.get_data.bind(this);
-    this.validateField = this.validateField.bind(this);
+    this.check_inputs = this.check_inputs.bind(this);
     this.delete_item = this.delete_item.bind(this);
     this.disable_buttons = this.disable_buttons.bind(this);
     this.handle_page_change = this.handle_page_change.bind(this);
@@ -78,72 +77,47 @@ class Company extends Component {
       }
     ) 
   }
+  enable_button(){
 
-  validateField(fieldName, value) {
-   var emailValid = false
-
-    switch(fieldName) {
-      case 'email':
-        emailValid = value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i);
-        if(emailValid){
-          this.setState({
-            alert_message: '',
-            alert_type: 'primary',
-            has_alert_hidden: true,
-          })
-          if (this.state.password != this.state.confirm_password) {
-            console.log('Password mismatch!')
-            this.setState({
-              alert_message: 'Password mismatch!',
-              alert_type: 'danger',
-              has_alert_hidden: false,
-            })
-            this.disable_buttons()
-    
-          } else if (this.state.confirm_password.length <=6 || this.state.password.length <=6){
-            console.log('Password is too short!')
-            this.setState({
-              alert_message: 'Password is too short!',
-              alert_type: 'danger',
-              has_alert_hidden: false,
-            })
-            this.disable_buttons()
-          }else {
-            console.log('Password matched!')
-            this.setState({
-              alert_message: 'Password matched!',
-              alert_type: 'success',
-              has_alert_hidden: false,
-            })
-            this.state.save_button_is_disabled = false
-            this.state.update_button_is_disabled = false
-          }
-        }else{
-          this.setState({
-            alert_message: 'Email is invalid.',
-            alert_type: 'danger',
-            has_alert_hidden: false,
-          })
-          this.disable_buttons()
+    if (this.state.is_add_process_type) {
+      this.setState(
+        {
+          save_button_is_disabled: false,
+          update_button_is_disabled: true,
         }
-
-        break;
-
-      default:
-        break;
+      ) 
+    }else{
+      this.setState(
+        {
+          save_button_is_disabled: true,
+          update_button_is_disabled: false,
+        }
+      ) 
     }
-    if (this.state.name =='' || this.state.role == '' || this.state.email == '' || this.state.password == '' || this.state.confirm_password == '' ) {
+    
+  }
+
+  check_inputs() {
+
+    if (this.state.name =='' || this.state.country == '' || this.state.city == '' || this.state.address == '' || this.state.location_map == '' ) {
       console.log('Incomplete form values!')
       this.disable_buttons()
+    }else{
+      this.enable_button()
     }
   }
 
   delete_item(i) {
     var self = this;
-    axios.delete('api/users/' + this.state.users[i].id)
+    axios.delete('api/companies/' + this.state.companies[i].id)
       .then(function (response) {
         console.log(response);
         self.get_data()
+        self.setState({
+          alert_message: 'Delete Successful.',
+          alert_type: 'success',
+          has_alert_hidden: false,
+        })
 
       })
       .catch(function (error) {
@@ -157,13 +131,13 @@ class Company extends Component {
 
     var self = this;
     let payload = {
-      sr_code: this.state.code,
       name: this.state.name,
-      role: this.state.role,
-      email: this.state.email,
-      password: this.state.password,
+      country: this.state.country,
+      city: this.state.city,
+      address: this.state.address,
+      location_map: this.state.location_map,
     }
-    axios.post('/api/users/' + this.state.id, payload)
+    axios.post('/api/companies/' + this.state.id, payload)
       .then(function (response) {
         console.log(response);
         self.get_data()
@@ -184,11 +158,12 @@ class Company extends Component {
   load_item(i) {
     this.toggle_add_form();
     this.setState({
-      id: this.state.users[i].id,
-      code: this.state.users[i].sr_code,
-      name: this.state.users[i].name,
-      role: this.state.users[i].role,
-      email: this.state.users[i].email,
+      id: this.state.companies[i].id,
+      name: this.state.companies[i].name,
+      country: this.state.companies[i].country,
+      city: this.state.companies[i].city,
+      address: this.state.companies[i].address,
+      location_map: this.state.companies[i].location_map,
       update_button_is_disabled: true,
 
     })
@@ -201,13 +176,13 @@ class Company extends Component {
     
     var self = this;
     let payload = {
-      sr_code: this.state.code,
       name: this.state.name,
-      role: this.state.role,
-      email: this.state.email,
-      password: this.state.password,
+      country: this.state.country,
+      city: this.state.city,
+      address: this.state.address,
+      location_map: this.state.location_map,
     }
-    axios.post('/api/users', payload)
+    axios.post('/api/companies', payload)
       .then(function (response) {
         console.log(response);
         self.get_data()
@@ -215,18 +190,14 @@ class Company extends Component {
       })
       .catch(function (error) {
         console.log(error.response.status);
-        if (error.response.data.message.includes('Username')) {
+        if (error.response.data.message.includes('Company already')) {
           self.setState({
             alert_message: error.response.data.message,
             alert_type: 'danger',
             has_alert_hidden: false,
           })
         }else{
-          self.setState({
-            alert_message: 'Email already exist.',
-            alert_type: 'danger',
-            has_alert_hidden: false,
-          })
+          alert('Save Failed. Contact your System Administrator')
         }
         
 
@@ -246,7 +217,7 @@ class Company extends Component {
    if(e.target.value){
     value = e.target.value
    
-   axios.get('/api/users/search/'+value)
+   axios.get('/api/companies/search/'+value)
       .then(function (response) {
         console.log(response);
         self.store_data_to_state(response.data)
@@ -270,106 +241,9 @@ class Company extends Component {
     })
 
     this.setState({ [e.target.name]: e.target.value });
-    if (e.target.value == '' || 
-      (this.state.name =='' && 
-      this.state.role == '' && 
-      this.state.email == '' && 
-      this.state.password == '' 
-      && this.state.confirm_password == '' )) {
-      console.log('Incomplete form values!')
-      this.disable_buttons()
-    } else {
-      console.log('Complete form values!')
-      if (this.state.is_add_process_type) {
-        this.setState(
-          {
-            save_button_is_disabled: false,
-            update_button_is_disabled: true,
-          }
-        ) 
-      } else {
-        this.setState(
-          {
-            save_button_is_disabled: true,
-            update_button_is_disabled: false,
-          }
-        ) 
-      }
-    }
-
-    if (e.target.name == 'confirm_password') {
-      if (this.state.password != e.target.value) {
-        console.log('Password mismatch!')
-        this.setState({
-          alert_message: 'Password mismatch!',
-          alert_type: 'danger',
-          has_alert_hidden: false,
-        })
-        this.disable_buttons()
-
-      } else if (this.state.confirm_password.length <=6 || this.state.password.length <=6){
-        console.log('Password is too short!')
-        this.setState({
-          alert_message: 'Password is too short!',
-          alert_type: 'danger',
-          has_alert_hidden: false,
-        })
-        this.disable_buttons()
-
-      }else if (this.state.password == '' && e.target.value == '') {
-        this.disable_buttons()
-
-        console.log('Password empty!')
-      }
-      else {
-        console.log('Password matched!')
-        this.setState({
-          alert_message: 'Password matched!',
-          alert_type: 'success',
-          has_alert_hidden: false,
-        })
-        this.state.save_button_is_disabled = false
-        this.state.update_button_is_disabled = false
-      }
-    } else if (e.target.name == 'password') {
-      if (this.state.confirm_password != e.target.value) {
-        console.log('Password mismatch!')
-        this.setState({
-          alert_message: 'Password mismatch!',
-          alert_type: 'danger',
-          has_alert_hidden: false,
-        })
-        this.disable_buttons()
-
-      } else if (this.state.confirm_password.length <=6 || this.state.password.length <=6){
-        console.log('Password is too short!')
-        this.setState({
-          alert_message: 'Password is too short!',
-          alert_type: 'danger',
-          has_alert_hidden: false,
-        })
-        this.disable_buttons()
-
-      }else {
-        if (this.state.confirm_password == '' && e.target.value == '') {
-          this.disable_buttons()
-          console.log('Password empty!')
-        }
-        else {
-          console.log('Password matched!')
-          this.setState({
-            alert_message: 'Password matched!',
-            alert_type: 'success',
-            has_alert_hidden: false,
-          })
-          this.state.save_button_is_disabled = false
-          this.state.update_button_is_disabled = false
-        }
-      }
-    }
-
     
-    this.validateField(e.target.name, e.target.value);
+    
+    this.check_inputs(e.target.name, e.target.value);
 
 
 
@@ -378,12 +252,11 @@ class Company extends Component {
   toggle_add_form() {
     this.setState({
       id: '',
-      code: '',
       name: '',
-      role: 'student',
-      email: '',
-      password:'',
-      confirm_password: '',
+      country: '',
+      city: '',
+      address: '',
+      location_map:'',
 
       update_button_is_disabled: true,
       add_form: !this.state.add_form,
@@ -400,12 +273,12 @@ class Company extends Component {
     if (i >= 0 ) {
       this.setState({
         detail_modal: !this.state.detail_modal,
-        id: this.state.users[i].id,
-        code: this.state.users[i].sr_code,
-        name: this.state.users[i].name,
-        role: this.state.users[i].role,
-        email: this.state.users[i].email,
-        password:'********',
+        id: this.state.companies[i].id,
+        name: this.state.companies[i].name,
+        country: this.state.companies[i].country,
+        city: this.state.companies[i].city,
+        address: this.state.companies[i].address,
+        location_map: this.state.companies[i].location_map,
       });
     }else{
       this.setState({
@@ -418,7 +291,7 @@ class Company extends Component {
   store_data_to_state(data) {
     // console.log(data)
     this.setState({ 
-      users: data.data,
+      companies: data.data,
 
       active_page: data.meta.current_page,
       items_count_per_page:data.meta.per_page,
@@ -428,7 +301,7 @@ class Company extends Component {
 
   get_data(page_number) {
     var self = this;
-    axios.get('/api/users/?page='+ page_number)
+    axios.get('/api/companies/?page='+ page_number)
       .then(res => {
         self.store_data_to_state(res.data)
       }).catch(err => {
@@ -484,7 +357,7 @@ class Company extends Component {
               <CardBody>
                 <Modal isOpen={this.state.add_form} toggle={this.toggle_add_form}
                   className={'modal-primary ' + this.props.className}>
-                  <ModalHeader toggle={this.toggle_add_form}>{this.state.is_add_process_type ? 'Add New' : 'Update'} User</ModalHeader>
+                  <ModalHeader toggle={this.toggle_add_form}>{this.state.is_add_process_type ? 'Add New' : 'Update'} Company</ModalHeader>
                   <ModalBody>
 
                     <Row>
@@ -495,69 +368,53 @@ class Company extends Component {
                             <Form action="" method="post" encType="multipart/form-data" className="form-horizontal">
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="code">SRCODE / Username</Label>
-                                </Col>
-                                <Col xs="12" md="9">
-                                  <Label hidden={this.state.is_add_process_type}>{this.state.code}</Label>
-                                  <Input hidden={!this.state.is_add_process_type} value={this.state.code} onChange={this.handle_input_change} type="text" id="code" name="code" placeholder="Text" />
-                                  <FormText color="muted">Student / Faculty Code</FormText>
-                                </Col>
-                              </FormGroup>
-                              <FormGroup row>
-                                <Col md="3">
                                   <Label htmlFor="name">Name</Label>
                                 </Col>
                                 <Col xs="12" md="9">
                                   <Input value={this.state.name} onChange={this.handle_input_change} type="text" id="name" name="name" placeholder="Text" />
-                                  <FormText color="muted">Write your name</FormText>
+                                  <FormText color="muted">Company Name</FormText>
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="role">Role</Label>
+                                  <Label htmlFor="country">Country</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input  value={this.state.role} onChange={this.handle_input_change} type="select" name="role" id="role">
-                                  <option>student</option>
-                                    <option>superuser</option>
-                                    <option>coordinator</option>
-                                    
-
-                                  </Input>
+                                  <Input value={this.state.country} onChange={this.handle_input_change} type="text" id="country" name="country" placeholder="Text" />
+                                  <FormText color="muted">Please write the country</FormText>
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="email-input">Email</Label>
+                                  <Label htmlFor="city">City</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input  value={this.state.email} onChange={this.handle_input_change} type="email" id="email" name="email" placeholder="Enter Email" />
-                                  <FormText className="help-block">Please enter your email</FormText>
+                                  <Input  value={this.state.city} onChange={this.handle_input_change} type="text" name="city" id="city"/>
+                                  
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="password">Password</Label>
+                                  <Label htmlFor="address">Address</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input  value={this.state.password} onChange={this.handle_input_change} type="password" id="password" name="password" placeholder="Password" />
-                                  <FormText className="help-block">Please enter a complex password</FormText>
+                                  <Input  value={this.state.address} onChange={this.handle_input_change} type="text" id="address" name="address" placeholder="Text" />
+                                  <FormText className="help-block">Please enter the address</FormText>
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="confirm_password">Confirm Password</Label>
+                                  <Label htmlFor="location_map">Location Map</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input  value={this.state.confirm_password} onChange={this.handle_input_change} type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" />
-                                  <FormText className="help-block">Please confirm complex password</FormText>
-                                  <Alert hidden={this.state.has_alert_hidden} color={this.state.alert_type}>
+                                  <Input  value={this.state.location_map} onChange={this.handle_input_change} type="text" id="location_map" name="location_map" placeholder="Location" />
+                                  <FormText className="help-block">Please enter the google map location</FormText>
+                                </Col>
+                              </FormGroup>
+                              
+                              <Alert hidden={this.state.has_alert_hidden} color={this.state.alert_type}>
                                     {this.state.alert_message}
                                   </Alert>
-                                </Col>
-                              </FormGroup>
-
-
                             </Form>
 
                           </CardBody>
@@ -574,7 +431,7 @@ class Company extends Component {
                 </Modal>
                 <Modal size='lg' isOpen={this.state.detail_modal} toggle={this.toggle_detail_modal}
                   className={'modal-primary ' + this.props.className}>
-                  <ModalHeader toggle={this.toggle_detail_modal}>User Detail</ModalHeader>
+                  <ModalHeader toggle={this.toggle_detail_modal}>Company Detail</ModalHeader>
                   <ModalBody>
 
                     <Row>
@@ -585,46 +442,47 @@ class Company extends Component {
                             <Form action="" method="post" encType="multipart/form-data" className="form-horizontal">
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="code">SRCODE / Username</Label>
+                                  <Label htmlFor="name">Company Name</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Label>{this.state.code}</Label>
+                                  <Label>{this.state.name}</Label>
                                   
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="name">Name</Label>
+                                  <Label htmlFor="country">Country</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                <Label>{this.state.name}</Label>
+                                <Label>{this.state.country}</Label>
                                   
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="role">Role</Label>
+                                  <Label htmlFor="city">City</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                <Label>{this.state.role}</Label>
+                                <Label>{this.state.city}</Label>
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="email">Email</Label>
+                                  <Label htmlFor="address">Address</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                <Label>{this.state.email}</Label>
+                                <Label>{this.state.address}</Label>
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="password">Password</Label>
+                                  <Label htmlFor="location_map">Location Map</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                <Label>{this.state.password}</Label>
+                                <Label>{this.state.location_map}</Label>
                                 </Col>
                               </FormGroup>
+                              
                               
                             </Form>
 
@@ -644,21 +502,21 @@ class Company extends Component {
                 <Table responsive>
                   <thead>
                     <tr>
-                      <th>SRCODE/Username</th>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Role</th>
+                      <th>Company</th>
+                      <th>Address</th>
+                      <th>City</th>
+                      <th>Country</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {this.state.users.map((data, i) => {
+                    {this.state.companies.map((data, i) => {
                       return (
                         <tr key={i}>
-                          <td>{data.sr_code}</td>
                           <td>{data.name}</td>
-                          <td>{data.email}</td>
-                          <td>{data.role}</td>
+                          <td>{data.address}</td>
+                          <td>{data.city}</td>
+                          <td>{data.country}</td>
                           <td>
                           <Button size="sm" className='text-white' color="info" onClick={() => this.toggle_detail_modal(i)}><i className="fa fa-book"></i> Details</Button>
                             <Button size="sm" color="primary" onClick={() => this.load_item(i)}><i className="fa fa-pencil"></i></Button>

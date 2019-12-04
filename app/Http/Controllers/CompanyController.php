@@ -16,7 +16,7 @@ class CompanyController extends Controller
     }
     public function search($value)
     {
-        return new CompanyCollection(Company::where('name', 'LIKE', '%'.$value.'%')->orWhere('sr_code', 'LIKE', '%'.$value.'%')->orderBy('name', 'ASC')->paginate(20));
+        return new CompanyCollection(Company::where('name', 'LIKE', '%'.$value.'%')->orWhere('address', 'LIKE', '%'.$value.'%')->orWhere('country', 'LIKE', '%'.$value.'%')->orWhere('city', 'LIKE', '%'.$value.'%')->orderBy('name', 'ASC')->paginate(20));
     }
 
     public function show($id)
@@ -72,7 +72,6 @@ class CompanyController extends Controller
             $company->city = request('city');
             $company->address = request('address');
             $company->location_map = request('location_map');
-            $company->main_branch = request('main_branch');
             $company->save();
     
             return response()->json([
