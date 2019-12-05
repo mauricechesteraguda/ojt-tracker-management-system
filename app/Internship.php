@@ -14,4 +14,14 @@ class Internship extends Model
     protected $fillable = [
         'user_id', 'company_id', 'start_date','representative','student_position','is_approved','status','comment','updated_by',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo('App\User');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo('App\Company');
+    }
 }

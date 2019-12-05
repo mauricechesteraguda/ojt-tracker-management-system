@@ -16,8 +16,8 @@ class Internship extends JsonResource
     {
         return [
             'id'         => $this->id,
-            'user_id'       => $this->user_id,
-            'company_id'    => $this->company_id,
+            'user'       => $this->user,
+            'company'    => $this->company,
             'start_date'    => $this->start_date,
             'representative'    => $this->representative,
             'student_postion' => $this->student_postion,

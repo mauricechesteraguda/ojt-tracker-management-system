@@ -15,5 +15,10 @@ class Company extends Model
         'name', 'country', 'city','address','location_map','main_branch',
     ];
 
+    public function internships()
+    {
+        return $this->hasMany('App\Internship');
+    }
+
     
 }
