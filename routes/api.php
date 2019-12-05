@@ -30,3 +30,10 @@ Route::post('/companies/{id}', 'CompanyController@update');
 Route::post('/companies', 'CompanyController@store');
 Route::delete('/companies/{id}', 'CompanyController@delete');
 Route::get('/companies/search/{value}', 'CompanyController@search');
+
+Route::get('/internships', 'InternshipController@index');
+Route::get('/internships/{id}', 'InternshipController@show');
+Route::post('/internships/{id}', 'InternshipController@update');
+Route::post('/internships', 'InternshipController@store');
+Route::delete('/internships/{id}', 'InternshipController@delete');
+Route::get('/internships/search/{value}', 'InternshipController@search');

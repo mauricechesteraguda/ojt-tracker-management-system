@@ -1,0 +1,30 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class Internship extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function toArray($request)
+    {
+        return [
+            'id'         => $this->id,
+            'user_id'       => $this->user_id,
+            'company_id'    => $this->company_id,
+            'start_date'    => $this->start_date,
+            'representative'    => $this->representative,
+            'student_postion' => $this->student_postion,
+            'is_approved' => $this->is_approved,
+            'status' => $this->status,
+            'comment' => $this->comment,
+            'updated_by' => $this->updated_by,
+        ];
+    }
+}
