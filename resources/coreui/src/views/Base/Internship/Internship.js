@@ -17,7 +17,7 @@ import {
 
 } from 'reactstrap';
 import axios from 'axios';
-import Select from 'react-select';
+// import Select from 'react-select';
 import Paginations from "react-js-pagination";
 
 
@@ -26,7 +26,9 @@ class Internship extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      companies: [],
       internships: [],
+      
 
       add_form: false,
       id: '',
@@ -70,6 +72,7 @@ class Internship extends Component {
     this.handle_page_change = this.handle_page_change.bind(this);
     this.toggle_detail_modal = this.toggle_detail_modal.bind(this);
     this.handle_search_input_change = this.handle_search_input_change.bind(this);
+    this.get_companies = this.get_companies.bind(this);
   
   }
 
@@ -335,6 +338,20 @@ class Internship extends Component {
         alert('Server disconnected.')
       })
   }
+  
+  get_companies() {
+    // if (this.state.is_add_process_type) {
+      var self = this;
+      axios.get('/api/companies/all')
+        .then(res => {
+          self.setState({companies:res.data.data})
+        }).catch(err => {
+          console.log(err)
+          alert('Server disconnected.')
+        })
+    // }
+
+  }
 
   componentDidMount() {
 
@@ -394,49 +411,73 @@ class Internship extends Component {
                           <CardBody>
                             <Form action="" method="post" encType="multipart/form-data" className="form-horizontal">
 
-                              <FormGroup row>
+                            <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="name">Name</Label>
+                                  <Label htmlFor="role">Company</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input value={this.state.name} onChange={this.handle_input_change} type="text" id="name" name="name" placeholder="Text" />
-                                  <FormText color="muted">Internship Name</FormText>
+                                  <Input  value={this.state.company_id} onChange={this.handle_input_change} type="select" name="company_id" id="company_id">
+                                    <option></option>
+                                    {this.state.companies.map((data, i) => {
+                                      return (
+                                        <option key={i} value={data.id}>{data.name}</option>
+                                        
+                                      )
+                                    })}
+
+                                  </Input>
+                                </Col>
+                              </FormGroup>
+
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="start_date">Start Date</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                  <Input value={this.state.start_date} onChange={this.handle_input_change} type="date" id="start_date" name="start_date" placeholder="Text" />
+                                  <FormText color="muted">Input Starting Date</FormText>
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="country">Country</Label>
+                                  <Label htmlFor="representative">Representative</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input value={this.state.country} onChange={this.handle_input_change} type="text" id="country" name="country" placeholder="Text" />
-                                  <FormText color="muted">Please write the country</FormText>
+                                  <Input value={this.state.representative} onChange={this.handle_input_change} type="text" id="representative" name="representative" placeholder="Text" />
+                                  <FormText color="muted">Name of the representative</FormText>
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="city">City</Label>
+                                  <Label htmlFor="student_position">Postion</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input  value={this.state.city} onChange={this.handle_input_change} type="text" name="city" id="city"/>
+                                  <Input  value={this.state.student_position} onChange={this.handle_input_change} type="text" name="student_position" id="student_position"/>
                                   
                                 </Col>
                               </FormGroup>
-                              <FormGroup row>
+                              
+                              <FormGroup hidden={this.state.is_add_process_type} row>
                                 <Col md="3">
-                                  <Label htmlFor="address">Address</Label>
+                                  <Label htmlFor="is_approved">Approve</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input  value={this.state.address} onChange={this.handle_input_change} type="text" id="address" name="address" placeholder="Text" />
-                                  <FormText className="help-block">Please enter the address</FormText>
+                                  <Input  value={this.state.is_approved} onChange={this.handle_input_change} type="select" name="is_approved" id="is_approved">
+                                  <option value=""></option>
+                                  <option value="0">No</option>
+                                  <option value="1">Yes</option>
+                                      
+
+                                    </Input>
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="location_map">Location Map</Label>
+                                  <Label htmlFor="comment">Comment</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input  value={this.state.location_map} onChange={this.handle_input_change} type="text" id="location_map" name="location_map" placeholder="Location" />
-                                  <FormText className="help-block">Please enter the google map location</FormText>
+                                  <Input  value={this.state.comment} onChange={this.handle_input_change} type="text" id="comment" name="comment" placeholder="Comment" />
+                                  
                                 </Col>
                               </FormGroup>
                               
