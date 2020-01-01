@@ -10,6 +10,10 @@ use App\Http\Resources\CompanyCollection;
 
 class CompanyController extends Controller
 {
+    public function all()
+    {
+        return new CompanyCollection(Company::orderBy('name', 'ASC')->get());
+    }
     public function index()
     {
         return new CompanyCollection(Company::orderBy('name', 'ASC')->paginate(5));

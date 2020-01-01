@@ -38,5 +38,6 @@ const routes = {
   '/widgets': 'Widgets',
   '/users': 'Users',
   '/companies': 'Company',
+  '/internships': 'Internship',
 };
 export default routes;

@@ -35,6 +35,7 @@ import ProgressBar from '../../views/Base/ProgressBar/';
 import Tooltips from '../../views/Base/Tooltips/';
 import User from '../../views/Base/User/User';
 import Company from '../../views/Base/Company';
+import Internship from '../../views/Base/Internship';
 
 // Buttons
 import Buttons from '../../views/Buttons/Buttons/';
@@ -66,6 +67,7 @@ class Full extends Component {
                 <Route path="/dashboard" name="Dashboard" component={Dashboard}/>
                 <Route path="/users" name="Users" component={User}/>
                 <Route path="/companies" name="Company" component={Company}/>
+                <Route path="/internships" name="Internship" component={Internship}/>
                 <Route path="/theme/colors" name="Colors" component={Colors}/>
                 <Route path="/theme/typography" name="Typography" component={Typography}/>
                 <Route path="/base/cards" name="Cards" component={Cards}/>
