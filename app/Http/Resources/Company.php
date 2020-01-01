@@ -21,6 +21,8 @@ class Company extends JsonResource
             'city'    => $this->city,
             'address'    => $this->address,
             'location_map' => $this->location_map,
+            'is_deleted' => $this->is_deleted,
+        
         ];
     }
 }

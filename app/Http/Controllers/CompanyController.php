@@ -12,15 +12,15 @@ class CompanyController extends Controller
 {
     public function all()
     {
-        return new CompanyCollection(Company::orderBy('name', 'ASC')->get());
+        return new CompanyCollection(Company::where('is_deleted', '=', '0')->orderBy('name', 'ASC')->get());
     }
     public function index()
     {
-        return new CompanyCollection(Company::orderBy('name', 'ASC')->paginate(5));
+        return new CompanyCollection(Company::where('is_deleted', '=', '0')->orderBy('name', 'ASC')->paginate(5));
     }
     public function search($value)
     {
-        return new CompanyCollection(Company::where('name', 'LIKE', '%'.$value.'%')->orWhere('address', 'LIKE', '%'.$value.'%')->orWhere('country', 'LIKE', '%'.$value.'%')->orWhere('city', 'LIKE', '%'.$value.'%')->orderBy('name', 'ASC')->paginate(20));
+        return new CompanyCollection(Company::where('is_deleted', '=', '0')->where('name', 'LIKE', '%'.$value.'%')->orWhere('address', 'LIKE', '%'.$value.'%')->orWhere('country', 'LIKE', '%'.$value.'%')->orWhere('city', 'LIKE', '%'.$value.'%')->where('is_deleted', '=', '1')->orderBy('name', 'ASC')->paginate(20));
     }
 
     public function show($id)
@@ -56,8 +56,8 @@ class CompanyController extends Controller
     public function delete($id)
     {
         $company = Company::findOrFail($id);
-        $company->delete();
-
+        $company->is_deleted="1";
+        $company->save();
         return response()->json(null, 204);
         // return new CompanyCollection(Company::all());
     }
