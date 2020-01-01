@@ -40,7 +40,7 @@ class Internship extends Component {
       is_approved: 0,
       status: '',
       comment: '',
-      updated_by: '',
+      updated_by: window.current_user_id,
 
       is_add_process_type: true,
       save_button_is_disabled: true,
@@ -280,8 +280,7 @@ class Internship extends Component {
       is_approved: 0,
       status: '',
       comment: '',
-      updated_by: '',
-      // selectedOptionCompany:{},
+      updated_by: window.current_user_id,
 
       update_button_is_disabled: true,
       add_form: !this.state.add_form,

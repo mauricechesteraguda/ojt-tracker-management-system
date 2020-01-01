@@ -37,6 +37,7 @@
                 return str.replace(new RegExp(find, 'g'), replace);
             }
              window.user='{{ Auth::user() }}';
+             window.current_user_id='{{ Auth::user()->id }}';
              window.user=JSON.parse(replaceAll(window.user,'&quot;','"'))
              console.log(window.user.role)
        </script>

@@ -28,7 +28,7 @@ class InternshipController extends Controller
     {
         $request->validate([
             'user_id' => 'required|max:255',
-            'internship_id' => 'required|max:255',
+            'company_id' => 'required|max:255',
 
         ]);
         
