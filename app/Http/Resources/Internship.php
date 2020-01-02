@@ -20,7 +20,7 @@ class Internship extends JsonResource
             'company'    => $this->company,
             'start_date'    => $this->start_date,
             'representative'    => $this->representative,
-            'student_postion' => $this->student_postion,
+            'student_position' => $this->student_position,
             'is_approved' => $this->is_approved,
             'status' => $this->status,
             'comment' => $this->comment,

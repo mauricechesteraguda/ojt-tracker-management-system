@@ -62,7 +62,7 @@ class InternshipController extends Controller
             $internship->user_id = request('user_id');
             $internship->company_id = request('company_id');
             $internship->representative = request('representative');
-            $internship->student_postion = request('student_postion');
+            $internship->student_position = request('student_position');
             $internship->is_approved = request('is_approved');
             $internship->status = request('status');
             $internship->comment = request('comment');
