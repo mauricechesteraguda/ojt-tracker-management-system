@@ -12,11 +12,15 @@ class InternshipController extends Controller
 {
     public function index()
     {
-        return new InternshipCollection(Internship::orderBy('id', 'ASC')->paginate(5));
+        return new InternshipCollection(Internship::where('is_deleted', '=', '0')->orderBy('id', 'ASC')->paginate(5));
     }
     public function search($value)
     {
-        // return new InternshipCollection(Internship::where('name', 'LIKE', '%'.$value.'%')->orWhere('address', 'LIKE', '%'.$value.'%')->orWhere('country', 'LIKE', '%'.$value.'%')->orWhere('city', 'LIKE', '%'.$value.'%')->orderBy('id', 'ASC')->paginate(20));
+        // return new InternshipCollection(Internship::with('Company')->where('is_deleted','=','0')->whereHas('Company', function($q){
+        //     $q->where('name', 'LIKE', '%'.$value.'%')->orWhere('address', 'LIKE', '%'.$value.'%')->orWhere('country', 'LIKE', '%'.$value.'%')->orWhere('city', 'LIKE', '%'.$value.'%')->orderBy('id', 'ASC')-get();
+        // })->paginate(5));
+        
+        
     }
 
     public function show($id)
@@ -44,7 +48,9 @@ class InternshipController extends Controller
     public function delete($id)
     {
         $internship = Internship::findOrFail($id);
-        $internship->delete();
+        $internship->is_deleted="1";
+        
+        $internship->save();
 
         return response()->json(null, 204);
         // return new InternshipCollection(Internship::all());
@@ -54,13 +60,12 @@ class InternshipController extends Controller
     public function update(Request $request, $id)
         {
             $this->validate($request, [
-                'name' => 'required|max:255',
+                'start_date' => 'required|max:255',
             ]);
     
             $internship = Internship::findOrFail($id);
             
-            $internship->user_id = request('user_id');
-            $internship->company_id = request('company_id');
+            $internship->start_date = request('start_date');
             $internship->representative = request('representative');
             $internship->student_position = request('student_position');
             $internship->is_approved = request('is_approved');

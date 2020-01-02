@@ -14,6 +14,7 @@ import {
   FormText,
   Label,
   Input,
+  Badge
 
 } from 'reactstrap';
 import axios from 'axios';
@@ -32,8 +33,9 @@ class Internship extends Component {
 
       add_form: false,
       id: '',
-      user_id: '',
+      user_id: window.current_user_id,
       company_id: '',
+      company_name: '',
       start_date: '',
       representative: '',
       student_position: '',
@@ -138,8 +140,6 @@ class Internship extends Component {
 
     var self = this;
     let payload = {
-      user_id: this.state.user_id,
-      company_id: this.state.company_id,
       start_date: this.state.start_date,
       representative: this.state.representative,
       student_position: this.state.student_position,
@@ -170,8 +170,9 @@ class Internship extends Component {
     this.toggle_add_form();
     this.setState({
       id: this.state.internships[i].id,
-      user_id: this.state.internships[i].user_id,
-      company_id: this.state.internships[i].company_id,
+      user_id: this.state.internships[i].user.id,
+      company_id: this.state.internships[i].company.id,
+      company_name: this.state.internships[i].company.name,
       start_date: this.state.internships[i].start_date,
       representative: this.state.internships[i].representative,
       student_position: this.state.internships[i].student_position,
@@ -192,7 +193,7 @@ class Internship extends Component {
     
     var self = this;
     let payload = {
-      user_id: this.state.user_id,
+      user_id: window.current_user_id,
       company_id: this.state.company_id,
       start_date: this.state.start_date,
       representative: this.state.representative,
@@ -272,7 +273,7 @@ class Internship extends Component {
   toggle_add_form() {
     this.setState({
       id: '',
-      user_id: '',
+      user_id: window.current_user_id,
       company_id: '',
       start_date: '',
       representative: '',
@@ -298,8 +299,8 @@ class Internship extends Component {
       this.setState({
         detail_modal: !this.state.detail_modal,
         id: this.state.internships[i].id,
-        user_id: this.state.internships[i].user_id,
-        company_id: this.state.internships[i].company_id,
+        user_name: this.state.internships[i].user.name,
+        company_name: this.state.internships[i].company.name,
         start_date: this.state.internships[i].start_date,
         representative: this.state.internships[i].representative,
         student_position: this.state.internships[i].student_position,
@@ -412,19 +413,20 @@ class Internship extends Component {
 
                             <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="role">Company</Label>
+                                  <Label htmlFor="company_id">Company</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input  value={this.state.company_id} onChange={this.handle_input_change} type="select" name="company_id" id="company_id">
+                                  <Input hidden={!this.state.is_add_process_type} value={this.state.company_id} onChange={this.handle_input_change} type="select" name="company_id" id="company_id">
                                     <option></option>
                                     {this.state.companies.map((data, i) => {
                                       return (
-                                        <option key={i} value={data.id}>{data.name}</option>
+                                        <option key={i} value={data.id}>{data.name} - {data.address}, {data.city}, {data.country} </option>
                                         
                                       )
                                     })}
 
                                   </Input>
+  <Label hidden={this.state.is_add_process_type} htmlFor="company_id">{this.state.company_name}</Label>
                                 </Col>
                               </FormGroup>
 
@@ -510,47 +512,62 @@ class Internship extends Component {
                             <Form action="" method="post" encType="multipart/form-data" className="form-horizontal">
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="name">Internship Name</Label>
+                                  <Label htmlFor="name">Student Name</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Label>{this.state.name}</Label>
+                                  <Label>{this.state.user_name}</Label>
                                   
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="country">Country</Label>
+                                  <Label htmlFor="company">Company</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                <Label>{this.state.country}</Label>
+                                <Label>{this.state.company_name}</Label>
                                   
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="city">City</Label>
+                                  <Label htmlFor="start_date">Start Date</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                <Label>{this.state.city}</Label>
+                                <Label>{this.state.start_date}</Label>
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="address">Address</Label>
+                                  <Label htmlFor="representative">Representative</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                <Label>{this.state.address}</Label>
+                                <Label>{this.state.representative}</Label>
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="location_map">Location Map</Label>
+                                  <Label htmlFor="student_position">Position</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                <Label>{this.state.location_map}</Label>
+                                <Label>{this.state.student_position}</Label>
                                 </Col>
                               </FormGroup>
-                              
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="is_approved">Status</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <Label><Badge color={this.state.is_approved ? 'success':'danger'} >{this.state.is_approved ? 'approved':'pending'}</Badge></Label>
+                                </Col>
+                              </FormGroup>
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="comment">Comments</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <Label>{this.state.comment}</Label>
+                                </Col>
+                              </FormGroup>
                               
                             </Form>
 
@@ -570,10 +587,11 @@ class Internship extends Component {
                 <Table responsive>
                   <thead>
                     <tr>
-                      <th>Internship</th>
-                      <th>Address</th>
-                      <th>City</th>
-                      <th>Country</th>
+                      <th>Student</th>
+                      <th>Company</th>
+                      <th>Start Date</th>
+                      <th>Representative</th>
+                      <th>Position</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -581,10 +599,11 @@ class Internship extends Component {
                     {this.state.internships.map((data, i) => {
                       return (
                         <tr key={i}>
-                          <td>{data.name}</td>
-                          <td>{data.address}</td>
-                          <td>{data.city}</td>
-                          <td>{data.country}</td>
+                          <td>{data.user.name}</td>
+                          <td>{data.company.name}</td>
+                          <td>{data.start_date}</td>
+                          <td>{data.representative}</td>
+                          <td>{data.student_position}</td>
                           <td>
                           <Button size="sm" className='text-white' color="info" onClick={() => this.toggle_detail_modal(i)}><i className="fa fa-book"></i> Details</Button>
                             <Button size="sm" color="primary" onClick={() => this.load_item(i)}><i className="fa fa-pencil"></i></Button>
