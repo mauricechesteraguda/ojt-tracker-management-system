@@ -185,9 +185,16 @@ class Description extends Component {
 
     this.setState({ [e.target.name]: e.target.value });
     
+    if (e.target.value == '') {
+      this.disable_buttons();
+      setTimeout(() => {
+      
+        this.check_inputs(e.target.name, e.target.value);
+      }, 500);
+    }else{
+      this.check_inputs(e.target.name, e.target.value);
+    }
     
-    this.check_inputs(e.target.name, e.target.value);
-
 
 
   }
@@ -223,15 +230,17 @@ class Description extends Component {
 
   get_data(page_number) {
     var self = this;
-    axios.get('/api/descriptions/internship/'+this.props.internship_id)
+    if (this.props.internship_id) {
+      axios.get('/api/descriptions/internship/'+this.props.internship_id)
       .then(res => {
         self.store_data_to_state(res.data)
       }).catch(err => {
         console.log(err)
         alert('Server disconnected.')
       })
+    }
+    
   }
-  
 
   componentDidUpdate(prevProps, prevState) {
     const { internship_id } = this.props;
