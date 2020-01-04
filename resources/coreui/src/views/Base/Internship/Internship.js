@@ -20,6 +20,7 @@ import {
 import axios from 'axios';
 // import Select from 'react-select';
 import Paginations from "react-js-pagination";
+import Description from "../Internship/Description";
 
 
 
@@ -647,9 +648,16 @@ class Internship extends Component {
                           </CardBody>
                         
             </Card>
+            <Description internship_id={this.state.id} is_approved={(this.state.is_approved==1?true:false)}></Description>
           </Col>
 
+          
+          
+
         </Row>
+
+        
+        
       </div>
 
     )
