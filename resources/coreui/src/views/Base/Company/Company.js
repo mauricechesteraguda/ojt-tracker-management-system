@@ -39,6 +39,7 @@ class Company extends Component {
       is_add_process_type: true,
       save_button_is_disabled: true,
       update_button_is_disabled: true,
+      is_detail_page: false,
 
       has_alert_hidden: true,
       alert_type: 'danger',
@@ -47,7 +48,7 @@ class Company extends Component {
       active_page:1,
       items_count_per_page:1,
       total_items_count:1,
-      detail_modal: false,
+      current_index:'',
 
       search_loading: false,
       search_message: '',
@@ -64,8 +65,15 @@ class Company extends Component {
     this.delete_item = this.delete_item.bind(this);
     this.disable_buttons = this.disable_buttons.bind(this);
     this.handle_page_change = this.handle_page_change.bind(this);
-    this.toggle_detail_modal = this.toggle_detail_modal.bind(this);
     this.handle_search_input_change = this.handle_search_input_change.bind(this);
+    this.toggle_detail_page = this.toggle_detail_page.bind(this);
+    this.go_back = this.go_back.bind(this);
+  }
+
+  go_back(){
+    if (this.state.is_detail_page == true) {
+      this.setState({is_detail_page:false})
+    }
     
   }
 
@@ -268,11 +276,12 @@ class Company extends Component {
     });
 
   }
-  toggle_detail_modal(i=undefined){
+  toggle_detail_page(i=undefined){
     
     if (i >= 0 ) {
       this.setState({
-        detail_modal: !this.state.detail_modal,
+        is_detail_page: true,
+        current_index:i,
         id: this.state.companies[i].id,
         name: this.state.companies[i].name,
         country: this.state.companies[i].country,
@@ -282,7 +291,7 @@ class Company extends Component {
       });
     }else{
       this.setState({
-        detail_modal: !this.state.detail_modal,
+        is_detail_page: false,
       });
     }
     
@@ -324,14 +333,14 @@ class Company extends Component {
   render() {
     return (
       <div className="animated fadeIn">
-        <Row>
+        <Row hidden={this.state.is_detail_page}>
           <Col xs="12" lg="12">
             <Card>
               <CardHeader>
                 <Row>
                 <Col xs="4" lg="4">
                   
-                  <i className="fa fa-align-justify"></i> Company
+                  <i className="fa fa-bank"></i> Company
                   </Col>
                   <Col xs="4" lg="4">
                   
@@ -429,14 +438,74 @@ class Company extends Component {
                     <Button color="secondary" onClick={this.toggle_add_form}>Cancel</Button>
                   </ModalFooter>
                 </Modal>
-                <Modal size='lg' isOpen={this.state.detail_modal} toggle={this.toggle_detail_modal}
-                  className={'modal-primary ' + this.props.className}>
-                  <ModalHeader toggle={this.toggle_detail_modal}>Company Detail</ModalHeader>
-                  <ModalBody>
+                
+                <Alert hidden={this.state.has_alert_hidden} color={this.state.alert_type}>
+                                    {this.state.alert_message}
+                                  </Alert>
+                <Table responsive>
+                  <thead>
+                    <tr>
+                      <th>Company</th>
+                      <th>Address</th>
+                      <th>City</th>
+                      <th>Country</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {this.state.companies.map((data, i) => {
+                      return (
+                        <tr key={i}>
+                          <td>{data.name}</td>
+                          <td>{data.address}</td>
+                          <td>{data.city}</td>
+                          <td>{data.country}</td>
+                          <td>
+                          <Button size="sm" className='text-white' color="info" onClick={() => this.toggle_detail_page(i)}><i className="fa fa-book"></i> Details</Button>
+                            <Button size="sm" color="primary" onClick={() => this.load_item(i)}><i className="fa fa-pencil"></i></Button>
+                            <Button size="sm" onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.delete_item(i) }} color="danger"><i className="fa fa-trash"></i></Button>
+                          </td>
+                        </tr>
+                      )
+                    })}
 
-                    <Row>
+
+                  </tbody>
+                </Table>
+                <Paginations
+                    activePage={this.state.active_page}
+                    itemsCountPerPage={this.state.items_count_per_page}
+                    totalItemsCount={this.state.total_items_count}
+                    pageRangeDisplayed={5}
+                    onChange={this.handle_page_change}
+                />
+                
+              </CardBody>
+            </Card>
+          </Col>
+
+        </Row>
+
+        <Row hidden={!this.state.is_detail_page}>
                       <Col xs="12" md="12">
                         <Card>
+                        <CardHeader>
+                <Row>
+                <Col xs="4" lg="4">
+                  
+                  <i className="fa fa-bank"></i> Company Detail
+                  </Col>
+                  <Col xs="4" lg="4">
+                  
+                  </Col>
+                  <Col xs="4" lg="4">
+                        
+                        
+                        <Button className="float-right" color="primary" onClick={this.go_back}><i className="fa fa-hand-o-left"></i> Back</Button>
+                        
+                  </Col>
+                </Row>
+              </CardHeader>
 
                           <CardBody>
                             <Form action="" method="post" encType="multipart/form-data" className="form-horizontal">
@@ -491,57 +560,7 @@ class Company extends Component {
                       </Col>
                     </Row>
 
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button color="secondary" onClick={this.toggle_detail_modal}>Close</Button>
-                  </ModalFooter>
-                </Modal>
-                <Alert hidden={this.state.has_alert_hidden} color={this.state.alert_type}>
-                                    {this.state.alert_message}
-                                  </Alert>
-                <Table responsive>
-                  <thead>
-                    <tr>
-                      <th>Company</th>
-                      <th>Address</th>
-                      <th>City</th>
-                      <th>Country</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {this.state.companies.map((data, i) => {
-                      return (
-                        <tr key={i}>
-                          <td>{data.name}</td>
-                          <td>{data.address}</td>
-                          <td>{data.city}</td>
-                          <td>{data.country}</td>
-                          <td>
-                          <Button size="sm" className='text-white' color="info" onClick={() => this.toggle_detail_modal(i)}><i className="fa fa-book"></i> Details</Button>
-                            <Button size="sm" color="primary" onClick={() => this.load_item(i)}><i className="fa fa-pencil"></i></Button>
-                            <Button size="sm" onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.delete_item(i) }} color="danger"><i className="fa fa-trash"></i></Button>
-                          </td>
-                        </tr>
-                      )
-                    })}
-
-
-                  </tbody>
-                </Table>
-                <Paginations
-                    activePage={this.state.active_page}
-                    itemsCountPerPage={this.state.items_count_per_page}
-                    totalItemsCount={this.state.total_items_count}
-                    pageRangeDisplayed={5}
-                    onChange={this.handle_page_change}
-                />
-                
-              </CardBody>
-            </Card>
-          </Col>
-
-        </Row>
+                  
       </div>
 
     )
