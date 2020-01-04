@@ -24,4 +24,8 @@ class Internship extends Model
     {
         return $this->belongsTo('App\Company');
     }
+    public function descriptions()
+    {
+        return $this->hasMany('App\Description');
+    }
 }

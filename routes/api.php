@@ -39,3 +39,12 @@ Route::post('/internships/{id}', 'InternshipController@update');
 Route::post('/internships', 'InternshipController@store');
 Route::delete('/internships/{id}', 'InternshipController@delete');
 Route::get('/internships/search/{value}', 'InternshipController@search');
+
+
+Route::get('/descriptions', 'DescriptionController@index');
+Route::get('/descriptions/internship/{id}', 'DescriptionController@by_internship_id');
+// Route::get('/descriptions/{id}', 'DescriptionController@show');
+// Route::post('/descriptions/{id}', 'DescriptionController@update');
+Route::post('/descriptions', 'DescriptionController@store');
+Route::delete('/descriptions/{id}', 'DescriptionController@delete');
+Route::get('/descriptions/search/{value}/internship/{id}', 'DescriptionController@search');
