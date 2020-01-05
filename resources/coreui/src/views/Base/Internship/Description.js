@@ -255,8 +255,8 @@ class Description extends Component {
 
   render() {
     return (
-      <div className="container-fluid">
-        
+      
+        <Row hidden={this.props.is_hidden}>
           <Col xs="12" lg="12">
             <Card>
               <CardHeader>
@@ -364,8 +364,8 @@ class Description extends Component {
               </CardBody>
             </Card>
           </Col>
-
-      </div>
+          </Row>
+      
 
     )
   }

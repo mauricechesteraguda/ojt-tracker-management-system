@@ -648,7 +648,7 @@ class Internship extends Component {
                           </CardBody>
                         
             </Card>
-            <Description internship_id={this.state.id} is_approved={(this.state.is_approved==1?true:false)}></Description>
+            
           </Col>
 
           
@@ -656,7 +656,7 @@ class Internship extends Component {
 
         </Row>
 
-        
+        <Description is_hidden={!this.state.is_detail_page} internship_id={this.state.id} is_approved={(this.state.is_approved==1?true:false)}></Description>
         
       </div>
 
