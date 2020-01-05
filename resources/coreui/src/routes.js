@@ -38,6 +38,7 @@ const routes = {
   '/widgets': 'Widgets',
   '/users': 'Users',
   '/companies': 'Company',
+  '/requirements/categories': 'Requirement Category',
   '/internships': 'Internship',
 };
 export default routes;

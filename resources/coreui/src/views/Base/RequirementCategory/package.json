@@ -1,0 +1,6 @@
+{
+  "name": "RequirementCategory",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./RequirementCategory.js"
+}

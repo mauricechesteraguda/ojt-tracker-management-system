@@ -250,9 +250,15 @@ class Company extends Component {
 
     this.setState({ [e.target.name]: e.target.value });
     
-    
-    this.check_inputs(e.target.name, e.target.value);
-
+    if (e.target.value == '') {
+      this.disable_buttons();
+      setTimeout(() => {
+      
+        this.check_inputs(e.target.name, e.target.value);
+      }, 500);
+    }else{
+      this.check_inputs(e.target.name, e.target.value);
+    }
 
 
   }

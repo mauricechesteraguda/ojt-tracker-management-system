@@ -15,6 +15,11 @@ export default {
       icon: 'icon-people'
     },
     {
+      name: 'Requirement Category',
+      url: '/requirements/categories',
+      icon: 'icon-paper-clip'
+    },
+    {
       name: 'Company',
       url: '/companies',
       icon: 'icon-grid'
