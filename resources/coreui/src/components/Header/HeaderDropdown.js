@@ -28,7 +28,7 @@ class HeaderDropdown extends Component {
 
   componentDidMount(){
     this.setState({
-      user_name: window.user.name
+      user_name: window.user.first_name
     });
   }
 

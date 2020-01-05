@@ -18,7 +18,7 @@ class UserController extends Controller
     }
     public function search($value)
     {
-        return new UserCollection(User::where('name', 'LIKE', '%'.$value.'%')->orWhere('sr_code', 'LIKE', '%'.$value.'%')->orderBy('name', 'ASC')->paginate(20));
+        return new UserCollection(User::where('name', 'LIKE', '%'.$value.'%')->orWhere('first_name', 'LIKE', '%'.$value.'%')->orWhere('last_name', 'LIKE', '%'.$value.'%')->orWhere('sr_code', 'LIKE', '%'.$value.'%')->orderBy('name', 'ASC')->paginate(20));
     }
 
     public function show($id)
@@ -29,6 +29,8 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'first_name' => 'required|max:255',
+            'last_name' => 'required|max:255',
             'name' => 'required|max:255',
             'role' => 'required|max:255',
         ]);
@@ -69,6 +71,8 @@ class UserController extends Controller
             $user = User::findOrFail($id);
             
             $user->name = request('name');
+            $user->first_name = request('first_name');
+            $user->last_name = request('last_name');
             $user->role = request('role');
             $user->email = request('email');
             if (request('password')) {

@@ -31,6 +31,8 @@ class Users extends Component {
       add_form: false,
       id: '',
       code: '',
+      first_name: '',
+      last_name: '',
       name: '',
       role: '',
       email: '',
@@ -142,7 +144,7 @@ class Users extends Component {
       default:
         break;
     }
-    if (this.state.name =='' || this.state.role == '' || this.state.email == '' || this.state.password == '' || this.state.confirm_password == '' ) {
+    if (this.state.first_name =='' || this.state.last_name =='' || this.state.name =='' || this.state.role == '' || this.state.email == '' || this.state.password == '' || this.state.confirm_password == '' ) {
       console.log('Incomplete form values!')
       this.disable_buttons()
     }
@@ -172,6 +174,8 @@ class Users extends Component {
     var self = this;
     let payload = {
       sr_code: this.state.code,
+      first_name: this.state.first_name,
+      last_name: this.state.last_name,
       name: this.state.name,
       role: this.state.role,
       email: this.state.email,
@@ -201,6 +205,8 @@ class Users extends Component {
       this.setState({
         id: this.state.users[this.state.current_index].id,
         code: this.state.users[this.state.current_index].sr_code,
+        first_name: this.state.users[this.state.current_index].first_name,
+        last_name: this.state.users[this.state.current_index].last_name,
         name: this.state.users[this.state.current_index].name,
         role: this.state.users[this.state.current_index].role,
         email: this.state.users[this.state.current_index].email,
@@ -213,6 +219,8 @@ class Users extends Component {
       this.setState({
         id: this.state.users[i].id,
         code: this.state.users[i].sr_code,
+        first_name: this.state.users[i].first_name,
+        last_name: this.state.users[i].last_name,
         name: this.state.users[i].name,
         role: this.state.users[i].role,
         email: this.state.users[i].email,
@@ -232,6 +240,8 @@ class Users extends Component {
     var self = this;
     let payload = {
       sr_code: this.state.code,
+      first_name: this.state.first_name,
+      last_name: this.state.last_name,
       name: this.state.name,
       role: this.state.role,
       email: this.state.email,
@@ -301,7 +311,9 @@ class Users extends Component {
 
     this.setState({ [e.target.name]: e.target.value });
     if (e.target.value == '' || 
-      (this.state.name =='' && 
+      (this.state.first_name =='' && 
+      this.state.last_name =='' && 
+      this.state.name =='' && 
       this.state.role == '' && 
       this.state.email == '' && 
       this.state.password == '' 
@@ -409,6 +421,8 @@ class Users extends Component {
     this.setState({
       id: '',
       code: '',
+      first_name: '',
+      last_name: '',
       name: '',
       role: 'student',
       email: '',
@@ -434,6 +448,8 @@ class Users extends Component {
         current_index:i,
         id: this.state.users[i].id,
         code: this.state.users[i].sr_code,
+        first_name: this.state.users[i].first_name,
+        last_name: this.state.users[i].last_name,
         name: this.state.users[i].name,
         role: this.state.users[i].role,
         email: this.state.users[i].email,
@@ -535,9 +551,30 @@ class Users extends Component {
                                   <FormText color="muted">Student / Faculty Code</FormText>
                                 </Col>
                               </FormGroup>
+                              
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="name">Name</Label>
+                                  <Label htmlFor="first_name">First Name</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                  <Input value={this.state.first_name} onChange={this.handle_input_change} type="text" id="first_name" name="first_name" placeholder="Text" />
+                                  <FormText color="muted">Write your first name</FormText>
+                                </Col>
+                              </FormGroup>
+
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="last_name">Last Name</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                  <Input value={this.state.last_name} onChange={this.handle_input_change} type="text" id="last_name" name="last_name" placeholder="Text" />
+                                  <FormText color="muted">Write your last_name</FormText>
+                                </Col>
+                              </FormGroup>
+
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="name">Middle Name</Label>
                                 </Col>
                                 <Col xs="12" md="9">
                                   <Input value={this.state.name} onChange={this.handle_input_change} type="text" id="name" name="name" placeholder="Text" />
@@ -623,7 +660,7 @@ class Users extends Component {
                       return (
                         <tr key={i}>
                           <td>{data.sr_code}</td>
-                          <td>{data.name}</td>
+                          <td>{data.last_name}, {data.first_name} {data.name}</td>
                           <td>{data.email}</td>
                           <td>{data.role}</td>
                           <td>
@@ -686,9 +723,31 @@ class Users extends Component {
                                   
                                 </Col>
                               </FormGroup>
+
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="name">Name</Label>
+                                  <Label htmlFor="first_name">First Name</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <Label>{this.state.first_name}</Label>
+                                  
+                                </Col>
+                              </FormGroup>
+
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="last_name">Last Name</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <Label>{this.state.last_name}</Label>
+                                  
+                                </Col>
+                              </FormGroup>
+
+
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="name">Middle Name</Label>
                                 </Col>
                                 <Col xs="12" md="9">
                                 <Label>{this.state.name}</Label>
