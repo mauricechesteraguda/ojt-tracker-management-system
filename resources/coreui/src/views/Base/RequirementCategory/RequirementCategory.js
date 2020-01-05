@@ -27,6 +27,7 @@ class RequirementCategory extends Component {
     super(props)
     this.state = {
       categories: [],
+      users:[],
 
       add_form: false,
       id: '',
@@ -66,6 +67,9 @@ class RequirementCategory extends Component {
     this.handle_search_input_change = this.handle_search_input_change.bind(this);
     this.toggle_detail_page = this.toggle_detail_page.bind(this);
     this.go_back = this.go_back.bind(this);
+    this.get_users = this.get_users.bind(this);
+    this.get_user = this.get_user.bind(this);
+    
   }
 
   go_back(){
@@ -315,9 +319,34 @@ class RequirementCategory extends Component {
       })
   }
 
+  get_users() {
+    var self = this;
+    axios.get('/api/users/')
+      .then(res => {
+        self.setState({users:res.data.data})
+      }).catch(err => {
+        console.log(err)
+        alert('Server disconnected.')
+      })
+  }
+
+  get_user(id) {
+    for (let i = 0; i < this.state.users.length; i++) {
+      
+      if (this.state.users[i].id == id) {
+        return this.state.users[i].first_name + ' ' + this.state.users[i].last_name  
+      }
+      
+      
+    }
+  }
+
+  
+
   componentDidMount() {
 
     this.get_data()
+    this.get_users()
 
   }
 
@@ -417,7 +446,7 @@ class RequirementCategory extends Component {
                     <tr>
                       <th>Name</th>
                       <th>File</th>
-                      <th>Updated By</th>
+                      <th>Last Updated By</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -427,7 +456,7 @@ class RequirementCategory extends Component {
                         <tr key={i}>
                           <td>{data.name}</td>
                           <td>{data.file}</td>
-                          <td>{data.updated_by}</td>
+                          <td>{this.get_user(data.updated_by)}</td>
                           <td>
                           <Button size="sm" className='text-white' color="info" onClick={() => this.toggle_detail_page(i)}><i className="fa fa-book"></i> Details</Button>
                             <Button size="sm" color="primary" onClick={() => this.load_item(i)}><i className="fa fa-pencil"></i></Button>
@@ -501,7 +530,7 @@ class RequirementCategory extends Component {
                                   <Label htmlFor="updated_by">Last Updated By</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                <Label>{this.state.updated_by}</Label>
+                                <Label>{this.get_user(this.state.updated_by)}</Label>
                                 </Col>
                               </FormGroup>
                               
