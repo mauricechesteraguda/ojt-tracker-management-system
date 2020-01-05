@@ -48,3 +48,11 @@ Route::get('/descriptions/internship/{id}', 'DescriptionController@by_internship
 Route::post('/descriptions', 'DescriptionController@store');
 Route::delete('/descriptions/{id}', 'DescriptionController@delete');
 Route::get('/descriptions/search/{value}/internship/{id}', 'DescriptionController@search');
+
+
+Route::get('/requirements/categories', 'RequirementCategoryController@index');
+Route::get('/requirements/categories/{id}', 'RequirementCategoryController@show');
+Route::post('/requirements/categories/{id}', 'RequirementCategoryController@update');
+Route::post('/requirements/categories', 'RequirementCategoryController@store');
+Route::delete('/requirements/categories/{id}', 'RequirementCategoryController@delete');
+Route::get('/requirements/categories/search/{value}', 'RequirementCategoryController@search');
