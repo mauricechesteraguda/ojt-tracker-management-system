@@ -32,8 +32,16 @@ class RequirementCategoryController extends Controller
             'name' => 'required|max:255',
 
         ]);
+
+        $fileExtension = $request->file('file')->getClientOriginalExtension();
+
+        $path = $request->file->move(public_path() . '/uploads',date('mdYHis') . uniqid() . '.' . $fileExtension);
         
         $requirement_category = RequirementCategory::create($request->all());
+        
+        $new_path = explode("public",$path)[1];
+
+        $requirement_category->file = $new_path;
         $requirement_category->save();
 
         return (new RequirementCategoryResource($requirement_category))

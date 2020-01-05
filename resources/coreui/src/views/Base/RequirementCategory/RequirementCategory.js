@@ -32,7 +32,7 @@ class RequirementCategory extends Component {
       add_form: false,
       id: '',
       name: '',
-      file: '',
+      file: null,
       updated_by: window.current_user_id,
 
       is_add_process_type: true,
@@ -177,17 +177,22 @@ class RequirementCategory extends Component {
     this.setState({ is_add_process_type: false });
   }
 
-  save_item(e) {
+  async save_item(e) {
     e.preventDefault();
     
     var self = this;
-    let payload = {
-      name: this.state.name,
-      file: this.state.country,
-      updated_by: window.current_user_id,
+    
+    const form_data = new FormData();
+    form_data.append('name',self.state.name);
+    form_data.append('file',self.state.file);
+    form_data.append('updated_by',window.current_user_id);
 
-    }
-    axios.post('/api/requirements/categories', payload)
+    
+    await axios.post('/api/requirements/categories', form_data,{
+      headers:{
+        'Content-Type':'multipart/form-data'
+      }
+    })
       .then(function (response) {
         console.log(response);
         self.get_data()
@@ -246,6 +251,11 @@ class RequirementCategory extends Component {
     })
 
     this.setState({ [e.target.name]: e.target.value });
+
+    if (e.target.files) {
+      this.setState({ file: e.target.files[0] });
+      
+    }
     
     if (e.target.value == '') {
       this.disable_buttons();
@@ -414,7 +424,7 @@ class RequirementCategory extends Component {
                                   <Label htmlFor="file">File</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                  <Input value={this.state.file} onChange={this.handle_input_change} type="file" id="file" name="file" />
+                                  <Input onChange={this.handle_input_change} type="file" id="customFile" name="customFile" />
                                   <FormText color="muted">Upload the template here</FormText>
                                 </Col>
                               </FormGroup>
@@ -445,7 +455,7 @@ class RequirementCategory extends Component {
                   <thead>
                     <tr>
                       <th>Name</th>
-                      <th>File</th>
+                      <th>File Link</th>
                       <th>Last Updated By</th>
                       <th>Actions</th>
                     </tr>
@@ -455,7 +465,7 @@ class RequirementCategory extends Component {
                       return (
                         <tr key={i}>
                           <td>{data.name}</td>
-                          <td>{data.file}</td>
+                          <td> <a className="btn btn btn-primary btn-sm" target="_blank" href={data.file}>Download</a></td>
                           <td>{this.get_user(data.updated_by)}</td>
                           <td>
                           <Button size="sm" className='text-white' color="info" onClick={() => this.toggle_detail_page(i)}><i className="fa fa-book"></i> Details</Button>
@@ -517,11 +527,20 @@ class RequirementCategory extends Component {
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="file">File</Label>
+                                  <Label htmlFor="file">File Link</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                <Label>{this.state.file}</Label>
+                                <a className="btn btn btn-primary btn-sm" target="_blank" href={this.state.file}>Download</a>
                                   
+                                </Col>
+                              </FormGroup>
+
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="iframe">View File</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <iframe src={this.state.file} width='100%' height='100%'></iframe>
                                 </Col>
                               </FormGroup>
                               
@@ -533,6 +552,7 @@ class RequirementCategory extends Component {
                                 <Label>{this.get_user(this.state.updated_by)}</Label>
                                 </Col>
                               </FormGroup>
+                              
                               
                               
                             </Form>
