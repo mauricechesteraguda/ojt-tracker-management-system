@@ -15,8 +15,8 @@ class RequirementCategory extends Model
         'name', 'file', 'is_deleted','updated_by',
     ];
 
-    // public function requirements()
-    // {
-    //     return $this->hasMany('App\Requirement');
-    // }
+    public function requirements()
+    {
+        return $this->hasMany('App\Requirement');
+    }
 }

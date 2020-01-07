@@ -19,7 +19,7 @@ class RequirementCategory extends JsonResource
             'name'       => $this->name,
             'file'    => $this->file,
             'is_deleted'    => $this->is_deleted,
-            // 'requirements'    => $this->requirements,
+            'requirements'    => $this->requirements,
             'updated_by' => $this->updated_by,
         ];
     }
