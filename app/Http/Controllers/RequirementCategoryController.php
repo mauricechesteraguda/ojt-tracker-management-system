@@ -33,15 +33,22 @@ class RequirementCategoryController extends Controller
 
         ]);
 
-        $fileExtension = $request->file('file')->getClientOriginalExtension();
-
-        $path = $request->file->move(public_path() . '/uploads',date('mdYHis') . uniqid() . '.' . $fileExtension);
-        
         $requirement_category = RequirementCategory::create($request->all());
-        
-        $new_path = explode("public",$path)[1];
 
-        $requirement_category->file = $new_path;
+        try {
+            $fileExtension = $request->file('file')->getClientOriginalExtension();
+
+            $path = $request->file->move(public_path() . '/uploads',date('mdYHis') . uniqid() . '.' . $fileExtension);
+            
+            $new_path = explode("public",$path)[1];
+    
+            $requirement_category->file = $new_path;
+    
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    
+
         $requirement_category->save();
 
         return (new RequirementCategoryResource($requirement_category))

@@ -252,7 +252,7 @@ class RequirementCategory extends Component {
 
     this.setState({ [e.target.name]: e.target.value });
 
-    if (e.target.files) {
+    if (typeof e.target.files != undefined && e.target.files != null) {
       this.setState({ file: e.target.files[0] });
       
     }
