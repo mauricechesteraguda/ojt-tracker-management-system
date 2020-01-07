@@ -43,11 +43,11 @@ class RequirementController extends Controller
 
         return new RequirementCollection(Requirement::where('is_deleted', '=', '0')->where('internship_id','=',$id)->orderBy('id', 'ASC')->paginate(5));
     }
-    public function search($value)
+    public function search($value,$id)
     {
-        // return new RequirementCollection(Requirement::where('is_deleted','=','0')->whereHas('RequirementCategory', function($q)use($value){
-        //     $q->where('name', 'LIKE', '%'.$value.'%')->where('is_deleted','=','0')->orderBy('name', 'ASC');
-        // })->paginate(5));
+        return new RequirementCollection(Requirement::where('is_deleted','=','0')->where('internship_id','=',$id)->whereHas('requirement_category', function($q)use($value){
+            $q->where('name', 'LIKE', '%'.$value.'%')->where('is_deleted','=','0')->orderBy('name', 'ASC');
+        })->paginate(5));
         
         
     }
