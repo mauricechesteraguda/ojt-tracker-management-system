@@ -202,7 +202,7 @@ class Requirement extends Component {
                     <tr>
                       <th>Requirement</th>
                       <th>Status</th>
-                      <th>Actions</th>
+                      <th>Verified?</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -213,7 +213,11 @@ class Requirement extends Component {
                           
                           <td><Label><Badge color={data.is_approved == '1' ? 'success':'danger'} >{data.is_approved == '1' ? 'verified':'pending'}</Badge></Label></td>
                           <td>
-                            <Input type="checkbox" hidden={this.props.is_approved} onChange={this.handle_input_change}></Input>
+                            <Label className="switch switch-icon switch-pill switch-primary">
+                              <Input className="switch-input" type="checkbox" hidden={this.props.is_approved} onChange={this.handle_input_change}></Input>
+                              <span className="switch-label" data-on={'\uf00c'} data-off={'\uf00d'}></span>
+                              <span className="switch-handle"></span>
+                            </Label>
                           </td>
                         </tr>
                       )
