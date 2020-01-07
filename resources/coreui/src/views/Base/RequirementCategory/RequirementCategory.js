@@ -136,17 +136,23 @@ class RequirementCategory extends Component {
       });
   }
 
-  update_item(e) {
+  async update_item(e) {
     e.preventDefault();
-
+    
     var self = this;
-    let payload = {
-      name: this.state.name,
-      file: this.state.file,
-      updated_by: window.current_user_id,
-    }
-    axios.post('/api/requirements/categories/' + this.state.id, payload)
-      .then(function (response) {
+    
+    const form_data = new FormData();
+    form_data.append('name',self.state.name);
+    form_data.append('file',self.state.file);
+    form_data.append('updated_by',window.current_user_id);
+
+    
+    await axios.post('/api/requirements/categories/' + this.state.id, form_data,{
+      headers:{
+        'Content-Type':'multipart/form-data'
+      }
+    })
+    .then(function (response) {
         console.log(response);
         self.get_data()
         self.toggle_add_form()

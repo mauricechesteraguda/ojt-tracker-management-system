@@ -19,9 +19,9 @@ class RequirementController extends Controller
 
         $requirement_categories = RequirementCategory::where('is_deleted', '=', '0')->orderBy('name', 'ASC')->get();
             foreach($requirement_categories as $rc){
-
+                $is_already_exist = false;
                 foreach ($requirements as $rq) {
-                    if ($rq->requirement_category->id == $rc->id) {
+                    if ($rq->requirement_category_id == $rc->id) {
                         $is_already_exist = true;
                     break;
                     }else{
@@ -41,13 +41,13 @@ class RequirementController extends Controller
                 
             }
 
-        return new RequirementCollection(Requirement::where('is_deleted', '=', '0')->orderBy('id', 'ASC')->paginate(5));
+        return new RequirementCollection(Requirement::where('is_deleted', '=', '0')->where('internship_id','=',$id)->orderBy('id', 'ASC')->paginate(5));
     }
     public function search($value)
     {
-        return new RequirementCollection(Requirement::where('is_deleted','=','0')->whereHas('RequirementCategory', function($q)use($value){
-            $q->where('name', 'LIKE', '%'.$value.'%')->where('is_deleted','=','0')->orderBy('name', 'ASC');
-        })->paginate(5));
+        // return new RequirementCollection(Requirement::where('is_deleted','=','0')->whereHas('RequirementCategory', function($q)use($value){
+        //     $q->where('name', 'LIKE', '%'.$value.'%')->where('is_deleted','=','0')->orderBy('name', 'ASC');
+        // })->paginate(5));
         
         
     }
