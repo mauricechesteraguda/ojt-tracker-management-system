@@ -21,6 +21,7 @@ import axios from 'axios';
 // import Select from 'react-select';
 import Paginations from "react-js-pagination";
 import Description from "../Internship/Description";
+import Requirement from "../Internship/Requirement";
 
 
 
@@ -563,7 +564,7 @@ class Internship extends Component {
 
         
         <Row hidden={!this.state.is_detail_page}>
-          <Col xs="12" lg="12">
+          <Col xs="6" lg="6">
             <Card>
               <CardHeader>
                 <Row>
@@ -651,11 +652,11 @@ class Internship extends Component {
             
           </Col>
 
-          
+          <Requirement is_hidden={!this.state.is_detail_page} internship_id={this.state.id} is_approved={(this.state.is_approved==1?true:false)}></Requirement>
           
 
         </Row>
-
+        
         <Description is_hidden={!this.state.is_detail_page} internship_id={this.state.id} is_approved={(this.state.is_approved==1?true:false)}></Description>
         
       </div>

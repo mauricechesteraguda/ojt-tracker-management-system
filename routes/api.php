@@ -58,9 +58,9 @@ Route::delete('/requirements/categories/{id}', 'RequirementCategoryController@de
 Route::get('/requirements/categories/search/{value}', 'RequirementCategoryController@search');
 
 
-Route::get('/requirements/{id}', 'RequirementController@index');
-Route::get('/requirements/{id}', 'RequirementController@show');
+Route::get('/requirements/internship/{id}', 'RequirementController@index');
+// Route::get('/requirements/{id}', 'RequirementController@show');
 Route::post('/requirements/{id}', 'RequirementController@update');
 Route::post('/requirements', 'RequirementController@store');
 Route::delete('/requirements/{id}', 'RequirementController@delete');
-Route::get('/requirements/search/{value}', 'RequirementController@search');
+Route::get('/requirements/search/{value}/internship/{id}', 'RequirementController@search');
