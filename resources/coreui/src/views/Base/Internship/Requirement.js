@@ -210,7 +210,8 @@ class Requirement extends Component {
                       return (
                         <tr key={i}>
                           <td>{data.requirement_category.name}</td>
-                          <td>{data.is_approved}</td>
+                          
+                          <td><Label><Badge color={data.is_approved == '1' ? 'success':'danger'} >{data.is_approved == '1' ? 'verified':'pending'}</Badge></Label></td>
                           <td>
                             <Input type="checkbox" hidden={this.props.is_approved} onChange={this.handle_input_change}></Input>
                           </td>
