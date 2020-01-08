@@ -530,7 +530,7 @@ class Internship extends Component {
                     {this.state.internships.map((data, i) => {
                       return (
                         <tr key={i}>
-                          <td>{data.user.name}</td>
+                          <td>{data.user.last_name + ', ' + data.user.first_name}</td>
                           <td>{data.company.name}</td>
                           <td>{data.start_date}</td>
                           <td>{data.representative}</td>

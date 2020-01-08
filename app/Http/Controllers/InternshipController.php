@@ -18,8 +18,10 @@ class InternshipController extends Controller
     }
     public function search($value)
     {
-        return new InternshipCollection(Internship::where('is_deleted','=','0')->whereHas('Company', function($q)use($value){
-            $q->where('name', 'LIKE', '%'.$value.'%')->orWhere('address', 'LIKE', '%'.$value.'%')->orWhere('country', 'LIKE', '%'.$value.'%')->orWhere('city', 'LIKE', '%'.$value.'%')->orderBy('id', 'ASC');
+        return new InternshipCollection(Internship::where('is_deleted','=','0')->whereHas('User', function($q)use($value){
+            $q->where('first_name', 'LIKE', '%'.$value.'%')->orWhere('last_name', 'LIKE', '%'.$value.'%')->orderBy('last_name', 'ASC');
+        })->orWhereHas('Company', function($q)use($value){
+            $q->where('name', 'LIKE', '%'.$value.'%')->orWhere('address', 'LIKE', '%'.$value.'%')->orWhere('country', 'LIKE', '%'.$value.'%')->orWhere('city', 'LIKE', '%'.$value.'%')->orderBy('name', 'ASC');
         })->paginate(5));
         
         
