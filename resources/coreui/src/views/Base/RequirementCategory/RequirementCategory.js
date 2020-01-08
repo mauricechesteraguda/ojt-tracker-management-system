@@ -259,7 +259,19 @@ class RequirementCategory extends Component {
     this.setState({ [e.target.name]: e.target.value });
 
     if (typeof e.target.files != undefined && e.target.files != null) {
-      this.setState({ file: e.target.files[0] });
+      if (e.target.files[0].name.includes('.jpg') || e.target.files[0].name.includes('.pdf')) {
+        this.setState({ file: e.target.files[0] });
+      }else{
+        this.setState({
+          alert_message: 'Invalid file format: accepts jpg or pdf file only.',
+          alert_type: 'danger',
+          has_alert_hidden: false,
+        })
+        e.target.files = [];
+        e.target.value = null;
+        this.disable_buttons();
+      }
+      
       
     }
     
@@ -471,7 +483,7 @@ class RequirementCategory extends Component {
                       return (
                         <tr key={i}>
                           <td>{data.name}</td>
-                          <td> <a className="btn btn btn-primary btn-sm" target="_blank" href={data.file}>Download</a></td>
+                          <td> <span hidden={data.file ? false:true}><a className="btn btn btn-primary btn-sm" target="_blank" href={data.file}>Download</a> </span></td>
                           <td>{this.get_user(data.updated_by)}</td>
                           <td>
                           <Button size="sm" className='text-white' color="info" onClick={() => this.toggle_detail_page(i)}><i className="fa fa-book"></i> Details</Button>
@@ -536,8 +548,9 @@ class RequirementCategory extends Component {
                                   <Label htmlFor="file">File Link</Label>
                                 </Col>
                                 <Col xs="12" md="9">
+                                  <span hidden={this.state.file ? false:true}>
                                 <a className="btn btn btn-primary btn-sm" target="_blank" href={this.state.file}>Download</a>
-                                  
+                                </span>
                                 </Col>
                               </FormGroup>
 
