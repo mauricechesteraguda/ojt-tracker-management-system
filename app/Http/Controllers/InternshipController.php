@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Requirement;
+use App\RequirementCategory;
 use App\Internship;
 use App\Http\Resources\Internship as InternshipResource;
 use App\Http\Resources\InternshipCollection;
@@ -38,6 +40,20 @@ class InternshipController extends Controller
         
         $internship = Internship::create($request->all());
         $internship->save();
+
+        if ($internship->id) {
+
+            $requirement_categories = RequirementCategory::where('is_deleted', '=', '0')->orderBy('name', 'ASC')->get();
+            foreach($requirement_categories as $r){
+                $requirement = Requirement::create(['requirement_category_id' => $r->id,
+                'internship_id'=> $internship->id,
+                'updated_by'=>$request->updated_by]);
+                $requirement->save();
+            }
+            
+        }
+
+        
 
         return (new InternshipResource($internship))
                 ->response()

@@ -78,7 +78,20 @@ class RequirementCategoryController extends Controller
             $requirement_category = RequirementCategory::findOrFail($id);
             
             $requirement_category->name = request('name');
-            $requirement_category->file = request('file');
+
+            try {
+                $fileExtension = $request->file('file')->getClientOriginalExtension();
+    
+                $path = $request->file->move(public_path() . '/uploads',date('mdYHis') . uniqid() . '.' . $fileExtension);
+                
+                $new_path = explode("public",$path)[1];
+        
+                $requirement_category->file = $new_path;
+        
+            } catch (\Throwable $th) {
+                //no file uploaded
+            }
+
             $requirement_category->updated_by = request('updated_by');
             $requirement_category->save();
     

@@ -5,6 +5,7 @@ npm install -g @storybook/cli
 getstorybook
 php artisan key:generate
 php artisan migrate
+
 php artisan tinker
 $user = new App\User();
 $user->password = Hash::make('123456');
@@ -12,3 +13,5 @@ $user->email = 'superuser@example.com';
 $user->name = 'superuser';
 $user->role = 'superuser';
 $user->save();
+
+php artisan passport:install
