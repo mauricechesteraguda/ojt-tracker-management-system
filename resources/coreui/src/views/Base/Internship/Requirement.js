@@ -36,6 +36,7 @@ class Requirement extends Component {
       user_id: window.current_user_id,
       internship_id: this.props.internship_id,
       requirement: '',
+      updated_by: window.current_user_id,
 
       is_add_process_type: true,
       save_button_is_disabled: true,
@@ -62,6 +63,8 @@ class Requirement extends Component {
 
     this.handle_page_change = this.handle_page_change.bind(this);
     this.handle_search_input_change = this.handle_search_input_change.bind(this);
+    this.get_users = this.get_users.bind(this);
+    this.get_user = this.get_user.bind(this);
   
   }
 
@@ -95,30 +98,40 @@ class Requirement extends Component {
   }
 
   handle_input_change(e) {
-     // clear alert status
-    // this.setState({
-    //   alert_message: '',
-    //   alert_type: 'primary',
-    //   has_alert_hidden: true,
-    // })
-
-    // this.setState({ [e.target.name]: e.target.value });
-    
-    // if (e.target.value == '') {
-    //   this.disable_buttons();
-    //   setTimeout(() => {
-      
-    //     this.check_inputs(e.target.name, e.target.value);
-    //   }, 500);
-    // }else{
-    //   this.check_inputs(e.target.name, e.target.value);
-    // }
+    var self = this;
+    var payload = {
+      is_approved: '0',
+      updated_by: this.state.updated_by,
+    }
     
     if (e.target.checked) {
-      alert("Checked")
-    }else{
-      alert("Unchecked")
+      
+     
+      payload = {
+        is_approved: '1',
+        updated_by: this.state.updated_by,
+      }
+      
+
+    } else {
+      payload = {
+        is_approved: '0',
+        updated_by: this.state.updated_by,
+      }
     }
+
+    var current_requirement_id = e.target.name.split("_")[1];
+
+    axios.post('/api/requirements/' + current_requirement_id, payload)
+      .then(function (response) {
+        console.log(response);
+        self.get_data()
+        
+      })
+      .catch(function (error) {
+        console.log(error);
+        alert('Update Failed. Contact your System Administrator')
+      });
 
 
   }
@@ -149,9 +162,38 @@ class Requirement extends Component {
     
   }
 
+  get_users() {
+    var self = this;
+    axios.get('/api/users/')
+      .then(res => {
+        self.setState({users:res.data.data})
+      }).catch(err => {
+        console.log(err)
+        alert('Server disconnected.')
+      })
+  }
+
+  get_user(id) {
+    for (let i = 0; i < this.state.users.length; i++) {
+      
+      if (this.state.users[i].id == id) {
+        return this.state.users[i].first_name + ' ' + this.state.users[i].last_name  
+      }
+      
+      
+    }
+  }
+
+
   componentDidUpdate(prevProps, prevState) {
     const { internship_id } = this.props;
     if (prevProps.internship_id !== internship_id) this.get_data();
+
+  }
+
+  componentDidMount() {
+
+    this.get_users()
 
   }
 
@@ -202,6 +244,7 @@ class Requirement extends Component {
                     <tr>
                       <th>Requirement</th>
                       <th>Status</th>
+                      <th>Last Updated by</th>
                       <th>Verified?</th>
                     </tr>
                   </thead>
@@ -212,9 +255,15 @@ class Requirement extends Component {
                           <td>{data.requirement_category.name}</td>
                           
                           <td><Label><Badge color={data.is_approved == '1' ? 'success':'danger'} >{data.is_approved == '1' ? 'verified':'pending'}</Badge></Label></td>
+
                           <td>
+                          {this.get_user(data.updated_by)}
+
+                          </td>
+                          <td>
+                            
                             <Label className="switch switch-icon switch-pill switch-primary">
-                              <Input className="switch-input" type="checkbox" hidden={this.props.is_approved} onChange={this.handle_input_change}></Input>
+                              <Input name={'req_'+data.id} checked={data.is_approved == '1'? true:false} className="switch-input" type="checkbox" hidden={this.props.is_approved} onChange={this.handle_input_change}></Input>
                               <span className="switch-label" data-on={'\uf00c'} data-off={'\uf00d'}></span>
                               <span className="switch-handle"></span>
                             </Label>

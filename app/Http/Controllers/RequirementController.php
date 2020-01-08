@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Auth;
+
 use App\Requirement;
 use App\RequirementCategory;
 use App\Http\Resources\Requirement as RequirementResource;
@@ -13,7 +15,7 @@ class RequirementController extends Controller
 {
     public function index($id)
     {
-        $user=auth()->user();
+        $user_id = Auth::user()->id;
         $is_already_exist=false;
         $requirements = Requirement::where('is_deleted', '=', '0')->where('internship_id','=',$id)->orderBy('id', 'ASC')->get();
 
@@ -30,18 +32,20 @@ class RequirementController extends Controller
                 }
 
                 if ($is_already_exist) {
-                    break;
+                    //pass
                 }else{
                     $requirement = Requirement::create(['requirement_category_id' => $rc->id,
                     'internship_id'=> $id,
-                    'updated_by'=>$user->id]);
+                    'updated_by'=>$user_id]);
                     $requirement->save();
                 }
 
                 
             }
 
-        return new RequirementCollection(Requirement::where('is_deleted', '=', '0')->where('internship_id','=',$id)->orderBy('id', 'ASC')->paginate(5));
+        return new RequirementCollection(Requirement::where('is_deleted', '=', '0')->where('internship_id','=',$id)->whereHas('requirement_category', function($q){
+            $q->where('is_deleted','=','0')->orderBy('name', 'ASC');
+        })->paginate(5));
     }
     public function search($value,$id)
     {
@@ -52,38 +56,6 @@ class RequirementController extends Controller
         
     }
 
-    public function show($id)
-    {
-        return new RequirementResource(Requirement::findOrFail($id));
-    }
-
-    public function store(Request $request)
-    {
-        // $request->validate([
-        //     'requirement_category_id' => 'required|max:255',
-        //     'internship_id' => 'required|max:255',
-
-        // ]);
-        
-        // $requirement = Requirement::create($request->all());
-        // $requirement->save();
-
-        // return (new RequirementResource($requirement))
-        //         ->response()
-        //         ->setStatusCode(201);
-    
-    }
-
-    public function delete($id)
-    {
-        // $requirement = Requirement::findOrFail($id);
-        // $requirement->is_deleted="1";
-        
-        // $requirement->save();
-
-        // return response()->json(null, 204);
-        // // return new RequirementCollection(Requirement::all());
-    }
 
         
     public function update(Request $request, $id)
