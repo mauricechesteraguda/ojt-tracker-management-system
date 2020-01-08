@@ -16,51 +16,51 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::middleware('auth:api')->group( function(){
+    
+Route::get('/users', 'UserController@index')->middleware('auth');
+Route::get('/users/{id}', 'UserController@show')->middleware('auth');
+Route::post('/users/{id}', 'UserController@update')->middleware('auth');
+Route::post('/users', 'UserController@store')->middleware('auth');
+Route::delete('/users/{id}', 'UserController@delete')->middleware('auth');
+Route::get('/users/search/{value}', 'UserController@search')->middleware('auth');
 
-Route::get('/users', 'UserController@index');
-Route::get('/users/{id}', 'UserController@show');
-Route::post('/users/{id}', 'UserController@update');
-Route::post('/users', 'UserController@store');
-Route::delete('/users/{id}', 'UserController@delete');
-Route::get('/users/search/{value}', 'UserController@search');
-
-Route::get('/companies', 'CompanyController@index');
-Route::get('/companies/all', 'CompanyController@all');
-Route::get('/companies/{id}', 'CompanyController@show');
-Route::post('/companies/{id}', 'CompanyController@update');
-Route::post('/companies', 'CompanyController@store');
-Route::delete('/companies/{id}', 'CompanyController@delete');
-Route::get('/companies/search/{value}', 'CompanyController@search');
-
-
-Route::get('/internships', 'InternshipController@index');
-Route::get('/internships/{id}', 'InternshipController@show');
-Route::post('/internships/{id}', 'InternshipController@update');
-Route::post('/internships', 'InternshipController@store');
-Route::delete('/internships/{id}', 'InternshipController@delete');
-Route::get('/internships/search/{value}', 'InternshipController@search');
+Route::get('/companies', 'CompanyController@index')->middleware('auth');
+Route::get('/companies/all', 'CompanyController@all')->middleware('auth');
+Route::get('/companies/{id}', 'CompanyController@show')->middleware('auth');
+Route::post('/companies/{id}', 'CompanyController@update')->middleware('auth');
+Route::post('/companies', 'CompanyController@store')->middleware('auth');
+Route::delete('/companies/{id}', 'CompanyController@delete')->middleware('auth');
+Route::get('/companies/search/{value}', 'CompanyController@search')->middleware('auth');
 
 
-Route::get('/descriptions', 'DescriptionController@index');
-Route::get('/descriptions/internship/{id}', 'DescriptionController@by_internship_id');
-// Route::get('/descriptions/{id}', 'DescriptionController@show');
-// Route::post('/descriptions/{id}', 'DescriptionController@update');
-Route::post('/descriptions', 'DescriptionController@store');
-Route::delete('/descriptions/{id}', 'DescriptionController@delete');
-Route::get('/descriptions/search/{value}/internship/{id}', 'DescriptionController@search');
+Route::get('/internships', 'InternshipController@index')->middleware('auth');
+Route::get('/internships/{id}', 'InternshipController@show')->middleware('auth');
+Route::post('/internships/{id}', 'InternshipController@update')->middleware('auth');
+Route::post('/internships', 'InternshipController@store')->middleware('auth');
+Route::delete('/internships/{id}', 'InternshipController@delete')->middleware('auth');
+Route::get('/internships/search/{value}', 'InternshipController@search')->middleware('auth');
 
 
-Route::get('/requirements/categories', 'RequirementCategoryController@index');
-Route::get('/requirements/categories/{id}', 'RequirementCategoryController@show');
-Route::post('/requirements/categories/{id}', 'RequirementCategoryController@update');
-Route::post('/requirements/categories', 'RequirementCategoryController@store');
-Route::delete('/requirements/categories/{id}', 'RequirementCategoryController@delete');
-Route::get('/requirements/categories/search/{value}', 'RequirementCategoryController@search');
+Route::get('/descriptions', 'DescriptionController@index')->middleware('auth');
+Route::get('/descriptions/internship/{id}', 'DescriptionController@by_internship_id')->middleware('auth');
+// Route::get('/descriptions/{id}', 'DescriptionController@show')->middleware('auth');
+// Route::post('/descriptions/{id}', 'DescriptionController@update')->middleware('auth');
+Route::post('/descriptions', 'DescriptionController@store')->middleware('auth');
+Route::delete('/descriptions/{id}', 'DescriptionController@delete')->middleware('auth');
+Route::get('/descriptions/search/{value}/internship/{id}', 'DescriptionController@search')->middleware('auth');
 
 
-Route::get('/requirements/internship/{id}', 'RequirementController@index');
-// Route::get('/requirements/{id}', 'RequirementController@show');
+Route::get('/requirements/categories', 'RequirementCategoryController@index')->middleware('auth');
+Route::get('/requirements/categories/{id}', 'RequirementCategoryController@show')->middleware('auth');
+Route::post('/requirements/categories/{id}', 'RequirementCategoryController@update')->middleware('auth');
+Route::post('/requirements/categories', 'RequirementCategoryController@store')->middleware('auth');
+Route::delete('/requirements/categories/{id}', 'RequirementCategoryController@delete')->middleware('auth');
+Route::get('/requirements/categories/search/{value}', 'RequirementCategoryController@search')->middleware('auth');
+
+
+Route::get('/requirements/internship/{id}', 'RequirementController@index')->middleware('auth');
+Route::get('/requirements/search/{value}/internship/{id}', 'RequirementController@search')->middleware('auth');
 Route::post('/requirements/{id}', 'RequirementController@update');
-Route::post('/requirements', 'RequirementController@store');
-Route::delete('/requirements/{id}', 'RequirementController@delete');
-Route::get('/requirements/search/{value}/internship/{id}', 'RequirementController@search');
+
+});
