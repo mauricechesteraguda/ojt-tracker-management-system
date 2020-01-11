@@ -22,6 +22,7 @@ import axios from 'axios';
 import Paginations from "react-js-pagination";
 import Description from "../Internship/Description";
 import Requirement from "../Internship/Requirement";
+import Report from "../Internship/Report";
 
 
 
@@ -658,6 +659,8 @@ class Internship extends Component {
         </Row>
         
         <Description is_hidden={!this.state.is_detail_page} internship_id={this.state.id} is_approved={(this.state.is_approved==1?true:false)}></Description>
+
+        <Report is_hidden={!this.state.is_detail_page} internship_id={this.state.id} is_approved={(this.state.is_approved==1?true:false)}></Report>
         
       </div>
 

@@ -22,7 +22,7 @@ class ReportController extends Controller
 
     public function search($value,$id)
     {
-        return new ReportCollection(Report::where('internship_id','=',$id)->where('is_deleted','=','0')->where('description', 'LIKE', '%'.$value.'%')->orderBy('id', 'ASC')->paginate(5));
+        return new ReportCollection(Report::where('internship_id','=',$id)->where('is_deleted','=','0')->where('description', 'LIKE', '%'.$value.'%')->orderBy('description', 'ASC')->paginate(5));
         
         
     }

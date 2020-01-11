@@ -67,7 +67,7 @@ Route::post('/requirements/{id}', 'RequirementController@update');
 Route::get('/reports', 'ReportController@index')->middleware('auth');
 Route::get('/reports/internship/{id}', 'ReportController@by_internship_id')->middleware('auth');
 // Route::get('/reports/{id}', 'ReportController@show')->middleware('auth');
-// Route::post('/reports/{id}', 'ReportController@update')->middleware('auth');
+Route::post('/reports/{id}', 'ReportController@update')->middleware('auth');
 Route::post('/reports', 'ReportController@store')->middleware('auth');
 Route::delete('/reports/{id}', 'ReportController@delete')->middleware('auth');
 Route::get('/reports/search/{value}/internship/{id}', 'ReportController@search')->middleware('auth');

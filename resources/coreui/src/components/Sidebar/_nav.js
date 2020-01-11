@@ -27,7 +27,12 @@ export default {
     {
       name: 'Internship',
       url: '/internships',
-      icon: 'icon-target'
+      icon: 'icon-trophy'
+    },
+    {
+      name: 'Visitation',
+      url: '/internships',
+      icon: 'icon-plane'
     },
     
     {
