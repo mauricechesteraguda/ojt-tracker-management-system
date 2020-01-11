@@ -243,6 +243,7 @@ class Requirement extends Component {
                   <thead>
                     <tr>
                       <th>Requirement</th>
+                      <th>Template</th>
                       <th>Status</th>
                       <th>Last Updated by</th>
                       <th>Verified?</th>
@@ -253,6 +254,7 @@ class Requirement extends Component {
                       return (
                         <tr key={i}>
                           <td>{data.requirement_category.name}</td>
+                          <td> <span hidden={data.requirement_category.file ? false:true}><a className="btn btn btn-primary btn-sm" target="_blank" href={data.requirement_category.file}>Download</a> </span></td>
                           
                           <td><Label><Badge color={data.is_approved == '1' ? 'success':'danger'} >{data.is_approved == '1' ? 'verified':'pending'}</Badge></Label></td>
 
