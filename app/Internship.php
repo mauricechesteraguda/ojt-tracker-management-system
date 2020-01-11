@@ -32,4 +32,8 @@ class Internship extends Model
     {
         return $this->hasMany('App\Requirement');
     }
+    public function reports()
+    {
+        return $this->hasMany('App\Report');
+    }
 }
