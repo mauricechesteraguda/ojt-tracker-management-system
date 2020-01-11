@@ -206,7 +206,7 @@ class Requirement extends Component {
     return (
       
         
-          <Col hidden={this.props.is_hidden} xs="6" lg="6">
+          <Col hidden={this.props.is_hidden} xs="12" lg="6">
             <Card>
               <CardHeader>
                 <Row>

@@ -565,7 +565,7 @@ class Internship extends Component {
 
         
         <Row hidden={!this.state.is_detail_page}>
-          <Col xs="6" lg="6">
+          <Col xs="12" lg="6">
             <Card>
               <CardHeader>
                 <Row>
