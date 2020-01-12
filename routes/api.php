@@ -72,4 +72,13 @@ Route::post('/reports', 'ReportController@store')->middleware('auth');
 Route::delete('/reports/{id}', 'ReportController@delete')->middleware('auth');
 Route::get('/reports/search/{value}/internship/{id}', 'ReportController@search')->middleware('auth');
 
+
+Route::get('/clusters', 'ClusterController@index')->middleware('auth');
+Route::get('/clusters/all', 'ClusterController@all')->middleware('auth');
+Route::get('/clusters/{id}', 'ClusterController@show')->middleware('auth');
+Route::post('/clusters/{id}', 'ClusterController@update')->middleware('auth');
+Route::post('/clusters', 'ClusterController@store')->middleware('auth');
+Route::delete('/clusters/{id}', 'ClusterController@delete')->middleware('auth');
+Route::get('/clusters/search/{value}', 'ClusterController@search')->middleware('auth');
+
 });

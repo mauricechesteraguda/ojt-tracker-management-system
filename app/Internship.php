@@ -36,4 +36,8 @@ class Internship extends Model
     {
         return $this->hasMany('App\Report');
     }
+    public function cluster()
+    {
+        return $this->belongsTo('App\Cluster');
+    }
 }

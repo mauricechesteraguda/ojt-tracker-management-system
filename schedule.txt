@@ -1,4 +1,7 @@
-internships = fetch all internship by year sorted by country, city, address, company
+api key google AIzaSyCf0T3NpakQJGRYfPZJGdVw86niWki7pag
+
+
+internships = fetch all internships by year sorted by country, city, address, company
 
 to_visit = []
 
