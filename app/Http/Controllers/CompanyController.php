@@ -14,7 +14,7 @@ class CompanyController extends Controller
 {
     public function cluster($id)
     {        
-        $companies = Company::selectRaw("*")->whereRaw("id in (SELECT company_id from internships where is_deleted = 0 and cluster_id =" . $id . ")")->paginate(5);
+        $companies = Company::selectRaw("*")->whereRaw("id in (SELECT company_id FROM internships WHERE is_deleted = 0 AND cluster_id =" . $id . ") ORDER BY country,province,city,address,name ASC")->paginate(5);
 
         return new CompanyCollection($companies);
     }
@@ -28,7 +28,7 @@ class CompanyController extends Controller
     }
     public function search($value)
     {
-        return new CompanyCollection(Company::where('is_deleted', '=', '0')->where('name', 'LIKE', '%'.$value.'%')->orWhere('address', 'LIKE', '%'.$value.'%')->orWhere('country', 'LIKE', '%'.$value.'%')->orWhere('city', 'LIKE', '%'.$value.'%')->where('is_deleted', '=', '1')->orderBy('name', 'ASC')->paginate(20));
+        return new CompanyCollection(Company::where('is_deleted', '=', '0')->where('name', 'LIKE', '%'.$value.'%')->orWhere('address', 'LIKE', '%'.$value.'%')->orWhere('country', 'LIKE', '%'.$value.'%')->orWhere('province', 'LIKE', '%'.$value.'%')->orWhere('city', 'LIKE', '%'.$value.'%')->where('is_deleted', '=', '1')->orderBy('name', 'ASC')->paginate(20));
     }
 
     public function show($id)
@@ -81,6 +81,7 @@ class CompanyController extends Controller
             
             $company->name = request('name');
             $company->country = request('country');
+            $company->province = request('province');
             $company->city = request('city');
             $company->address = request('address');
             $company->location_map = request('location_map');

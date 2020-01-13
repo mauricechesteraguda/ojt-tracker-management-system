@@ -32,6 +32,7 @@ class Company extends Component {
       id: '',
       name: '',
       country: '',
+      province: '',
       city: '',
       address: '',
       location_map: '',
@@ -107,7 +108,7 @@ class Company extends Component {
 
   check_inputs() {
 
-    if (this.state.name =='' || this.state.country == '' || this.state.city == '' || this.state.address == '' || this.state.location_map == '' ) {
+    if (this.state.name =='' || this.state.country == '' || this.state.province == '' || this.state.city == '' || this.state.address == '' || this.state.location_map == '' ) {
       console.log('Incomplete form values!')
       this.disable_buttons()
     }else{
@@ -141,6 +142,7 @@ class Company extends Component {
     let payload = {
       name: this.state.name,
       country: this.state.country,
+      province: this.state.province,
       city: this.state.city,
       address: this.state.address,
       location_map: this.state.location_map,
@@ -169,6 +171,7 @@ class Company extends Component {
       id: this.state.companies[i].id,
       name: this.state.companies[i].name,
       country: this.state.companies[i].country,
+      province: this.state.companies[i].province,
       city: this.state.companies[i].city,
       address: this.state.companies[i].address,
       location_map: this.state.companies[i].location_map,
@@ -186,6 +189,7 @@ class Company extends Component {
     let payload = {
       name: this.state.name,
       country: this.state.country,
+      province: this.state.province,
       city: this.state.city,
       address: this.state.address,
       location_map: this.state.location_map,
@@ -268,6 +272,7 @@ class Company extends Component {
       id: '',
       name: '',
       country: '',
+      province:'',
       city: '',
       address: '',
       location_map:'',
@@ -291,6 +296,7 @@ class Company extends Component {
         id: this.state.companies[i].id,
         name: this.state.companies[i].name,
         country: this.state.companies[i].country,
+        province: this.state.companies[i].province,
         city: this.state.companies[i].city,
         address: this.state.companies[i].address,
         location_map: this.state.companies[i].location_map,
@@ -401,7 +407,16 @@ class Company extends Component {
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="city">City</Label>
+                                  <Label htmlFor="province">Province</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                  <Input  value={this.state.province} onChange={this.handle_input_change} type="text" name="province" id="province"/>
+                                  
+                                </Col>
+                              </FormGroup>
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="city">City/Municipality</Label>
                                 </Col>
                                 <Col xs="12" md="9">
                                   <Input  value={this.state.city} onChange={this.handle_input_change} type="text" name="city" id="city"/>
@@ -454,6 +469,7 @@ class Company extends Component {
                       <th>Company</th>
                       <th>Address</th>
                       <th>City</th>
+                      <th>Province</th>
                       <th>Country</th>
                       <th>Actions</th>
                     </tr>
@@ -465,6 +481,7 @@ class Company extends Component {
                           <td>{data.name}</td>
                           <td>{data.address}</td>
                           <td>{data.city}</td>
+                          <td>{data.province}</td>
                           <td>{data.country}</td>
                           <td>
                           <Button size="sm" className='text-white' color="info" onClick={() => this.toggle_detail_page(i)}><i className="fa fa-book"></i> Details</Button>
@@ -531,6 +548,14 @@ class Company extends Component {
                                 <Col xs="12" md="9">
                                 <Label>{this.state.country}</Label>
                                   
+                                </Col>
+                              </FormGroup>
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="province">Province</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <Label>{this.state.province}</Label>
                                 </Col>
                               </FormGroup>
                               <FormGroup row>

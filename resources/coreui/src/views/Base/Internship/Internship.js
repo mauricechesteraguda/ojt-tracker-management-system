@@ -313,7 +313,7 @@ class Internship extends Component {
         current_index:i,
         id: this.state.internships[i].id,
         user_name: this.state.internships[i].user.first_name + ' ' + this.state.internships[i].user.last_name,
-        company_name: (this.state.internships[i].company.name+ ' - '+ this.state.internships[i].company.address+ ', '+this.state.internships[i].company.city+ ', '+this.state.internships[i].company.country),
+        company_name: (this.state.internships[i].company.name+ ' - '+ this.state.internships[i].company.address+ ', '+this.state.internships[i].company.city+ ', '+this.state.internships[i].company.province+ ', '+this.state.internships[i].company.country),
         start_date: this.state.internships[i].start_date,
         representative: this.state.internships[i].representative,
         student_position: this.state.internships[i].student_position,
