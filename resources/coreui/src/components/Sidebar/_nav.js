@@ -31,7 +31,7 @@ export default {
     },
     {
       name: 'Visitation',
-      url: '/internships',
+      url: '/clusters',
       icon: 'icon-plane'
     },
     

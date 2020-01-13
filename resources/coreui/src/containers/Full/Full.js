@@ -37,6 +37,7 @@ import User from '../../views/Base/User/User';
 import Company from '../../views/Base/Company';
 import RequirementCategory from '../../views/Base/RequirementCategory';
 import Internship from '../../views/Base/Internship';
+import Visitation from '../../views/Base/Visitation';
 
 // Buttons
 import Buttons from '../../views/Buttons/Buttons/';
@@ -70,6 +71,7 @@ class Full extends Component {
                 <Route path="/companies" name="Company" component={Company}/>
                 <Route path="/requirements/categories" name="Requirement Category" component={RequirementCategory}/>
                 <Route path="/internships" name="Internship" component={Internship}/>
+                <Route path="/clusters" name="Visitation" component={Visitation}/>
                 <Route path="/theme/colors" name="Colors" component={Colors}/>
                 <Route path="/theme/typography" name="Typography" component={Typography}/>
                 <Route path="/base/cards" name="Cards" component={Cards}/>
