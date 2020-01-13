@@ -75,7 +75,8 @@ class Visitation extends Component {
 
   go_back(){
     if (this.state.is_detail_page == true) {
-      this.setState({is_detail_page:false})
+      this.setState({is_detail_page:false,
+        companies:[]})
     }
     
   }
@@ -513,7 +514,7 @@ class Visitation extends Component {
                       return (
                         <tr key={i}>
                           <td>{data.name}</td>
-                          <td>{data.address}, {data.city}, {data.country}</td>
+                          <td>{data.address}, {data.city},{data.province}, {data.country}</td>
                           {/* <td><Label><Badge color={data.is_approved == '1' ? 'success':'danger'} >{data.is_approved == '1' ? 'verified':'pending'}</Badge></Label></td> */}
                           <td></td>
                           <td>{data.date_visited}</td>
