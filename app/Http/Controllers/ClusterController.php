@@ -36,16 +36,58 @@ class ClusterController extends Controller
 
         ]);
 
+        $internships = Internship::whereNull('cluster_id')->where('is_deleted', '=', '0')->where('start_date', 'LIKE','%' . $request->year . '%' )->orderBy('id', 'ASC')->get();
+
+        $locations = array();
+
+        foreach ($internships as $i) {
+            array_push($locations, $i->company->id);
+        }
+        
+        array_unique($locations);
+
+        $company_visit_per_day = 4;
+        $counter = 0;
+        // $latest_cluster_number = fetch from db 
+        $current_year = $request->year;
+        $cluster = null;
+
+        foreach ($locations as $l) {
             
-            $cluster = Cluster::create($request->all());
-            $cluster->save();
 
-            $internships = Internship::where('is_deleted', '=', '0')->where('start_date', 'LIKE','%' . $cluster->year . '%' )->orderBy('id', 'ASC')->get();
+            if ($counter == 0){
+                $cluster = Cluster::create($request->all());
+                $cluster->save();
 
-            foreach ($internships as $i) {
-                $i->cluster_id = $cluster->id;
-                $i->save();
+                $internships_by_company = Internship::whereNull('cluster_id')->where('is_deleted', '=', '0')->where('start_date', 'LIKE','%' . $request->year . '%' )->where('company_id','=',$l)->orderBy('id', 'ASC')->get();
+
+                foreach ($internships_by_company as $i) {
+                    $i->cluster_id = $cluster->id;
+                    $i->save();
+                }
+                $counter++;
+            }elseif ($counter >= 1 && $counter <  $company_visit_per_day) {
+                foreach ($internships_by_company as $i) {
+                    $i->cluster_id = $cluster->id;
+                    $i->save();
+                }
+                $counter++;
+            }elseif ($counter  == $company_visit_per_day) {
+                $cluster = Cluster::create($request->all());
+                $cluster->save();
+
+                $internships_by_company = Internship::whereNull('cluster_id')->where('is_deleted', '=', '0')->where('start_date', 'LIKE','%' . $request->year . '%' )->where('company_id','=',$l)->orderBy('id', 'ASC')->get();
+
+                foreach ($internships_by_company as $i) {
+                    $i->cluster_id = $cluster->id;
+                    $i->save();
+                }
+                $counter = 1;
             }
+        
+        }
+                    
+            
             return (new ClusterResource($cluster))
                     ->response()
                     ->setStatusCode(201);
