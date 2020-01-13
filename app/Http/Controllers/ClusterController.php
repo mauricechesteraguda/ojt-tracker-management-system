@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Cluster;
+use App\Internship;
 use App\Http\Resources\Cluster as ClusterResource;
 use App\Http\Resources\ClusterCollection;
 
@@ -35,9 +36,16 @@ class ClusterController extends Controller
 
         ]);
 
+            
             $cluster = Cluster::create($request->all());
             $cluster->save();
 
+            $internships = Internship::where('is_deleted', '=', '0')->where('start_date', 'LIKE','%' . $cluster->year . '%' )->orderBy('id', 'ASC')->get();
+
+            foreach ($internships as $i) {
+                $i->cluster_id = $cluster->id;
+                $i->save();
+            }
             return (new ClusterResource($cluster))
                     ->response()
                     ->setStatusCode(201);

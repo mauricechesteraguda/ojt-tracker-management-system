@@ -316,7 +316,8 @@ class Visitation extends Component {
   get_companies() {
     // if (this.state.is_add_process_type) {
       var self = this;
-      axios.get('/api/companies/cluster/' + this.state.clusters[this.state.current_index].id)
+      var cluster_id = this.state.clusters[this.state.current_index].id;
+      axios.get('/api/companies/cluster/' + cluster_id)
         .then(res => {
           self.setState({companies:res.data.data})
         }).catch(err => {
