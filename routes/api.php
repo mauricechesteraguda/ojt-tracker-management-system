@@ -32,6 +32,7 @@ Route::post('/companies/{id}', 'CompanyController@update')->middleware('auth');
 Route::post('/companies', 'CompanyController@store')->middleware('auth');
 Route::delete('/companies/{id}', 'CompanyController@delete')->middleware('auth');
 Route::get('/companies/search/{value}', 'CompanyController@search')->middleware('auth');
+Route::get('/companies/cluster/{id}', 'CompanyController@cluster')->middleware('auth');
 
 
 Route::get('/internships', 'InternshipController@index')->middleware('auth');

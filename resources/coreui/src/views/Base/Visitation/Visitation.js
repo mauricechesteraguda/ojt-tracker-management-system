@@ -271,7 +271,7 @@ class Visitation extends Component {
 
   }
   toggle_detail_page(i=undefined){
-    
+    var self = this;
     if (i >= 0 ) {
       this.setState({
         is_detail_page: true,
@@ -280,6 +280,9 @@ class Visitation extends Component {
         year: this.state.clusters[i].year,
         updated_by: this.state.clusters[i].updated_by,
       });
+      setTimeout(() => {
+        self.get_companies()
+      }, 500);
     }else{
       this.setState({
         is_detail_page: false,
@@ -313,7 +316,7 @@ class Visitation extends Component {
   get_companies() {
     // if (this.state.is_add_process_type) {
       var self = this;
-      axios.get('/api/companies/all')
+      axios.get('/api/companies/cluster/' + this.state.clusters[this.state.current_index].id)
         .then(res => {
           self.setState({companies:res.data.data})
         }).catch(err => {
@@ -327,7 +330,6 @@ class Visitation extends Component {
   componentDidMount() {
 
     this.get_data()
-    // this.get_companies()
 
   }
 
@@ -449,7 +451,7 @@ class Visitation extends Component {
                           {/* <td><Label><Badge color={data.is_approved == '1' ? 'success':'danger'} >{data.is_approved == '1' ? 'verified':'pending'}</Badge></Label></td> */}
                           <td></td>
                           <td>
-                          <Button size="sm" className='text-white' color="info" onClick={() => this.toggle_detail_page(i)}><i className="fa fa-book"></i> Details</Button>
+                          <Button size="sm" className='text-white' color="info" onClick={() => this.toggle_detail_page(i)}><i className="fa fa-book"></i> View Companies</Button>
                             </td>
                         </tr>
                       )
@@ -475,7 +477,7 @@ class Visitation extends Component {
 
         
         <Row hidden={!this.state.is_detail_page}>
-          <Col xs="12" lg="6">
+          <Col xs="12" lg="12">
             <Card>
               <CardHeader>
                 <Row>
@@ -495,68 +497,42 @@ class Visitation extends Component {
                 </Row>
               </CardHeader>
               <CardBody>        
-                            <Form action="" method="post" encType="multipart/form-data" className="form-horizontal">
-                              <FormGroup row>
-                                <Col md="3">
-                                  <Label htmlFor="name">Student Name</Label>
-                                </Col>
-                                <Col xs="12" md="9">
-                                  <Label>{this.state.user_name}</Label>
-                                  
-                                </Col>
-                              </FormGroup>
-                              <FormGroup row>
-                                <Col md="3">
-                                  <Label htmlFor="company">Company</Label>
-                                </Col>
-                                <Col xs="12" md="9">
-                                <Label>{this.state.company_name}</Label>
-                                  
-                                </Col>
-                              </FormGroup>
-                              <FormGroup row>
-                                <Col md="3">
-                                  <Label htmlFor="start_date">Start Date</Label>
-                                </Col>
-                                <Col xs="12" md="9">
-                                <Label>{this.state.start_date}</Label>
-                                </Col>
-                              </FormGroup>
-                              <FormGroup row>
-                                <Col md="3">
-                                  <Label htmlFor="representative">Representative</Label>
-                                </Col>
-                                <Col xs="12" md="9">
-                                <Label>{this.state.representative}</Label>
-                                </Col>
-                              </FormGroup>
-                              <FormGroup row>
-                                <Col md="3">
-                                  <Label htmlFor="student_position">Position</Label>
-                                </Col>
-                                <Col xs="12" md="9">
-                                <Label>{this.state.student_position}</Label>
-                                </Col>
-                              </FormGroup>
-                              <FormGroup row>
-                                <Col md="3">
-                                  <Label htmlFor="is_approved">Status</Label>
-                                </Col>
-                                <Col xs="12" md="9">
-                                <Label><Badge color={this.state.is_approved ? 'success':'danger'} >{this.state.is_approved ? 'approved':'pending'}</Badge></Label>
-                                </Col>
-                              </FormGroup>
-                              <FormGroup row>
-                                <Col md="3">
-                                  <Label htmlFor="comment">Comments</Label>
-                                </Col>
-                                <Col xs="12" md="9">
-                                <Label>{this.state.comment}</Label>
-                                </Col>
-                              </FormGroup>
-                              
-                            </Form>
+              <Table responsive>
+                  <thead>
+                    <tr>
+                      <th>Company</th>
+                      <th>Address</th>
+                      <th>Status</th>
+                      <th>Date Visited</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {this.state.companies.map((data, i) => {
+                      return (
+                        <tr key={i}>
+                          <td>{data.name}</td>
+                          <td>{data.address}, {data.city}, {data.country}</td>
+                          {/* <td><Label><Badge color={data.is_approved == '1' ? 'success':'danger'} >{data.is_approved == '1' ? 'verified':'pending'}</Badge></Label></td> */}
+                          <td></td>
+                          <td>{data.date_visited}</td>
+                          <td>
+                          <Button size="sm" className='text-white' color="primary" ><i className="fa fa-edit"></i> Update Status</Button>
+                            </td>
+                        </tr>
+                      )
+                    })}
 
+
+                  </tbody>
+                </Table>
+                <Paginations
+                    activePage={this.state.active_page}
+                    itemsCountPerPage={this.state.items_count_per_page}
+                    totalItemsCount={this.state.total_items_count}
+                    pageRangeDisplayed={5}
+                    onChange={this.handle_page_change}
+                />
                           </CardBody>
                         
             </Card>

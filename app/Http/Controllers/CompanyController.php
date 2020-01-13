@@ -8,8 +8,16 @@ use App\Company;
 use App\Http\Resources\Company as CompanyResource;
 use App\Http\Resources\CompanyCollection;
 
+use Illuminate\Support\Facades\DB;
+
 class CompanyController extends Controller
 {
+    public function cluster($id)
+    {        
+        $companies = Company::selectRaw("*")->whereRaw("id in (SELECT company_id from internships where is_deleted = 0 and cluster_id =" . $id . ")")->paginate(5);
+
+        return new CompanyCollection($companies);
+    }
     public function all()
     {
         return new CompanyCollection(Company::where('is_deleted', '=', '0')->orderBy('name', 'ASC')->get());
