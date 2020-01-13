@@ -20,6 +20,7 @@ import {
 import axios from 'axios';
 // import Select from 'react-select';
 import Paginations from "react-js-pagination";
+// import UpdateModal from './UpdateModal';
 
 
 
@@ -41,6 +42,13 @@ class Visitation extends Component {
       save_button_is_disabled: true,
       update_button_is_disabled: true,
       is_detail_page: false,
+
+      is_update_modal:false,
+      update_modal_id:'',
+      update_modal_year:'',
+      update_modal_company_name:'',
+      xupdate_button_is_disabled: true,
+      date_visited:'',
 
       has_alert_hidden: true,
       alert_type: 'danger',
@@ -70,7 +78,74 @@ class Visitation extends Component {
     this.get_companies = this.get_companies.bind(this);
     this.go_back = this.go_back.bind(this);
     this.toggle_detail_page = this.toggle_detail_page.bind(this);
+    
+    this.xtoggle_add_form = this.xtoggle_add_form.bind(this);
+    this.xcheck_inputs = this.xcheck_inputs.bind(this);
+    this.xdisable_buttons = this.xdisable_buttons.bind(this);
+    this.xenable_button = this.xenable_button.bind(this);
+    this.xhandle_input_change = this.xhandle_input_change.bind(this);
   
+  }
+
+  xhandle_input_change(e) {
+    // clear alert status
+   this.setState({
+     alert_message: '',
+     alert_type: 'primary',
+     has_alert_hidden: true,
+   })
+
+   this.setState({ [e.target.name]: e.target.value });
+   
+   
+   this.xcheck_inputs(e.target.name, e.target.value);
+
+
+
+ }
+
+  xdisable_buttons(){
+    this.setState(
+      {
+        xupdate_button_is_disabled: true,
+      }
+    ) 
+  }
+  xenable_button(){
+    this.setState(
+      {
+        xupdate_button_is_disabled: false,
+      }
+    ) 
+  }
+
+  xcheck_inputs() {
+
+    if (this.state.date_visited == '') {
+      console.log('Incomplete form values!')
+      setTimeout(() => {
+        this.xdisable_buttons()
+      }, 200);
+      
+    }else{
+      setTimeout(() => {
+        this.xenable_button()
+      }, 200);
+      
+    }
+  }
+
+  xtoggle_add_form(e, id, year, company_name) {
+
+    var self = this;
+
+      self.setState({
+        is_update_modal: !this.state.is_update_modal,
+        update_modal_id: id,
+        update_modal_year: year,
+        update_modal_company_name: company_name,
+      })
+
   }
 
   go_back(){
@@ -519,7 +594,7 @@ class Visitation extends Component {
                           <td></td>
                           <td>{data.date_visited}</td>
                           <td>
-                          <Button size="sm" className='text-white' color="primary" ><i className="fa fa-edit"></i> Update Status</Button>
+                          <Button size="sm" className='text-white' color="primary" onClick={(e)=> this.xtoggle_add_form(e,data.id,this.state.year,data.name +' - '+data.address+','+data.city+','+data.province+','+data.country)}><i className="fa fa-edit"></i> Update Status</Button>
                             </td>
                         </tr>
                       )
@@ -528,13 +603,67 @@ class Visitation extends Component {
 
                   </tbody>
                 </Table>
-                <Paginations
-                    activePage={this.state.active_page}
-                    itemsCountPerPage={this.state.items_count_per_page}
-                    totalItemsCount={this.state.total_items_count}
-                    pageRangeDisplayed={5}
-                    onChange={this.handle_page_change}
-                />
+
+                
+
+                <Modal isOpen={this.state.is_update_modal} toggle={this.xtoggle_add_form}
+                  className={'modal-primary ' + this.props.className}>
+                  <ModalHeader toggle={this.xtoggle_add_form}>Update Visitation to Company</ModalHeader>
+                  <ModalBody>
+
+                    <Row>
+                      <Col xs="12" md="12">
+                        <Card>
+
+                          <CardBody>
+                            <Form action="" method="post" encType="multipart/form-data" className="form-horizontal">
+
+                            <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="company">Company</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                  <Label >{this.state.update_modal_company_name}</Label>
+                                </Col>
+                              </FormGroup>
+
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="year">Year</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                  <Label >{this.state.update_modal_year}</Label>
+                                </Col>
+                              </FormGroup>
+
+                            <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="date_visited">Date Visited</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                  <Input value={this.state.date_visited} onChange={this.xhandle_input_change} type="date" id="date_visited" name="date_visited" placeholder="Text" />
+                                  <FormText color="muted">Input Date Visited</FormText>
+                                </Col>
+                              </FormGroup>
+                              
+                              <Alert hidden={this.state.has_alert_hidden} color={this.state.alert_type}>
+                                    {this.state.alert_message}
+                                  </Alert>
+                            </Form>
+
+                          </CardBody>
+                        </Card>
+                      </Col>
+                    </Row>
+
+                  </ModalBody>
+                  <ModalFooter>
+                    
+                    <Button type='submit' disabled={this.state.xupdate_button_is_disabled} color="primary" onClick={this.xupdate_item}><i className="fa fa-edit"></i>Update</Button>{' '}
+                    <Button color="secondary" onClick={(e)=>this.xtoggle_add_form(e)}>Cancel</Button>
+                  </ModalFooter>
+                </Modal>
+                
                           </CardBody>
                         
             </Card>
