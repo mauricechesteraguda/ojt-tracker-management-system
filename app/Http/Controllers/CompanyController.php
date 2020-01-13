@@ -14,7 +14,7 @@ class CompanyController extends Controller
 {
     public function cluster($id)
     {        
-        $companies = Company::selectRaw("*")->whereRaw("id in (SELECT company_id FROM internships WHERE is_deleted = 0 AND cluster_id =" . $id . ") ORDER BY country,province,city,address,name ASC")->paginate(5);
+        $companies = Company::selectRaw("*")->whereRaw("id in (SELECT company_id FROM internships WHERE is_deleted = 0 AND cluster_id =" . $id . ") ORDER BY country,province,city,address,name ASC")->paginate(20);
 
         return new CompanyCollection($companies);
     }
