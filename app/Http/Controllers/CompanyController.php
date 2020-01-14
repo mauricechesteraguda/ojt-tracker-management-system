@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Company;
+use App\Internship;
 use App\Http\Resources\Company as CompanyResource;
 use App\Http\Resources\CompanyCollection;
 
@@ -12,6 +13,30 @@ use Illuminate\Support\Facades\DB;
 
 class CompanyController extends Controller
 {
+    public function cluster_status($id)
+    {        
+        $is_visited = false;
+        $internships = Internship::where('is_deleted','=','0')->where('cluster_id','=',$id)->get();
+
+        foreach ($internships as $i) {
+            if ($i->date_visited) {
+                $is_visited = true;
+                continue;
+            }else{
+                $is_visited = false;
+                break;
+            }
+        }
+
+        if ($is_visited) {
+            return response()->json([
+                'message' => 'Cluster visit completed.'
+            ], 200);
+        }
+        return response()->json([
+            'message' => 'Cluster visit not yet completed.'
+        ], 201);
+    }
     public function cluster($id)
     {        
         $companies = Company::selectRaw("*")->whereRaw("id in (SELECT company_id FROM internships WHERE is_deleted = 0 AND cluster_id =" . $id . ") ORDER BY country,province,city,address,name ASC")->paginate(20);

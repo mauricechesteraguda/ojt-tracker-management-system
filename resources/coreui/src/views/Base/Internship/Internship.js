@@ -44,6 +44,7 @@ class Internship extends Component {
       student_position: '',
       is_approved: 0,
       status: '',
+      date_visited:'',
       comment: '',
       updated_by: window.current_user_id,
 
@@ -189,6 +190,7 @@ class Internship extends Component {
       representative: this.state.internships[i].representative,
       student_position: this.state.internships[i].student_position,
       is_approved: this.state.internships[i].is_approved,
+      date_visited: this.state.internships[i].date_visited,
       status: this.state.internships[i].status,
       comment: this.state.internships[i].comment,
       updated_by: this.state.internships[i].updated_by,
@@ -291,6 +293,7 @@ class Internship extends Component {
       representative: '',
       student_position: '',
       is_approved: 0,
+      date_visited: '',
       status: '',
       comment: '',
       updated_by: window.current_user_id,
@@ -318,6 +321,7 @@ class Internship extends Component {
         representative: this.state.internships[i].representative,
         student_position: this.state.internships[i].student_position,
         is_approved: this.state.internships[i].is_approved,
+        date_visited: this.state.internships[i].date_visited,
         status: this.state.internships[i].status,
         comment: this.state.internships[i].comment,
         updated_by: this.state.internships[i].updated_by,
@@ -630,10 +634,27 @@ class Internship extends Component {
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="is_approved">Status</Label>
+                                  <Label htmlFor="is_approved">Approved?</Label>
                                 </Col>
                                 <Col xs="12" md="9">
                                 <Label><Badge color={this.state.is_approved ? 'success':'danger'} >{this.state.is_approved ? 'approved':'pending'}</Badge></Label>
+                                </Col>
+                              </FormGroup>
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="date_visited">Visited</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <Label><Badge color={this.state.date_visited ? 'success':'danger'} >{this.state.date_visited ? 'visited':'not yet'}</Badge></Label>
+                                
+                                </Col>
+                              </FormGroup>
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="date_visited">Date Visited</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <Label>{this.state.date_visited}</Label>
                                 </Col>
                               </FormGroup>
                               <FormGroup row>

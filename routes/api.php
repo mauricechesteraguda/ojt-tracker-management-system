@@ -33,11 +33,14 @@ Route::post('/companies', 'CompanyController@store')->middleware('auth');
 Route::delete('/companies/{id}', 'CompanyController@delete')->middleware('auth');
 Route::get('/companies/search/{value}', 'CompanyController@search')->middleware('auth');
 Route::get('/companies/cluster/{id}', 'CompanyController@cluster')->middleware('auth');
+Route::get('/companies/cluster/status/{id}', 'CompanyController@cluster_status')->middleware('auth');
+
 
 
 Route::get('/internships', 'InternshipController@index')->middleware('auth');
 Route::get('/internships/{id}', 'InternshipController@show')->middleware('auth');
 Route::post('/internships/{id}', 'InternshipController@update')->middleware('auth');
+Route::post('/internships/clusters/companies/{id}', 'InternshipController@visit_company')->middleware('auth');
 Route::post('/internships', 'InternshipController@store')->middleware('auth');
 Route::delete('/internships/{id}', 'InternshipController@delete')->middleware('auth');
 Route::get('/internships/search/{value}', 'InternshipController@search')->middleware('auth');

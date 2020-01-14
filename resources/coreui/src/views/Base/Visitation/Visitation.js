@@ -30,7 +30,6 @@ class Visitation extends Component {
     this.state = {
       companies: [],
       clusters: [],
-      
 
       add_form: false,
       id: '',
@@ -49,6 +48,7 @@ class Visitation extends Component {
       update_modal_company_name:'',
       xupdate_button_is_disabled: true,
       date_visited:'',
+      comment:'',
 
       has_alert_hidden: true,
       alert_type: 'danger',
@@ -84,7 +84,36 @@ class Visitation extends Component {
     this.xdisable_buttons = this.xdisable_buttons.bind(this);
     this.xenable_button = this.xenable_button.bind(this);
     this.xhandle_input_change = this.xhandle_input_change.bind(this);
+    this.xupdate_item = this.xupdate_item.bind(this);
+    this.get_cluster_status = this.get_cluster_status.bind(this);
   
+  }
+
+  xupdate_item(e) {
+    e.preventDefault();
+
+    var self = this;
+    let payload = {
+      year: this.state.update_modal_year,
+      date_visited:this.state.date_visited,
+      updated_by: this.state.updated_by,
+      comment: this.state.comment,
+    }
+    axios.post('/api/internships/clusters/companies/' + this.state.update_modal_id, payload)
+      .then(function (response) {
+        console.log(response);
+        self.xtoggle_add_form()
+        self.setState({
+          alert_message: 'Update Successful.',
+          alert_type: 'success',
+          has_alert_hidden: false,
+        })
+      })
+      .catch(function (error) {
+        console.log(error);
+        alert('Update Failed. Contact your System Administrator')
+      });
+
   }
 
   xhandle_input_change(e) {
@@ -142,6 +171,8 @@ class Visitation extends Component {
         update_modal_id: id,
         update_modal_year: year,
         update_modal_company_name: company_name,
+        date_visited:'',
+        comment:'',
       })
 
   }
@@ -149,7 +180,14 @@ class Visitation extends Component {
   go_back(){
     if (this.state.is_detail_page == true) {
       this.setState({is_detail_page:false,
-        companies:[]})
+        companies:[],
+        date_visited:'',
+        comment:'',
+        alert_message: '',
+      alert_type: 'primary',
+      has_alert_hidden: true,
+      })
+        this.get_data();
     }
     
   }
@@ -367,6 +405,8 @@ class Visitation extends Component {
 
   store_data_to_state(data) {
     // console.log(data)
+    var self = this;
+
     this.setState({ 
       clusters: data.data,
 
@@ -374,6 +414,14 @@ class Visitation extends Component {
       items_count_per_page:data.meta.per_page,
       total_items_count:data.meta.total,
      })
+     
+     setTimeout(() => {
+      for (let i = 0; i < data.data.length; i++) {
+        data.data[i].status = self.get_cluster_status(data.data[i].id) ;
+        
+      }
+     }, 500);
+     
   }
 
   get_data(page_number) {
@@ -400,6 +448,43 @@ class Visitation extends Component {
         })
     // }
 
+  }
+
+  get_cluster_status(id){
+    var self = this;
+    var status = false;
+
+   axios.get('/api/companies/cluster/status/' + id)
+        .then(res => {
+          if (res.status == 200) {
+            for (let i = 0; i < self.state.clusters.length; i++) {
+              if (self.state.clusters[i].id == id) {
+                self.state.clusters[i].status = true;
+                self.forceUpdate();
+                break;
+              }
+              
+              
+            }
+          }else if(res.status == 201){
+            for (let i = 0; i < self.state.clusters.length; i++) {
+              if (self.state.clusters[i].id == id) {
+                self.state.clusters[i].status = false;
+                self.forceUpdate();
+                break;
+              }
+              
+            }
+          }
+
+        }).catch(err => {
+          console.log(err)
+          alert('Server disconnected.')
+        })
+      
+  
+
+      
   }
 
   componentDidMount() {
@@ -523,8 +608,8 @@ class Visitation extends Component {
                         <tr key={i}>
                           <td>{data.year + '-' + data.id}</td>
                           <td>{data.year}</td>
-                          {/* <td><Label><Badge color={data.is_approved == '1' ? 'success':'danger'} >{data.is_approved == '1' ? 'verified':'pending'}</Badge></Label></td> */}
-                          <td></td>
+                          <td><Label><Badge color={data.status ? 'success':'danger'} >{data.status  ? 'complete':'not yet'}</Badge></Label></td>
+                          
                           <td>
                           <Button size="sm" className='text-white' color="info" onClick={() => this.toggle_detail_page(i)}><i className="fa fa-book"></i> View Companies</Button>
                             </td>
@@ -572,6 +657,11 @@ class Visitation extends Component {
                 </Row>
               </CardHeader>
               <CardBody>        
+                
+              <Alert hidden={this.state.has_alert_hidden} color={this.state.alert_type}>
+                                    {this.state.alert_message}
+                                  </Alert>
+
               <Table responsive>
                   <thead>
                     <tr>
@@ -641,6 +731,16 @@ class Visitation extends Component {
                                 <Col xs="12" md="9">
                                   <Input value={this.state.date_visited} onChange={this.xhandle_input_change} type="date" id="date_visited" name="date_visited" placeholder="Text" />
                                   <FormText color="muted">Input Date Visited</FormText>
+                                </Col>
+                              </FormGroup>
+
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="comment">Remarks</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                  <Input value={this.state.comment} onChange={this.xhandle_input_change} type="text" id="comment" name="comment" placeholder="Text" />
+                                  <FormText color="muted">Input optional remarks here</FormText>
                                 </Col>
                               </FormGroup>
                               
