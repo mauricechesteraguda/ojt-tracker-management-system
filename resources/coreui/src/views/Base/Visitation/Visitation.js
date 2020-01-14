@@ -173,7 +173,9 @@ class Visitation extends Component {
         update_modal_company_name: company_name,
         date_visited:'',
         comment:'',
+        
       })
+      this.xcheck_inputs()
 
   }
 
@@ -221,13 +223,15 @@ class Visitation extends Component {
   }
 
   check_inputs() {
-
-    if (this.state.year == '') {
-      console.log('Incomplete form values!')
-      this.disable_buttons()
-    }else{
-      this.enable_button()
-    }
+    setTimeout(() => {
+      if (this.state.year == '') {
+        console.log('Incomplete form values!')
+        this.disable_buttons()
+      }else{
+        this.enable_button()
+      }
+    }, 300);
+    
   }
 
   delete_item(i) {
@@ -380,6 +384,7 @@ class Visitation extends Component {
       alert_type: 'primary',
       has_alert_hidden: true,
     });
+    this.check_inputs();
 
   }
   toggle_detail_page(i=undefined){
