@@ -96,11 +96,11 @@ class Visitation extends Component {
    })
 
    this.setState({ [e.target.name]: e.target.value });
-   
-   
-   this.xcheck_inputs(e.target.name, e.target.value);
 
 
+    this.xcheck_inputs(e.target.name, e.target.value);  
+
+   
 
  }
 
@@ -120,19 +120,17 @@ class Visitation extends Component {
   }
 
   xcheck_inputs() {
-
-    if (this.state.date_visited == '') {
-      console.log('Incomplete form values!')
-      setTimeout(() => {
-        this.xdisable_buttons()
-      }, 200);
-      
-    }else{
-      setTimeout(() => {
-        this.xenable_button()
-      }, 200);
-      
-    }
+    setTimeout(() => {
+      if (this.state.date_visited == '' || this.state.date_visited == null) {
+        console.log('Incomplete form values!')
+       
+          this.xdisable_buttons()
+        
+      }else{
+          this.xenable_button()
+        
+      }  
+    }, 300);
   }
 
   xtoggle_add_form(e, id, year, company_name) {
