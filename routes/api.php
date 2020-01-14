@@ -34,6 +34,7 @@ Route::delete('/companies/{id}', 'CompanyController@delete')->middleware('auth')
 Route::get('/companies/search/{value}', 'CompanyController@search')->middleware('auth');
 Route::get('/companies/cluster/{id}', 'CompanyController@cluster')->middleware('auth');
 Route::get('/companies/cluster/status/{id}', 'CompanyController@cluster_status')->middleware('auth');
+Route::get('/companies/status/{id}/{year}', 'CompanyController@company_status')->middleware('auth');
 
 
 

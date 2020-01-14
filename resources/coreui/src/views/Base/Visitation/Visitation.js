@@ -86,7 +86,8 @@ class Visitation extends Component {
     this.xhandle_input_change = this.xhandle_input_change.bind(this);
     this.xupdate_item = this.xupdate_item.bind(this);
     this.get_cluster_status = this.get_cluster_status.bind(this);
-  
+    this.get_company_status = this.get_company_status.bind(this);
+    
   }
 
   xupdate_item(e) {
@@ -108,6 +109,10 @@ class Visitation extends Component {
           alert_type: 'success',
           has_alert_hidden: false,
         })
+        setTimeout(() => {
+          self.get_companies()
+        }, 300);
+        
       })
       .catch(function (error) {
         console.log(error);
@@ -150,15 +155,10 @@ class Visitation extends Component {
 
   xcheck_inputs() {
     setTimeout(() => {
-      if (this.state.date_visited == '' || this.state.date_visited == null) {
-        console.log('Incomplete form values!')
-       
-          this.xdisable_buttons()
-        
-      }else{
+      
           this.xenable_button()
         
-      }  
+        
     }, 300);
   }
 
@@ -447,12 +447,55 @@ class Visitation extends Component {
       axios.get('/api/companies/cluster/' + cluster_id)
         .then(res => {
           self.setState({companies:res.data.data})
+          setTimeout(() => {
+            for (let i = 0; i < res.data.data.length; i++) {
+              res.data.data[i].status = self.get_company_status(res.data.data[i].id) ;
+              
+            }
+           }, 300);
         }).catch(err => {
           console.log(err)
           alert('Server disconnected.')
         })
     // }
 
+  }
+
+  get_company_status(id){
+    var self = this;
+
+   axios.get('/api/companies/status/' + id + '/'+self.state.year)
+        .then(res => {
+          if (res.status == 200) {
+            for (let i = 0; i < self.state.companies.length; i++) {
+              if (self.state.companies[i].id == id) {
+                self.state.companies[i].status = true;
+                self.state.companies[i].date_visited = res.data.date_visited;
+                self.forceUpdate();
+                break;
+              }
+              
+              
+            }
+          }else if(res.status == 201){
+            for (let i = 0; i < self.state.companies.length; i++) {
+              if (self.state.companies[i].id == id) {
+                self.state.companies[i].status = false;
+                self.forceUpdate();
+                break;
+              }
+              
+            }
+          }
+
+        }).catch(err => {
+          console.log(err)
+          alert('Server disconnected.')
+        })
+      
+  
+
+      
   }
 
   get_cluster_status(id){
@@ -683,8 +726,7 @@ class Visitation extends Component {
                         <tr key={i}>
                           <td>{data.name}</td>
                           <td>{data.address}, {data.city},{data.province}, {data.country}</td>
-                          {/* <td><Label><Badge color={data.is_approved == '1' ? 'success':'danger'} >{data.is_approved == '1' ? 'verified':'pending'}</Badge></Label></td> */}
-                          <td></td>
+                          <td><Label><Badge color={data.status ? 'success':'danger'} >{data.status  ? 'complete':'not yet'}</Badge></Label></td>
                           <td>{data.date_visited}</td>
                           <td>
                           <Button size="sm" className='text-white' color="primary" onClick={(e)=> this.xtoggle_add_form(e,data.id,this.state.year,data.name +' - '+data.address+','+data.city+','+data.province+','+data.country)}><i className="fa fa-edit"></i> Update Status</Button>

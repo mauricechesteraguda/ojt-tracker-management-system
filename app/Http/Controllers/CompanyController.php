@@ -13,6 +13,30 @@ use Illuminate\Support\Facades\DB;
 
 class CompanyController extends Controller
 {
+    public function company_status($id,$year)
+    {        
+        $is_visited = false;
+        $date_visited = '';
+        $internships = Internship::where('is_deleted','=','0')->where('company_id','=',$id)->where('start_date','LIKE','%'.$year.'%')->get();
+
+        foreach ($internships as $i) {
+            if ($i->date_visited) {
+                $date_visited = $i->date_visited;
+                $is_visited = true;
+                break;
+            }
+        }
+
+        if ($is_visited) {
+            return response()->json([
+                'date_visited' => $date_visited
+            ], 200);
+        }
+        return response()->json([
+            'message' => 'Company visit not yet completed.'
+        ], 201);
+    }
+
     public function cluster_status($id)
     {        
         $is_visited = false;

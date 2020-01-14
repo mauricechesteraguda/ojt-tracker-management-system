@@ -78,7 +78,6 @@ class InternshipController extends Controller
     public function visit_company(Request $request, $id)
         {
             $this->validate($request, [
-                'date_visited' => 'required|max:255',
                 'year' => 'required|max:255',
             ]);
     
