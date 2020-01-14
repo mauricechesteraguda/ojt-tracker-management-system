@@ -399,7 +399,7 @@ class Visitation extends Component {
       });
       setTimeout(() => {
         self.get_companies()
-      }, 500);
+      }, 300);
     }else{
       this.setState({
         is_detail_page: false,
@@ -420,13 +420,11 @@ class Visitation extends Component {
       total_items_count:data.meta.total,
      })
      
-     setTimeout(() => {
       for (let i = 0; i < data.data.length; i++) {
         data.data[i].status = self.get_cluster_status(data.data[i].id) ;
         
       }
-     }, 500);
-     
+      
   }
 
   get_data(page_number) {
@@ -447,12 +445,10 @@ class Visitation extends Component {
       axios.get('/api/companies/cluster/' + cluster_id)
         .then(res => {
           self.setState({companies:res.data.data})
-          setTimeout(() => {
             for (let i = 0; i < res.data.data.length; i++) {
               res.data.data[i].status = self.get_company_status(res.data.data[i].id) ;
               
             }
-           }, 300);
         }).catch(err => {
           console.log(err)
           alert('Server disconnected.')
@@ -461,10 +457,10 @@ class Visitation extends Component {
 
   }
 
-  get_company_status(id){
+  async get_company_status(id){
     var self = this;
 
-   axios.get('/api/companies/status/' + id + '/'+self.state.year)
+   await axios.get('/api/companies/status/' + id + '/'+self.state.year)
         .then(res => {
           if (res.status == 200) {
             for (let i = 0; i < self.state.companies.length; i++) {
@@ -498,11 +494,11 @@ class Visitation extends Component {
       
   }
 
-  get_cluster_status(id){
+  async get_cluster_status(id){
     var self = this;
     var status = false;
 
-   axios.get('/api/companies/cluster/status/' + id)
+   await axios.get('/api/companies/cluster/status/' + id)
         .then(res => {
           if (res.status == 200) {
             for (let i = 0; i < self.state.clusters.length; i++) {
