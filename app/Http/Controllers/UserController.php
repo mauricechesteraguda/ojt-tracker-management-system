@@ -12,8 +12,16 @@ use App\Http\Resources\UserCollection;
 class UserController extends Controller
 {
 
+    public function internship_requirement()
+    {
+        return new UserCollection(User::orderBy('name', 'ASC')->paginate(5));
+    }
     public function index()
     {
+        $user = \Auth::user();
+        if ($user->role != 'superuser') {
+            return new UserCollection(User::where('id','=',$user->id)->orderBy('name', 'ASC')->paginate(5));
+        }
         return new UserCollection(User::orderBy('name', 'ASC')->paginate(5));
     }
     public function search($value)
@@ -64,16 +72,18 @@ class UserController extends Controller
         
     public function update(Request $request, $id)
         {
-            $this->validate($request, [
-                'name' => 'required|max:255',
-            ]);
-    
+            $current_user = \Auth::user();
+        
             $user = User::findOrFail($id);
             
             $user->name = request('name');
             $user->first_name = request('first_name');
             $user->last_name = request('last_name');
-            $user->role = request('role');
+            
+            if ($current_user->role == 'superuser') {
+                $user->role = request('role');
+            }
+           
             $user->email = request('email');
             if (request('password')) {
                 $user->password = Hash::make(request('password'));
