@@ -24,6 +24,8 @@ import Description from "../Internship/Description";
 import Requirement from "../Internship/Requirement";
 import Report from "../Internship/Report";
 
+import Can from '../../../Can';
+
 
 
 class Internship extends Component {
@@ -409,8 +411,15 @@ class Internship extends Component {
                 
                 
                   <Col xs="4" lg="4">
+
+                  <Can
+                      role={user.role}
+                      perform="internship:add"
+                      yes={() => <Button className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-plus-circle"></i> Add</Button>}
+                      no={() => <div></div>}
+                      />
                         
-                        <Button className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-plus-circle"></i> Add</Button>
+                       
                         
                   </Col>
                 </Row>
@@ -474,8 +483,11 @@ class Internship extends Component {
                                   
                                 </Col>
                               </FormGroup>
-                              
-                              <FormGroup hidden={this.state.is_add_process_type} row>
+
+                              <Can
+                                role={user.role}
+                                perform="internship:approve"
+                                yes={() => <FormGroup hidden={this.state.is_add_process_type} row>
                                 <Col md="3">
                                   <Label htmlFor="is_approved">Approve</Label>
                                 </Col>
@@ -488,7 +500,11 @@ class Internship extends Component {
 
                                     </Input>
                                 </Col>
-                              </FormGroup>
+                              </FormGroup>}
+                                no={() => <div></div>}
+                                />
+                              
+                              
                               <FormGroup row>
                                 <Col md="3">
                                   <Label htmlFor="comment">Comment</Label>

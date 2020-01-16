@@ -5,7 +5,8 @@ const rules = {
   },
   student: {
       static: [
-        "dashboard-page:visit"
+        "dashboard-page:visit",
+        "internship:add",
       ],
       dynamic: {
         "posts:edit": ({userId, postOwnerId}) => {
@@ -23,6 +24,7 @@ const rules = {
         "company:delete",
         "requirement:verify",
         "user-report:validate",
+        "internship:approve",
       ]
     },
     superuser: {
@@ -37,6 +39,8 @@ const rules = {
         "user:delete",
         "requirement:verify",
         "user-report:validate",
+        "internship:add",
+        "internship:approve",
       ]
     }
   };

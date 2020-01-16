@@ -263,14 +263,23 @@ class Visitation extends Component {
     }
     axios.post('/api/clusters/' + this.state.id, payload)
       .then(function (response) {
-        console.log(response);
-        self.get_data()
-        self.toggle_add_form()
-        self.setState({
-          alert_message: 'Update Successful.',
-          alert_type: 'success',
-          has_alert_hidden: false,
-        })
+        if (response.status == 201) {
+          self.setState({
+            alert_message: response.data.message,
+            alert_type: 'danger',
+            has_alert_hidden: false,
+          })
+        }else{
+          console.log(response);
+          self.get_data()
+          self.toggle_add_form()
+          self.setState({
+            alert_message: 'Update Successful.',
+            alert_type: 'success',
+            has_alert_hidden: false,
+          })
+        }
+        
       })
       .catch(function (error) {
         console.log(error);
@@ -305,8 +314,24 @@ class Visitation extends Component {
     axios.post('/api/clusters', payload)
       .then(function (response) {
         console.log(response);
-        self.get_data()
-        self.toggle_add_form();
+
+        if (response.status == 201) {
+          self.setState({
+            alert_message: response.data.message,
+            alert_type: 'danger',
+            has_alert_hidden: false,
+          })
+        }else{
+          console.log(response);
+          self.get_data()
+          self.toggle_add_form()
+          self.setState({
+            alert_message: 'Update Successful.',
+            alert_type: 'success',
+            has_alert_hidden: false,
+          })
+        }
+        
       })
       .catch(function (error) {
         console.log(error.response.status);

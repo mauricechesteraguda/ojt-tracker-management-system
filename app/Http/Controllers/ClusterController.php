@@ -40,7 +40,7 @@ class ClusterController extends Controller
         
         $internships = Internship::whereNull('cluster_id')->where('is_deleted', '=', '0')->where('start_date', 'LIKE','%' . $request->year . '%' )->orderBy('id', 'ASC')->get();
 
-        if ($internships) {
+        if ($internships->count()) {
             # code...
         
             $locations = array();
@@ -125,6 +125,10 @@ class ClusterController extends Controller
             return (new ClusterResource($cluster))
                     ->response()
                     ->setStatusCode(201);
+        }else{
+            return response()->json([
+                'message' => 'No more internships for the specified year!'
+            ], 201);
         }
         
 
