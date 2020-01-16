@@ -18,7 +18,11 @@ const rules = {
       static: [
         "users:list",
         "users:get",
-        "dashboard-page:visit"
+        "dashboard-page:visit",
+        "sidebar-admin:visit",
+        "company:add",
+        "company:edit",
+        "company:delete",
       ]
     },
     superuser: {
@@ -28,7 +32,11 @@ const rules = {
         "users:edit",
         "users:delete",
         "users:get",
-        "dashboard-page:visit"
+        "dashboard-page:visit",
+        "sidebar-admin:visit",
+        "company:add",
+        "company:edit",
+        "company:delete",
       ]
     }
   };

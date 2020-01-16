@@ -1,4 +1,4 @@
-export default {
+export const nav1 = {
   items: [
     {
       name: 'Dashboard',
@@ -289,5 +289,37 @@ export default {
       icon: 'icon-layers',
       variant: 'danger'
     }
+  ]
+};
+
+export const nav2 = {
+  items: [
+    {
+      name: 'Dashboard',
+      url: '/dashboard',
+      icon: 'icon-speedometer',
+      // badge: {
+      //   variant: 'info',
+      //   text: 'NEW'
+      // }
+    },
+    {
+      name: 'User',
+      url: '/users',
+      icon: 'icon-people'
+    },
+
+    {
+      name: 'Company',
+      url: '/companies',
+      icon: 'icon-grid'
+    },
+    {
+      name: 'Internship',
+      url: '/internships',
+      icon: 'icon-trophy'
+    },
+    
+    
   ]
 };

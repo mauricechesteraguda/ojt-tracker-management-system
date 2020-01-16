@@ -2,11 +2,13 @@ import React, {Component} from 'react';
 import {NavLink} from 'react-router-dom';
 import {Badge, Nav, NavItem, NavLink as RsNavLink} from 'reactstrap';
 import classNames from 'classnames';
-import nav from './_nav';
+import {nav1,nav2} from './_nav';
 import SidebarFooter from './../SidebarFooter';
 import SidebarForm from './../SidebarForm';
 import SidebarHeader from './../SidebarHeader';
 import SidebarMinimizer from './../SidebarMinimizer';
+
+import Can from '../../Can';
 
 class Sidebar extends Component {
 
@@ -150,9 +152,19 @@ class Sidebar extends Component {
         <SidebarHeader/>
         <SidebarForm/>
         <nav className="sidebar-nav">
-          <Nav>
-            {navList(nav.items)}
-          </Nav>
+        
+        <Can
+        role={user.role}
+        perform="sidebar-admin:visit"
+        yes={() => <Nav>
+          {navList(nav1.items)}
+        </Nav>}
+        no={() => <Nav>
+          {navList(nav2.items)}
+        </Nav>}
+        />
+        
+          
         </nav>
         <SidebarFooter/>
         <SidebarMinimizer/>

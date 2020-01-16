@@ -20,6 +20,7 @@ import {
 } from 'reactstrap';
 import axios from 'axios';
 import Paginations from "react-js-pagination";
+import Can from '../../../Can';
 
 
 class Company extends Component {
@@ -369,8 +370,13 @@ class Company extends Component {
                 
                 
                   <Col xs="4" lg="4">
+                  <Can
+                  role={user.role}
+                  perform="company:add"
+                  yes={() => <Button className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-plus-circle"></i> Add</Button>}
+                  no={() => <span></span>}
+                  />
                         
-                        <Button className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-plus-circle"></i> Add</Button>
                         
                   </Col>
                 </Row>
@@ -485,8 +491,21 @@ class Company extends Component {
                           <td>{data.country}</td>
                           <td>
                           <Button size="sm" className='text-white' color="info" onClick={() => this.toggle_detail_page(i)}><i className="fa fa-book"></i> Details</Button>
-                            <Button size="sm" color="primary" onClick={() => this.load_item(i)}><i className="fa fa-pencil"></i></Button>
-                            <Button size="sm" onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.delete_item(i) }} color="danger"><i className="fa fa-trash"></i></Button>
+
+                          <Can
+                  role={user.role}
+                  perform="company:edit"
+                  yes={() => <Button size="sm" color="primary" onClick={() => this.load_item(i)}><i className="fa fa-pencil"></i></Button>}
+                  no={() => <span></span>}
+                  />
+                            
+                            <Can
+                  role={user.role}
+                  perform="company:edit"
+                  yes={() => <Button size="sm" onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.delete_item(i) }} color="danger"><i className="fa fa-trash"></i></Button>}
+                  no={() => <span></span>}
+                  />
+                            
                           </td>
                         </tr>
                       )
