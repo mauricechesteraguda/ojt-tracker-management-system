@@ -21,6 +21,8 @@ import axios from 'axios';
 // import Select from 'react-select';
 import Paginations from "react-js-pagination";
 
+import Can from '../../../Can';
+
 
 
 class Description extends Component {
@@ -281,7 +283,14 @@ class Description extends Component {
                 
                   <Col xs="4" lg="4">
                         
-                        <Button hidden={this.props.is_approved} className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-plus-circle"></i> Add</Button>
+                        <Can
+                                role={user.role}
+                                perform="job-description:add"
+                                yes={() => <Button hidden={this.props.is_approved} className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-plus-circle"></i> Add</Button>
+                              }
+                                no={() => <div></div>}
+                                />
+                        
                         
                   </Col>
                 </Row>
@@ -344,7 +353,14 @@ class Description extends Component {
                         <tr key={i}>
                           <td>{data.description}</td>
                           <td>
-                            <Button hidden={this.props.is_approved} size="sm" onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.delete_item(i) }} color="danger"><i className="fa fa-trash"></i></Button>
+                          <Can
+                                role={user.role}
+                                perform="job-description:delete"
+                                yes={() => <Button hidden={this.props.is_approved} size="sm" onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.delete_item(i) }} color="danger"><i className="fa fa-trash"></i></Button>
+                              }
+                                no={() => <div></div>}
+                                />
+                            
                           </td>
                         </tr>
                       )

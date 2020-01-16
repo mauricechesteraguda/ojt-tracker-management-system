@@ -7,7 +7,11 @@ const rules = {
       static: [
         "dashboard-page:visit",
         "internship:add",
-        "internship:delete"
+        "internship:delete",
+        "student-report:delete",
+        "student-report:add",
+        "job-description:add",
+        "job-description:delete"
       ],
       dynamic: {
         "posts:edit": ({userId, postOwnerId}) => {
@@ -40,9 +44,10 @@ const rules = {
         "user:delete",
         "requirement:verify",
         "user-report:validate",
-        "internship:add",
         "internship:approve",
-        "internship:delete"
+        "internship:delete",
+        "student-report:delete",
+
       ]
     }
   };
