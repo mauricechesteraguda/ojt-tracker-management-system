@@ -47,6 +47,7 @@ const rules = {
         "internship:approve",
         "internship:delete",
         "student-report:delete",
+        "user-role:change",
 
       ]
     }

@@ -593,28 +593,28 @@ class Users extends Component {
                                   <FormText color="muted">Write your name</FormText>
                                 </Col>
                               </FormGroup>
-                              <FormGroup row>
+                              
+                                  <Can
+                  role={user.role}
+                  perform="user-role:change"
+                  yes={() =>  <div>
+                    <FormGroup row>
                                 <Col md="3">
                                   <Label htmlFor="role">Role</Label>
                                 </Col>
                                 <Col xs="12" md="9">
                                   <Input  value={this.state.role} onChange={this.handle_input_change} type="select" name="role" id="role">
-
-                                  <Can
-                  role={user.role}
-                  perform="user-role:change"
-                  yes={() =>   <div><option>student</option>
-                    <option>superuser</option>
-                  <option>coordinator</option></div>}
-                  no={() =>  <option>{user.role}</option>
+                                  <option>student</option>
+                                  <option>superuser</option>
+                                <option>coordinator</option>
+                                </Input>
+                                </Col>
+                              </FormGroup>
+                    </div>}
+                  no={() =>  <div></div>
                     }
                   />
                                  
-                                    
-
-                                  </Input>
-                                </Col>
-                              </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
                                   <Label htmlFor="email-input">Email</Label>
