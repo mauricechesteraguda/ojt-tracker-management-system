@@ -21,6 +21,8 @@ import {
 import axios from 'axios';
 import Paginations from "react-js-pagination";
 
+import Can from '../../../Can';
+
 
 class Users extends Component {
   constructor(props) {
@@ -509,22 +511,32 @@ class Users extends Component {
                   <i className="fa fa-users"></i> Users
                   </Col>
                   <Col xs="4" lg="4">
+                  <Can
+                  role={user.role}
+                  perform="user:search"
+                  yes={() => <Input
+                    type="text"
+                    value={this.state.search_value}
+                    
+                    name="search"
+                    placeholder="Search..."
+                    onChange={this.handle_search_input_change}
+                    />}
+                  no={() => <div></div>}
+                  />
                   
-                  <Input
-                          type="text"
-                          value={this.state.search_value}
-                          
-                          name="search"
-                          placeholder="Search..."
-                          onChange={this.handle_search_input_change}
-                          />
                     </Col>
                     
                 
                 
                   <Col xs="4" lg="4">
-                        
-                        <Button className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-plus-circle"></i> Add</Button>
+                  <Can
+                  role={user.role}
+                  perform="user:add"
+                  yes={() =>  <Button className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-plus-circle"></i> Add</Button>}
+                  no={() => <div></div>}
+                  />
+                       
                         
                   </Col>
                 </Row>
@@ -587,9 +599,17 @@ class Users extends Component {
                                 </Col>
                                 <Col xs="12" md="9">
                                   <Input  value={this.state.role} onChange={this.handle_input_change} type="select" name="role" id="role">
-                                  <option>student</option>
-                                    <option>superuser</option>
-                                    <option>coordinator</option>
+
+                                  <Can
+                  role={user.role}
+                  perform="user-role:change"
+                  yes={() =>   <div><option>student</option>
+                    <option>superuser</option>
+                  <option>coordinator</option></div>}
+                  no={() =>  <option>{user.role}</option>
+                    }
+                  />
+                                 
                                     
 
                                   </Input>
@@ -666,7 +686,14 @@ class Users extends Component {
                           <td>
                           <Button size="sm" className='text-white' color="info" onClick={() => this.toggle_detail_page(i)}><i className="fa fa-book"></i> Details</Button>
                             <Button size="sm" color="primary" onClick={() => this.load_item(i)}><i className="fa fa-pencil"></i></Button>
-                            <Button size="sm" onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.delete_item(i) }} color="danger"><i className="fa fa-trash"></i></Button>
+
+                            <Can
+                  role={user.role}
+                  perform="user:delete"
+                  yes={() =>  <Button size="sm" onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.delete_item(i) }} color="danger"><i className="fa fa-trash"></i></Button>}
+                  no={() => <div></div>}
+                  />
+                            
                           </td>
                         </tr>
                       )

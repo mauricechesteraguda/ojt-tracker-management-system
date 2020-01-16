@@ -374,7 +374,7 @@ class Company extends Component {
                   role={user.role}
                   perform="company:add"
                   yes={() => <Button className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-plus-circle"></i> Add</Button>}
-                  no={() => <span></span>}
+                  no={() => <div></div>}
                   />
                         
                         
@@ -496,14 +496,14 @@ class Company extends Component {
                   role={user.role}
                   perform="company:edit"
                   yes={() => <Button size="sm" color="primary" onClick={() => this.load_item(i)}><i className="fa fa-pencil"></i></Button>}
-                  no={() => <span></span>}
+                  no={() => <div></div>}
                   />
                             
                             <Can
                   role={user.role}
                   perform="company:edit"
                   yes={() => <Button size="sm" onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.delete_item(i) }} color="danger"><i className="fa fa-trash"></i></Button>}
-                  no={() => <span></span>}
+                  no={() => <div></div>}
                   />
                             
                           </td>

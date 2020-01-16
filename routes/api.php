@@ -24,6 +24,7 @@ Route::post('/users/{id}', 'UserController@update')->middleware('auth');
 Route::post('/users', 'UserController@store')->middleware('auth');
 Route::delete('/users/{id}', 'UserController@delete')->middleware('auth');
 Route::get('/users/search/{value}', 'UserController@search')->middleware('auth');
+Route::get('/users/internship/requirement', 'UserController@internship_requirement')->middleware('auth');
 
 Route::get('/companies', 'CompanyController@index')->middleware('auth');
 Route::get('/companies/all', 'CompanyController@all')->middleware('auth');

@@ -21,7 +21,7 @@ import axios from 'axios';
 // import Select from 'react-select';
 import Paginations from "react-js-pagination";
 
-
+import Can from '../../../Can';
 
 class Report extends Component {
   constructor(props) {
@@ -450,17 +450,27 @@ class Report extends Component {
                               </FormGroup>
 
 
-                              <FormGroup row>
-                                <Col md="3">
-                                  <Label htmlFor="is_valid">Valid?</Label>
-                                </Col>
-                                <Col xs="12" md="9">
-                                  <Input value={this.state.is_valid}  onChange={this.handle_input_change} type="select" name="is_valid" id="is_valid">
-                                  <option value="0">No</option>
-                                    <option value="1">Yes</option>
-                                    </Input>
-                                </Col>
-                              </FormGroup>
+
+                              <Can
+                                role={user.role}
+                                perform="user-report:validate"
+                                yes={() =>   <FormGroup row>
+                                  <Col md="3">
+                                    <Label htmlFor="is_valid">Valid?</Label>
+                                  </Col>
+                                  <Col xs="12" md="9">
+  
+                                  
+                                    <Input value={this.state.is_valid}  onChange={this.handle_input_change} type="select" name="is_valid" id="is_valid">
+                                    <option value="0">No</option>
+                                      <option value="1">Yes</option>
+                                      </Input>
+                                  </Col>
+                                </FormGroup>}
+                                no={() =>  <div></div>
+                                  }
+                                />
+                              
 
                               <FormGroup row>
                                 <Col md="3">

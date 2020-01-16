@@ -16,27 +16,27 @@ const rules = {
     },
     coordinator: {
       static: [
-        "users:list",
-        "users:get",
         "dashboard-page:visit",
         "sidebar-admin:visit",
         "company:add",
         "company:edit",
         "company:delete",
+        "requirement:verify",
+        "user-report:validate",
       ]
     },
     superuser: {
       static: [
-        "users:list",
-        "users:create",
-        "users:edit",
-        "users:delete",
-        "users:get",
         "dashboard-page:visit",
         "sidebar-admin:visit",
         "company:add",
         "company:edit",
         "company:delete",
+        "user:add",
+        "user:search",
+        "user:delete",
+        "requirement:verify",
+        "user-report:validate",
       ]
     }
   };

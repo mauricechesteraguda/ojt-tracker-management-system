@@ -23,6 +23,7 @@ import axios from 'axios';
 import Paginations from "react-js-pagination";
 
 
+import Can from '../../../Can';
 
 class Requirement extends Component {
   constructor(props) {
@@ -164,7 +165,7 @@ class Requirement extends Component {
 
   get_users() {
     var self = this;
-    axios.get('/api/users/')
+    axios.get('/api/users/internship/requirement')
       .then(res => {
         self.setState({users:res.data.data})
       }).catch(err => {
@@ -245,8 +246,9 @@ class Requirement extends Component {
                       <th>Requirement</th>
                       <th>Template</th>
                       <th>Status</th>
-                      <th>Last Updated by</th>
+                      <th>Updated by</th>
                       <th>Verified?</th>
+                      
                     </tr>
                   </thead>
                   <tbody>
@@ -262,14 +264,20 @@ class Requirement extends Component {
                           {this.get_user(data.updated_by)}
 
                           </td>
-                          <td>
+                          
+                          <Can
+                  role={user.role}
+                  perform="requirement:verify"
+                  yes={() =>  <td><Label className="switch switch-icon switch-pill switch-primary">
+                  <Input name={'req_'+data.id} checked={data.is_approved == '1'? true:false} className="switch-input" type="checkbox" hidden={this.props.is_approved} onChange={this.handle_input_change}></Input>
+                  <span className="switch-label" data-on={'\uf00c'} data-off={'\uf00d'}></span>
+                  <span className="switch-handle"></span>
+                </Label></td>}
+                  no={() => <td><span></span></td>}
+                  />
+
                             
-                            <Label className="switch switch-icon switch-pill switch-primary">
-                              <Input name={'req_'+data.id} checked={data.is_approved == '1'? true:false} className="switch-input" type="checkbox" hidden={this.props.is_approved} onChange={this.handle_input_change}></Input>
-                              <span className="switch-label" data-on={'\uf00c'} data-off={'\uf00d'}></span>
-                              <span className="switch-handle"></span>
-                            </Label>
-                          </td>
+                          
                         </tr>
                       )
                     })}
