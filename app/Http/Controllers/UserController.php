@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\batsu_api;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -18,6 +20,8 @@ class UserController extends Controller
     }
     public function index()
     {
+        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
+        $colleges = $api->fetch_colleges();
         $user = \Auth::user();
         if ($user->role != 'superuser') {
             return new UserCollection(User::where('id','=',$user->id)->orderBy('name', 'ASC')->paginate(5));
