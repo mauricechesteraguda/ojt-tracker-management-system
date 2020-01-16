@@ -14,11 +14,11 @@ class ClusterController extends Controller
 {
     public function all()
     {
-        return new ClusterCollection(Cluster::where('is_deleted', '=', '0')->orderBy('id', 'DSC')->get());
+        return new ClusterCollection(Cluster::where('is_deleted', '=', '0')->orderBy('year', 'DSC')->get());
     }
     public function index()
     {
-        return new ClusterCollection(Cluster::where('is_deleted', '=', '0')->orderBy('id', 'DSC')->paginate(5));
+        return new ClusterCollection(Cluster::where('is_deleted', '=', '0')->orderBy('year', 'DSC')->paginate(5));
     }
     public function search($value)
     {
