@@ -19,9 +19,11 @@ class Company extends JsonResource
             'name'       => $this->name,
             'country'    => $this->country,
             'city'    => $this->city,
+            'province'    => $this->province,
             'address'    => $this->address,
             'location_map' => $this->location_map,
             'is_deleted' => $this->is_deleted,
+            'internships' => $this->internships,
         
         ];
     }

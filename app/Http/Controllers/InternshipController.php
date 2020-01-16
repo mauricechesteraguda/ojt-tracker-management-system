@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Requirement;
 use App\RequirementCategory;
 use App\Internship;
+use App\Company;
 use App\Http\Resources\Internship as InternshipResource;
 use App\Http\Resources\InternshipCollection;
 
@@ -74,6 +75,31 @@ class InternshipController extends Controller
         // return new InternshipCollection(Internship::all());
     }
 
+    public function visit_company(Request $request, $id)
+        {
+            $this->validate($request, [
+                'year' => 'required|max:255',
+            ]);
+    
+            $company = Company::find($id);
+            if ($company) {
+                $internships = Internship::where('start_date','LIKE','%'.$request->year.'%')->where('is_deleted','=','0')->where('company_id', '=',$company->id)->whereNotNull('cluster_id')->get();
+            
+                foreach ($internships as $internship) {
+                    $internship->date_visited = request('date_visited');
+                    $internship->comment = request('comment');
+                    $internship->updated_by = request('updated_by');
+                    $internship->save();
+                }
+                
+        
+                return response()->json([
+                    'message' => 'Internship updated successfully!'
+                ], 200);
+            }
+            
+        }
+
         
     public function update(Request $request, $id)
         {
@@ -96,4 +122,6 @@ class InternshipController extends Controller
                 'message' => 'Internship updated successfully!'
             ], 200);
         }
+
+        
 }

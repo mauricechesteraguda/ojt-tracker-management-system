@@ -5,7 +5,9 @@ const rules = {
   },
   student: {
       static: [
-        "dashboard-page:visit"
+        "dashboard-page:visit",
+        "internship:add",
+        "internship:delete"
       ],
       dynamic: {
         "posts:edit": ({userId, postOwnerId}) => {
@@ -16,19 +18,31 @@ const rules = {
     },
     coordinator: {
       static: [
-        "users:list",
-        "users:get",
-        "dashboard-page:visit"
+        "dashboard-page:visit",
+        "sidebar-admin:visit",
+        "company:add",
+        "company:edit",
+        "company:delete",
+        "requirement:verify",
+        "user-report:validate",
+        "internship:approve",
       ]
     },
     superuser: {
       static: [
-        "users:list",
-        "users:create",
-        "users:edit",
-        "users:delete",
-        "users:get",
-        "dashboard-page:visit"
+        "dashboard-page:visit",
+        "sidebar-admin:visit",
+        "company:add",
+        "company:edit",
+        "company:delete",
+        "user:add",
+        "user:search",
+        "user:delete",
+        "requirement:verify",
+        "user-report:validate",
+        "internship:add",
+        "internship:approve",
+        "internship:delete"
       ]
     }
   };

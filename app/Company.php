@@ -12,7 +12,7 @@ class Company extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'country', 'city','address','location_map','main_branch',
+        'name', 'country', 'province','city','address','location_map','main_branch',
     ];
 
     public function internships()

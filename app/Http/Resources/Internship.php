@@ -27,6 +27,8 @@ class Internship extends JsonResource
             'status' => $this->status,
             'comment' => $this->comment,
             'updated_by' => $this->updated_by,
+            'cluster' => $this->cluster,
+            'date_visited' => $this->date_visited,
         ];
     }
 }

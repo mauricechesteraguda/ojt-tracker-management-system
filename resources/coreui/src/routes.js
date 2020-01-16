@@ -40,5 +40,6 @@ const routes = {
   '/companies': 'Company',
   '/requirements/categories': 'Requirement Category',
   '/internships': 'Internship',
+  '/clusters': 'Visitation',
 };
 export default routes;

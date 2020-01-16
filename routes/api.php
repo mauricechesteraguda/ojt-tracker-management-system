@@ -24,6 +24,7 @@ Route::post('/users/{id}', 'UserController@update')->middleware('auth');
 Route::post('/users', 'UserController@store')->middleware('auth');
 Route::delete('/users/{id}', 'UserController@delete')->middleware('auth');
 Route::get('/users/search/{value}', 'UserController@search')->middleware('auth');
+Route::get('/users/internship/requirement', 'UserController@internship_requirement')->middleware('auth');
 
 Route::get('/companies', 'CompanyController@index')->middleware('auth');
 Route::get('/companies/all', 'CompanyController@all')->middleware('auth');
@@ -32,11 +33,16 @@ Route::post('/companies/{id}', 'CompanyController@update')->middleware('auth');
 Route::post('/companies', 'CompanyController@store')->middleware('auth');
 Route::delete('/companies/{id}', 'CompanyController@delete')->middleware('auth');
 Route::get('/companies/search/{value}', 'CompanyController@search')->middleware('auth');
+Route::get('/companies/cluster/{id}', 'CompanyController@cluster')->middleware('auth');
+Route::get('/companies/cluster/status/{id}', 'CompanyController@cluster_status')->middleware('auth');
+Route::get('/companies/status/{id}/{year}', 'CompanyController@company_status')->middleware('auth');
+
 
 
 Route::get('/internships', 'InternshipController@index')->middleware('auth');
 Route::get('/internships/{id}', 'InternshipController@show')->middleware('auth');
 Route::post('/internships/{id}', 'InternshipController@update')->middleware('auth');
+Route::post('/internships/clusters/companies/{id}', 'InternshipController@visit_company')->middleware('auth');
 Route::post('/internships', 'InternshipController@store')->middleware('auth');
 Route::delete('/internships/{id}', 'InternshipController@delete')->middleware('auth');
 Route::get('/internships/search/{value}', 'InternshipController@search')->middleware('auth');
@@ -71,5 +77,14 @@ Route::post('/reports/{id}', 'ReportController@update')->middleware('auth');
 Route::post('/reports', 'ReportController@store')->middleware('auth');
 Route::delete('/reports/{id}', 'ReportController@delete')->middleware('auth');
 Route::get('/reports/search/{value}/internship/{id}', 'ReportController@search')->middleware('auth');
+
+
+Route::get('/clusters', 'ClusterController@index')->middleware('auth');
+Route::get('/clusters/all', 'ClusterController@all')->middleware('auth');
+Route::get('/clusters/{id}', 'ClusterController@show')->middleware('auth');
+Route::post('/clusters/{id}', 'ClusterController@update')->middleware('auth');
+Route::post('/clusters', 'ClusterController@store')->middleware('auth');
+Route::delete('/clusters/{id}', 'ClusterController@delete')->middleware('auth');
+Route::get('/clusters/search/{value}', 'ClusterController@search')->middleware('auth');
 
 });

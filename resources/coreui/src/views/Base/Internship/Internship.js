@@ -24,6 +24,8 @@ import Description from "../Internship/Description";
 import Requirement from "../Internship/Requirement";
 import Report from "../Internship/Report";
 
+import Can from '../../../Can';
+
 
 
 class Internship extends Component {
@@ -44,6 +46,7 @@ class Internship extends Component {
       student_position: '',
       is_approved: 0,
       status: '',
+      date_visited:'',
       comment: '',
       updated_by: window.current_user_id,
 
@@ -189,6 +192,7 @@ class Internship extends Component {
       representative: this.state.internships[i].representative,
       student_position: this.state.internships[i].student_position,
       is_approved: this.state.internships[i].is_approved,
+      date_visited: this.state.internships[i].date_visited,
       status: this.state.internships[i].status,
       comment: this.state.internships[i].comment,
       updated_by: this.state.internships[i].updated_by,
@@ -291,6 +295,7 @@ class Internship extends Component {
       representative: '',
       student_position: '',
       is_approved: 0,
+      date_visited: '',
       status: '',
       comment: '',
       updated_by: window.current_user_id,
@@ -313,11 +318,12 @@ class Internship extends Component {
         current_index:i,
         id: this.state.internships[i].id,
         user_name: this.state.internships[i].user.first_name + ' ' + this.state.internships[i].user.last_name,
-        company_name: (this.state.internships[i].company.name+ ' - '+ this.state.internships[i].company.address+ ', '+this.state.internships[i].company.city+ ', '+this.state.internships[i].company.country),
+        company_name: (this.state.internships[i].company.name+ ' - '+ this.state.internships[i].company.address+ ', '+this.state.internships[i].company.city+ ', '+this.state.internships[i].company.province+ ', '+this.state.internships[i].company.country),
         start_date: this.state.internships[i].start_date,
         representative: this.state.internships[i].representative,
         student_position: this.state.internships[i].student_position,
         is_approved: this.state.internships[i].is_approved,
+        date_visited: this.state.internships[i].date_visited,
         status: this.state.internships[i].status,
         comment: this.state.internships[i].comment,
         updated_by: this.state.internships[i].updated_by,
@@ -405,8 +411,15 @@ class Internship extends Component {
                 
                 
                   <Col xs="4" lg="4">
+
+                  <Can
+                      role={user.role}
+                      perform="internship:add"
+                      yes={() => <Button className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-plus-circle"></i> Add</Button>}
+                      no={() => <div></div>}
+                      />
                         
-                        <Button className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-plus-circle"></i> Add</Button>
+                       
                         
                   </Col>
                 </Row>
@@ -470,8 +483,11 @@ class Internship extends Component {
                                   
                                 </Col>
                               </FormGroup>
-                              
-                              <FormGroup hidden={this.state.is_add_process_type} row>
+
+                              <Can
+                                role={user.role}
+                                perform="internship:approve"
+                                yes={() => <FormGroup hidden={this.state.is_add_process_type} row>
                                 <Col md="3">
                                   <Label htmlFor="is_approved">Approve</Label>
                                 </Col>
@@ -484,7 +500,11 @@ class Internship extends Component {
 
                                     </Input>
                                 </Col>
-                              </FormGroup>
+                              </FormGroup>}
+                                no={() => <div></div>}
+                                />
+                              
+                              
                               <FormGroup row>
                                 <Col md="3">
                                   <Label htmlFor="comment">Comment</Label>
@@ -539,7 +559,14 @@ class Internship extends Component {
                           <td>
                           <Button size="sm" className='text-white' color="info" onClick={() => this.toggle_detail_page(i)}><i className="fa fa-book"></i> Details</Button>
                             <Button size="sm" color="primary" onClick={() => this.load_item(i)}><i className="fa fa-pencil"></i></Button>
-                            <Button size="sm" onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.delete_item(i) }} color="danger"><i className="fa fa-trash"></i></Button>
+
+                            <Can
+                                role={user.role}
+                                perform="internship:delete"
+                                yes={() => <Button size="sm" onClick={(e) => { if (window.confirm('Are you sure you wish to delete this item?')) this.delete_item(i) }} color="danger"><i className="fa fa-trash"></i></Button>}
+                                no={() => <div></div>}
+                                />
+                            
                           </td>
                         </tr>
                       )
@@ -630,10 +657,27 @@ class Internship extends Component {
                               </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="is_approved">Status</Label>
+                                  <Label htmlFor="is_approved">Approved?</Label>
                                 </Col>
                                 <Col xs="12" md="9">
                                 <Label><Badge color={this.state.is_approved ? 'success':'danger'} >{this.state.is_approved ? 'approved':'pending'}</Badge></Label>
+                                </Col>
+                              </FormGroup>
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="date_visited">Visited</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <Label><Badge color={this.state.date_visited ? 'success':'danger'} >{this.state.date_visited ? 'visited':'not yet'}</Badge></Label>
+                                
+                                </Col>
+                              </FormGroup>
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="date_visited">Date Visited</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <Label>{this.state.date_visited}</Label>
                                 </Col>
                               </FormGroup>
                               <FormGroup row>

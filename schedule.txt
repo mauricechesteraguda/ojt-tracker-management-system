@@ -1,0 +1,51 @@
+api key google AIzaSyCf0T3NpakQJGRYfPZJGdVw86niWki7pag
+
+
+internships = fetch all internships by year sorted by country, city, address, company
+
+to_visit = []
+
+for internship in internships:
+    if internship.cluster:
+        pass
+    else:
+        to_visit.add(internship)
+
+locations = []
+
+for internship in to_visit:
+    locations.add(internships.company.name + ','+internships.company.city + ','+ internships.company.country+ ','+ internships.company.id)
+
+locations = array_unique(locations)
+
+company_visit_per_day = 4
+
+counter = 0
+latest_cluster_number = fetch from db 
+current_year = today.year
+current_cluster = none
+
+for location in locations:
+    current_company_id = location[:3]
+    internships_by_company = internships.object.filter(company_id=current_company_id)
+    if counter == 0:
+        current_cluster.object.create(cluster_number=latest_cluster_number, year=current_year)
+        current_cluster.save()
+        for i in internships_by_company:
+            i.cluster_id = current_cluster.id
+            i.save()
+        counter++
+    else if counter >= 1 and counter < 4:
+        for i in internships_by_company:
+            i.cluster_id = current_cluster.id
+            i.save()
+        counter++
+    else if counter == 4:
+        latest_cluster_number++
+        current_cluster.object.create(cluster_number=latest_cluster_number, year=current_year)
+        current_cluster.save()
+        for i in internships_by_company:
+            i.cluster_id = current_cluster.id
+            i.save()
+        counter = 0
+    

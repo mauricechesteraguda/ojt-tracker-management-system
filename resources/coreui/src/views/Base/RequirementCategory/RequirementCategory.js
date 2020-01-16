@@ -349,7 +349,7 @@ class RequirementCategory extends Component {
 
   get_users() {
     var self = this;
-    axios.get('/api/users/')
+    axios.get('/api/users/internship/requirement')
       .then(res => {
         self.setState({users:res.data.data})
       }).catch(err => {

@@ -5,11 +5,68 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Company;
+use App\Internship;
 use App\Http\Resources\Company as CompanyResource;
 use App\Http\Resources\CompanyCollection;
 
+use Illuminate\Support\Facades\DB;
+
 class CompanyController extends Controller
 {
+    public function company_status($id,$year)
+    {        
+        $is_visited = false;
+        $date_visited = '';
+        $internships = Internship::where('is_deleted','=','0')->where('company_id','=',$id)->where('start_date','LIKE','%'.$year.'%')->get();
+
+        foreach ($internships as $i) {
+            if ($i->date_visited) {
+                $date_visited = $i->date_visited;
+                $is_visited = true;
+                break;
+            }
+        }
+
+        if ($is_visited) {
+            return response()->json([
+                'date_visited' => $date_visited
+            ], 200);
+        }
+        return response()->json([
+            'message' => 'Company visit not yet completed.'
+        ], 201);
+    }
+
+    public function cluster_status($id)
+    {        
+        $is_visited = false;
+        $internships = Internship::where('is_deleted','=','0')->where('cluster_id','=',$id)->get();
+
+        foreach ($internships as $i) {
+            if ($i->date_visited) {
+                $is_visited = true;
+                continue;
+            }else{
+                $is_visited = false;
+                break;
+            }
+        }
+
+        if ($is_visited) {
+            return response()->json([
+                'message' => 'Cluster visit completed.'
+            ], 200);
+        }
+        return response()->json([
+            'message' => 'Cluster visit not yet completed.'
+        ], 201);
+    }
+    public function cluster($id)
+    {        
+        $companies = Company::selectRaw("*")->whereRaw("id in (SELECT company_id FROM internships WHERE is_deleted = 0 AND cluster_id =" . $id . ") ORDER BY country,province,city,address,name ASC")->paginate(20);
+
+        return new CompanyCollection($companies);
+    }
     public function all()
     {
         return new CompanyCollection(Company::where('is_deleted', '=', '0')->orderBy('name', 'ASC')->get());
@@ -20,7 +77,7 @@ class CompanyController extends Controller
     }
     public function search($value)
     {
-        return new CompanyCollection(Company::where('is_deleted', '=', '0')->where('name', 'LIKE', '%'.$value.'%')->orWhere('address', 'LIKE', '%'.$value.'%')->orWhere('country', 'LIKE', '%'.$value.'%')->orWhere('city', 'LIKE', '%'.$value.'%')->where('is_deleted', '=', '1')->orderBy('name', 'ASC')->paginate(20));
+        return new CompanyCollection(Company::where('is_deleted', '=', '0')->where('name', 'LIKE', '%'.$value.'%')->orWhere('address', 'LIKE', '%'.$value.'%')->orWhere('country', 'LIKE', '%'.$value.'%')->orWhere('province', 'LIKE', '%'.$value.'%')->orWhere('city', 'LIKE', '%'.$value.'%')->where('is_deleted', '=', '1')->orderBy('name', 'ASC')->paginate(20));
     }
 
     public function show($id)
@@ -73,6 +130,7 @@ class CompanyController extends Controller
             
             $company->name = request('name');
             $company->country = request('country');
+            $company->province = request('province');
             $company->city = request('city');
             $company->address = request('address');
             $company->location_map = request('location_map');
