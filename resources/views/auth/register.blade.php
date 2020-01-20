@@ -79,6 +79,9 @@
                                             <strong>{{ $errors->first('sr_code') }}</strong>
                                         </span>
                                     @endif
+                                    <span>
+                                        <strong>{{ $errors->sr_code->first('sr_code') }}</strong>
+                                    </span>
                                 </div>
                             </div>
 

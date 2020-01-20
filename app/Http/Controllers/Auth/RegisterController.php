@@ -7,7 +7,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
 
+use App\Classes\batsu_api;
 class RegisterController extends Controller
 {
     /*
@@ -48,14 +50,40 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:6', 'confirmed'],
-            'sr_code' => ['required','string','max:255','unique:users'],
-        ]);
+            return Validator::make($data, [
+                'name' => ['required', 'string', 'max:255'],
+                'first_name' => ['required', 'string', 'max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                'password' => ['required', 'string', 'min:6', 'confirmed'],
+                'sr_code' => ['required','string','max:255','unique:users'],
+            ]);
+    }
+
+    /**
+     *
+     * Override Trait RegistersUsers : vendor/laravel/framework/src/Illuminate/Foundation/Auth/RegistersUsers.php
+     *
+    */
+    public function register(Request $request)
+    {
+        $validator = $this->validator($request->all());
+
+        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
+        $user = json_decode($api->fetch_student_profile( $request->input('sr_code')),true);
+
+        if (!$user) {
+            return redirect('/register')
+            ->withErrors($validator,'sr_code')
+            ->withInput();
+        }
+        if ($validator->fails()) {
+            return redirect('/register')
+            ->withErrors($validator)
+            ->withInput();
+        }
+
+        return redirect($this->redirectPath());
     }
 
     /**
@@ -66,7 +94,7 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+            return User::create([
             'name' => $data['name'],
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
