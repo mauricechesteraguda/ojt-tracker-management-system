@@ -109,10 +109,22 @@ class Company extends Component {
 
   check_inputs() {
 
-    if (this.state.name =='' || this.state.country == '' || this.state.province == '' || this.state.city == '' || this.state.address == '' || this.state.location_map == '' ) {
+    if (this.state.name == '' || this.state.country == '' || this.state.province == '' || this.state.city == '' || this.state.address == '' || this.state.location_map == '') {
       console.log('Incomplete form values!')
       this.disable_buttons()
-    }else{
+    } else {
+      if (!this.state.location_map.includes('https://www.google.com/maps/embed?pb=')) {
+        console.log('Invalid google embeded link.')
+        this.disable_buttons()
+        this.setState({
+          alert_message: 'Invalid google embeded link.',
+          alert_type: 'danger',
+          has_alert_hidden: false,
+        })
+
+      } else {
+        this.enable_button()
+      }
       this.enable_button()
     }
   }
@@ -444,7 +456,7 @@ class Company extends Component {
                                 </Col>
                                 <Col xs="12" md="9">
                                   <Input  value={this.state.location_map} onChange={this.handle_input_change} type="text" id="location_map" name="location_map" placeholder="Location" />
-                                  <FormText className="help-block">Please enter the google map location</FormText>
+                                  <FormText className="help-block">Copy and paste the embed link from google maps</FormText>
                                 </Col>
                               </FormGroup>
                               
@@ -598,11 +610,14 @@ class Company extends Component {
                                   <Label htmlFor="location_map">Location Map</Label>
                                 </Col>
                                 <Col xs="12" md="9">
-                                <Label>{this.state.location_map}</Label>
+                                <iframe src={this.state.location_map} width="100%" height="100%" frameBorder="0"  allowFullScreen></iframe>
+                               
+					   		
                                 </Col>
                               </FormGroup>
-                              
-                              
+
+
+					  
                             </Form>
 
                           </CardBody>
