@@ -73,6 +73,7 @@ class RegisterController extends Controller
         $user = json_decode($api->fetch_student_profile( $request->input('sr_code')),true);
 
         if (!$user) {
+            $validator->getMessageBag()->add('sr_code', 'Incorrect code.');
             return redirect('/register')
             ->withErrors($validator,'sr_code')
             ->withInput();
