@@ -20,8 +20,6 @@ class UserController extends Controller
     }
     public function index()
     {
-        // $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
-        // $colleges = json_decode($api->fetch_colleges(),true);
         $user = \Auth::user();
         if ($user->role != 'superuser') {
             return new UserCollection(User::where('id','=',$user->id)->orderBy('name', 'ASC')->paginate(5));

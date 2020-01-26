@@ -95,14 +95,33 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
+        $schoolyears = json_decode($api->fetch_schoolyear(),true);
+        $semesters = json_decode($api->fetch_semester(),true);
+        krsort($semesters);
+        foreach ($schoolyears as $sy) {
+            # code...
+            foreach ($semesters as $sem) {
+                $user_enrollment_record = json_decode($api->fetch_enrollment_records($sy,$sem,$data['sr_code']),true);
+                if ($user_enrollment_record) {
+                    break;
+                }
+            }
+
+        }
             return User::create([
-            'name' => $data['name'],
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
+            'name' => $user_enrollment_record['middlename'],
+            'first_name' => $user_enrollment_record['firstname'],
+            'last_name' => $user_enrollment_record['lastname'],
+            'current_schoolyear' => $user_enrollment_record['schoolyear'],
+            'current_course_code' => $user_enrollment_record['coursecode'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'role' => 'student',
             'sr_code' => $data['sr_code'],
+            'contact_no' => $data['contact_no'],
+            'parent' => $data['parent'],
+            'parent_contact_no' => $data['parent_contact_no'],
             
         ]);
     }
