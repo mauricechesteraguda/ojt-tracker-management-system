@@ -509,7 +509,7 @@ class batsu_api
 		
 		//echo $REQUEST_URL;
 
-		echo $REQUEST_URL;
+		// echo $REQUEST_URL;
 	    $API_RETURN = file_get_contents($REQUEST_URL);
 
 	   	/* use this option in-case the host disable file_get_contents() function */
