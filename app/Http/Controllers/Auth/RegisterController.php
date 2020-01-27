@@ -57,6 +57,11 @@ class RegisterController extends Controller
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
                 'password' => ['required', 'string', 'min:6', 'confirmed'],
                 'sr_code' => ['required','string','max:255','unique:users'],
+                'contact_no' => ['string', 'max:255'],
+                'parent' => ['string', 'max:255'],
+                'parent_contact_no' => ['string', 'max:255'],
+                'current_schoolyear' => ['string', 'max:255'],
+                'current_course_code' => ['string', 'max:255']
             ]);
     }
 
@@ -84,6 +89,8 @@ class RegisterController extends Controller
             ->withInput();
         }
 
+        $this->create($request->all());
+
         return redirect($this->redirectPath());
     }
 
@@ -104,17 +111,17 @@ class RegisterController extends Controller
             foreach ($semesters as $sem) {
                 $user_enrollment_record = json_decode($api->fetch_enrollment_records($sy,$sem,$data['sr_code']),true);
                 if ($user_enrollment_record) {
-                    break;
+                    break 2;
                 }
             }
 
         }
             return User::create([
-            'name' => $user_enrollment_record['middlename'],
-            'first_name' => $user_enrollment_record['firstname'],
-            'last_name' => $user_enrollment_record['lastname'],
-            'current_schoolyear' => $user_enrollment_record['schoolyear'],
-            'current_course_code' => $user_enrollment_record['coursecode'],
+            'name' => $user_enrollment_record[0]['middlename'],
+            'first_name' => $user_enrollment_record[0]['firstname'],
+            'last_name' => $user_enrollment_record[0]['lastname'],
+            'current_schoolyear' => $user_enrollment_record[0]['schoolyear'],
+            'current_course_code' => $user_enrollment_record[0]['coursecode'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'role' => 'student',

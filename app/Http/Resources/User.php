@@ -24,6 +24,11 @@ class User extends JsonResource
         'sr_code'    => $this->sr_code,
         'created_at' => $this->created_at,
         'updated_at' => $this->updated_at,
+        'contact_no'       => $this->contact_no,
+        'parent'       => $this->parent,
+        'parent_contact_no'       => $this->parent_contact_no,
+        'current_schoolyear'       => $this->current_schoolyear,
+        'current_course_code'       => $this->current_course_code,
     ];
 }
 }

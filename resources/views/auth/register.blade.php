@@ -107,6 +107,50 @@
                             </div>
                         </div>
 
+                        <div class="form-group row">
+                            <label for="contact_no" class="col-md-4 col-form-label text-md-right">{{ __('Contact #') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="contact_no" type="text" class="form-control{{ $errors->has('contact_no') ? ' is-invalid' : '' }}" name="contact_no" value="{{ old('contact_no') }}" required autofocus>
+
+                                @if ($errors->has('contact_no'))
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('contact_no') }}</strong>
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="parent" class="col-md-4 col-form-label text-md-right">{{ __('Parent / Guardian Name') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="parent" type="text" class="form-control{{ $errors->has('parent') ? ' is-invalid' : '' }}" name="parent" value="{{ old('parent') }}" required autofocus>
+
+                                @if ($errors->has('name'))
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('name') }}</strong>
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="parent_contact_no" class="col-md-4 col-form-label text-md-right">{{ __('Parent Contact #') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="parent_contact_no" type="text" class="form-control{{ $errors->has('parent_contact_no') ? ' is-invalid' : '' }}" name="parent_contact_no" value="{{ old('parent_contact_no') }}" required autofocus>
+
+                                @if ($errors->has('parent_contact_no'))
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('parent_contact_no') }}</strong>
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
+                        
+
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
