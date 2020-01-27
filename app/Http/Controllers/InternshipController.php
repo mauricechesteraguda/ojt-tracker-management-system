@@ -150,6 +150,7 @@ class InternshipController extends Controller
             $internship = Internship::findOrFail($id);
             
             $internship->start_date = request('start_date');
+            $internship->end_date = request('end_date');
             $internship->representative = request('representative');
             $internship->student_position = request('student_position');
             $internship->is_approved = request('is_approved');
