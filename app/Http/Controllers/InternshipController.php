@@ -11,20 +11,37 @@ use App\Company;
 use App\Http\Resources\Internship as InternshipResource;
 use App\Http\Resources\InternshipCollection;
 
+use App\Classes\batsu_api;
+
 class InternshipController extends Controller
 {
     public function index()
     {
+        $current_user = \Auth::user();
+        $sr_code = $current_user->sr_code;
+        if ($current_user->role == 'student') {
+            return new InternshipCollection(Internship::where('is_deleted', '=', '0')->whereHas('User', function($q)use($sr_code){
+                $q->where('sr_code', '=', $sr_code)->orderBy('last_name', 'ASC');
+            })->orderBy('id', 'ASC')->paginate(5));
+        }
         return new InternshipCollection(Internship::where('is_deleted', '=', '0')->orderBy('id', 'ASC')->paginate(5));
     }
     public function search($value)
     {
-        return new InternshipCollection(Internship::where('is_deleted','=','0')->whereHas('User', function($q)use($value){
-            $q->where('first_name', 'LIKE', '%'.$value.'%')->orWhere('last_name', 'LIKE', '%'.$value.'%')->orderBy('last_name', 'ASC');
-        })->orWhereHas('Company', function($q)use($value){
+        $current_user = \Auth::user();
+        $sr_code = $current_user->sr_code;
+        if (!$current_user->role == 'student') {
+            return new InternshipCollection(Internship::where('is_deleted', '=', '0')->whereHas('User', function ($q) use ($value) {
+                $q->where('first_name', 'LIKE', '%'.$value.'%')->orWhere('last_name', 'LIKE', '%'.$value.'%')->orderBy('last_name', 'ASC');
+            })->orWhereHas('Company', function ($q) use ($value) {
+                $q->where('name', 'LIKE', '%'.$value.'%')->orWhere('address', 'LIKE', '%'.$value.'%')->orWhere('country', 'LIKE', '%'.$value.'%')->orWhere('city', 'LIKE', '%'.$value.'%')->orderBy('name', 'ASC');
+            })->paginate(5));
+        }
+        return new InternshipCollection(Internship::where('is_deleted', '=', '0')->whereHas('User', function ($q) use ($value,$sr_code) {
+            $q->where('sr_code', '=', $sr_code);
+        })->WhereHas('Company', function ($q) use ($value) {
             $q->where('name', 'LIKE', '%'.$value.'%')->orWhere('address', 'LIKE', '%'.$value.'%')->orWhere('country', 'LIKE', '%'.$value.'%')->orWhere('city', 'LIKE', '%'.$value.'%')->orderBy('name', 'ASC');
         })->paginate(5));
-        
         
     }
 
@@ -40,8 +57,31 @@ class InternshipController extends Controller
             'company_id' => 'required|max:255',
 
         ]);
+
+        $user = \Auth::user();
         
+        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
+        $schoolyears = json_decode($api->fetch_schoolyear(),true);
+        $semesters = json_decode($api->fetch_semester(),true);
+        krsort($semesters);
+        foreach ($schoolyears as $sy) {
+            # code...
+            foreach ($semesters as $sem) {
+                $user_enrollment_record = json_decode($api->fetch_enrollment_records($sy,$sem,$user->sr_code),true);
+                if ($user_enrollment_record) {
+                    break 2;
+                }
+            }
+
+        }
+
         $internship = Internship::create($request->all());
+        $internship->schoolyear = $user_enrollment_record[0]['schoolyear'];
+        $internship->course_code = $user_enrollment_record[0]['coursecode'];
+        $internship->semester = $user_enrollment_record[0]['semester'];
+        $internship->campus = $user_enrollment_record[0]['campus'];
+        $internship->college_code = $user_enrollment_record[0]['collegecode'];
+
         $internship->save();
 
         if ($internship->id) {

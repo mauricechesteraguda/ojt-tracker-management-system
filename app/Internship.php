@@ -12,7 +12,7 @@ class Internship extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'company_id', 'start_date','representative','student_position','is_approved','status','comment','updated_by',
+        'user_id', 'company_id', 'start_date','representative','student_position','is_approved','status','comment','updated_by','sc','schoolyear','course_code','end_date','semester','campus','college_code',
     ];
 
     public function user()

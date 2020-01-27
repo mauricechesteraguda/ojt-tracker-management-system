@@ -28,6 +28,12 @@ class Internship extends JsonResource
             'comment' => $this->comment,
             'updated_by' => $this->updated_by,
             'cluster' => $this->cluster,
+            'schoolyear' => $this->schoolyear,
+            'course_code' => $this->course_code,
+            'end_date' => $this->end_date,
+            'semester' => $this->semester,
+            'campus' => $this->campus,
+            'college_code' => $this->college_code,
             'date_visited' => $this->date_visited,
         ];
     }

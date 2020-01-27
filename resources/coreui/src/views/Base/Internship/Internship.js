@@ -42,6 +42,7 @@ class Internship extends Component {
       company_id: '',
       company_name: '',
       start_date: '',
+      end_date: '',
       representative: '',
       student_position: '',
       is_approved: 0,
@@ -156,6 +157,7 @@ class Internship extends Component {
     var self = this;
     let payload = {
       start_date: this.state.start_date,
+      end_date: this.state.end_date,
       representative: this.state.representative,
       student_position: this.state.student_position,
       is_approved: this.state.is_approved,
@@ -189,6 +191,7 @@ class Internship extends Component {
       company_id: this.state.internships[i].company.id,
       company_name: (this.state.internships[i].company.name+ ' - '+ this.state.internships[i].company.address+ ', '+this.state.internships[i].company.city+ ', '+this.state.internships[i].company.country),
       start_date: this.state.internships[i].start_date,
+      end_date: this.state.internships[i].end_date,
       representative: this.state.internships[i].representative,
       student_position: this.state.internships[i].student_position,
       is_approved: this.state.internships[i].is_approved,
@@ -212,6 +215,7 @@ class Internship extends Component {
       user_id: window.current_user_id,
       company_id: this.state.company_id,
       start_date: this.state.start_date,
+      end_date: this.state.end_date,
       representative: this.state.representative,
       student_position: this.state.student_position,
       is_approved: this.state.is_approved,
@@ -224,6 +228,11 @@ class Internship extends Component {
         console.log(response);
         self.get_data()
         self.toggle_add_form();
+        self.setState({
+          alert_message: 'Creation Successful.',
+          alert_type: 'success',
+          has_alert_hidden: false,
+        })
       })
       .catch(function (error) {
         console.log(error.response.status);
@@ -292,6 +301,7 @@ class Internship extends Component {
       user_id: window.current_user_id,
       company_id: '',
       start_date: '',
+      end_date: '',
       representative: '',
       student_position: '',
       is_approved: 0,
@@ -320,6 +330,7 @@ class Internship extends Component {
         user_name: this.state.internships[i].user.first_name + ' ' + this.state.internships[i].user.last_name,
         company_name: (this.state.internships[i].company.name+ ' - '+ this.state.internships[i].company.address+ ', '+this.state.internships[i].company.city+ ', '+this.state.internships[i].company.province+ ', '+this.state.internships[i].company.country),
         start_date: this.state.internships[i].start_date,
+        end_date: this.state.internships[i].end_date,
         representative: this.state.internships[i].representative,
         student_position: this.state.internships[i].student_position,
         is_approved: this.state.internships[i].is_approved,
@@ -463,6 +474,15 @@ class Internship extends Component {
                                 <Col xs="12" md="9">
                                   <Input value={this.state.start_date} onChange={this.handle_input_change} type="date" id="start_date" name="start_date" placeholder="Text" />
                                   <FormText color="muted">Input Starting Date</FormText>
+                                </Col>
+                              </FormGroup>
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="end_date">End Date</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                  <Input value={this.state.end_date} onChange={this.handle_input_change} type="date" id="end_date" name="end_date" placeholder="Text" />
+                                  <FormText color="muted">Input End Date</FormText>
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
@@ -637,6 +657,14 @@ class Internship extends Component {
                                 </Col>
                                 <Col xs="12" md="9">
                                 <Label>{this.state.start_date}</Label>
+                                </Col>
+                              </FormGroup>
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="end_date">End Date</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <Label>{this.state.end_date}</Label>
                                 </Col>
                               </FormGroup>
                               <FormGroup row>
