@@ -89,7 +89,8 @@ class RegisterController extends Controller
             ->withInput();
         }
 
-        $this->create($request->all());
+        $created_user = $this->create($request->all());
+        \Auth::login($created_user);
 
         return redirect($this->redirectPath());
     }
