@@ -38,7 +38,7 @@ Route::get('/companies/cluster/status/{id}', 'CompanyController@cluster_status')
 Route::get('/companies/status/{id}/{year}', 'CompanyController@company_status')->middleware('auth');
 
 
-
+Route::get('/internships/schoolyears', 'InternshipController@schoolyears')->middleware('auth');
 Route::get('/internships', 'InternshipController@index')->middleware('auth');
 Route::get('/internships/{id}', 'InternshipController@show')->middleware('auth');
 Route::post('/internships/{id}', 'InternshipController@update')->middleware('auth');
@@ -46,6 +46,7 @@ Route::post('/internships/clusters/companies/{id}', 'InternshipController@visit_
 Route::post('/internships', 'InternshipController@store')->middleware('auth');
 Route::delete('/internships/{id}', 'InternshipController@delete')->middleware('auth');
 Route::get('/internships/search/{value}', 'InternshipController@search')->middleware('auth');
+
 
 
 Route::get('/descriptions', 'DescriptionController@index')->middleware('auth');

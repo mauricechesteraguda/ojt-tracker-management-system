@@ -15,6 +15,13 @@ use App\Classes\batsu_api;
 
 class InternshipController extends Controller
 {
+    public function schoolyears(){
+        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
+        $schoolyears = json_decode($api->fetch_schoolyear(),true);
+
+        return response()->json($schoolyears, 200);
+
+    }
     public function index()
     {
         $current_user = \Auth::user();

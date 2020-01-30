@@ -30,6 +30,7 @@ class Visitation extends Component {
     this.state = {
       companies: [],
       clusters: [],
+      schoolyears:[],
 
       add_form: false,
       id: '',
@@ -87,6 +88,7 @@ class Visitation extends Component {
     this.xupdate_item = this.xupdate_item.bind(this);
     this.get_cluster_status = this.get_cluster_status.bind(this);
     this.get_company_status = this.get_company_status.bind(this);
+    this.get_schoolyears = this.get_schoolyears.bind(this);
     
   }
 
@@ -556,9 +558,26 @@ class Visitation extends Component {
       
   }
 
+  get_schoolyears(){
+    var self = this;
+    axios.get('/api/internships/schoolyears')
+        .then(res => {
+          if (res.status == 200) {
+            
+              self.setState({schoolyears:res.data})
+            
+          }
+
+        }).catch(err => {
+          console.log(err)
+          alert('Server disconnected.')
+        })
+  }
+
   componentDidMount() {
 
     this.get_data()
+    this.get_schoolyears()
 
   }
 
@@ -617,23 +636,18 @@ class Visitation extends Component {
 
                               <FormGroup row>
                                 <Col md="3">
-                                  <Label htmlFor="year">Year</Label>
+                                  <Label htmlFor="year">School Year</Label>
                                 </Col>
                                 <Col xs="12" md="9">
                                   <Input  value={this.state.year} onChange={this.handle_input_change} type="select" name="year" id="year">
                                   <option value=""></option>
-                                  <option value="2019">2019</option>
-                                  <option value="2020">2020</option>
-                                  <option value="2021">2021</option>
-                                  <option value="2022">2022</option>
-                                  <option value="2023">2023</option>
-                                  <option value="2024">2024</option>
-                                  <option value="2025">2025</option>
-                                  <option value="2026">2026</option>
-                                  <option value="2027">2027</option>
-                                  <option value="2028">2028</option>
-                                  <option value="2029">2029</option>
-                                  <option value="2030">2030</option>
+                                  
+                                  {this.state.schoolyears.map((data, i) => {
+                                      return (
+                                        <option key={i} value={data[i]}>{data[i]} </option>
+                                        
+                                      )
+                                    })}
                                   
 
                                     </Input>
