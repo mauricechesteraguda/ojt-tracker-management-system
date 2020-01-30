@@ -34,8 +34,10 @@ class Internship extends Component {
     this.state = {
       companies: [],
       internships: [],
-      
+      campuses:[],
+      campus:'',
 
+      print_form: false,
       add_form: false,
       id: '',
       user_id: window.current_user_id,
@@ -71,6 +73,10 @@ class Internship extends Component {
       search_value:''
       
     }
+    this.toggle_print_form = this.toggle_print_form.bind(this);
+    this.handle_input_change_print = this.handle_input_change_print.bind(this);
+    this.print_item = this.print_item.bind(this);
+    this.check_print_inputs = this.check_print_inputs.bind(this);
     this.toggle_add_form = this.toggle_add_form.bind(this);
     this.handle_input_change = this.handle_input_change.bind(this);
     this.save_item = this.save_item.bind(this);
@@ -129,6 +135,16 @@ class Internship extends Component {
       this.disable_buttons()
     }else{
       this.enable_button()
+    }
+  }
+
+  check_print_inputs() {
+
+    if (this.state.campus =='' ) {
+      console.log('Incomplete print form values!')
+      this.disable_print_button()
+    }else{
+      this.enable_print_button()
     }
   }
 
@@ -250,6 +266,44 @@ class Internship extends Component {
       });
 
   }
+
+  print_item(e) {
+    e.preventDefault();
+    
+    var self = this;
+    
+    const form_data = new FormData();
+    form_data.append('campus',self.state.campus);
+    form_data.append('updated_by',window.current_user_id);
+
+    
+    axios.post('/internships/print-pdf', form_data,{
+      headers:{
+        'Content-Type':'multipart/form-data'
+      }
+    })
+      .then(function (response) {
+        console.log(response);
+        
+        self.toggle_print_form();
+      })
+      .catch(function (error) {
+        console.log(error.response.status);
+        if (error.response.data.message) {
+          self.setState({
+            alert_message: error.response.data.message,
+            alert_type: 'danger',
+            has_alert_hidden: false,
+          })
+        }else{
+          alert('Print Failed. Contact your System Administrator')
+        }
+        
+
+      });
+
+  }
+
   handle_search_input_change(e) {
     // clear alert status
     var self = this;
@@ -292,6 +346,36 @@ class Internship extends Component {
     this.check_inputs(e.target.name, e.target.value);
 
 
+
+  }
+  handle_input_change_print(e) {
+    // clear alert status
+   this.setState({
+     alert_message: '',
+     alert_type: 'primary',
+     has_alert_hidden: true,
+   })
+
+   this.setState({ [e.target.name]: e.target.value });
+   
+   
+   this.check_print_inputs(e.target.name, e.target.value);
+
+
+
+ }
+
+  toggle_print_form() {
+    this.setState({
+      campus: '',
+      user_id: window.current_user_id,
+      
+      print_form: !this.state.print_form,
+
+      alert_message: '',
+      alert_type: 'primary',
+      has_alert_hidden: true,
+    });
 
   }
 
@@ -429,13 +513,54 @@ class Internship extends Component {
                       yes={() => <Button className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-plus-circle"></i> Add</Button>}
                       no={() => <div></div>}
                       />
-                        
+                        <Button className="float-lg-right" color="danger" onClick={this.toggle_print_form}><i className="fa fa-print"></i> Print</Button>
                        
                         
                   </Col>
                 </Row>
               </CardHeader>
               <CardBody>
+              <Modal isOpen={this.state.print_form} toggle={this.toggle_print_form}
+                  className={'modal-primary ' + this.props.className}>
+                  <ModalHeader toggle={this.toggle_print_form}>Print Masterlist</ModalHeader>
+                  <ModalBody>
+
+                    <Row>
+                      <Col xs="12" md="12">
+                        <Card>
+
+                          <CardBody>
+                            <Form action="" method="post" encType="multipart/form-data" className="form-horizontal">
+                            <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="campus">Campus</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                  <Input  value={this.state.campus} onChange={this.handle_input_change_print} type="select" name="campus" id="campus">
+                                  <option value=""></option>
+                                  <option value="ALANGILAN">ALANGILAN</option>
+                                  
+                                      
+
+                                    </Input>
+                                </Col>
+                              </FormGroup>
+                              
+                            </Form>
+
+                          </CardBody>
+                        </Card>
+                      </Col>
+                    </Row>
+
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button type='submit' disabled={this.state.print_button_is_disabled} color="primary" onClick={this.print_item}><i className="fa fa-print"></i> Print</Button>{' '}
+                    <Button color="secondary" onClick={this.toggle_print_form}>Cancel</Button>
+                  </ModalFooter>
+                </Modal>
+
+
                 <Modal isOpen={this.state.add_form} toggle={this.toggle_add_form}
                   className={'modal-primary ' + this.props.className}>
                   <ModalHeader toggle={this.toggle_add_form}>{this.state.is_add_process_type ? 'Add New' : 'Update'} Internship</ModalHeader>
