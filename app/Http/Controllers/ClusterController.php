@@ -38,7 +38,7 @@ class ClusterController extends Controller
         ]);
 
         
-        $internships = Internship::whereNull('cluster_id')->where('is_deleted', '=', '0')->where('start_date', 'LIKE','%' . $request->year . '%' )->orderBy('id', 'ASC')->get();
+        $internships = Internship::whereNull('cluster_id')->where('is_deleted', '=', '0')->where('schoolyear', 'LIKE','%' . $request->year . '%' )->orderBy('id', 'ASC')->get();
 
         if ($internships->count()) {
             # code...
@@ -71,7 +71,7 @@ class ClusterController extends Controller
                     $cluster = Cluster::create($request->all());
                     $cluster->save();
 
-                    $internships_by_company = Internship::whereNull('cluster_id')->where('is_deleted', '=', '0')->where('start_date', 'LIKE', '%' . $request->year . '%')->where('company_id', '=', $c->id)->orderBy('id', 'ASC')->get();
+                    $internships_by_company = Internship::whereNull('cluster_id')->where('is_deleted', '=', '0')->where('schoolyear', 'LIKE', '%' . $request->year . '%')->where('company_id', '=', $c->id)->orderBy('id', 'ASC')->get();
 
                     foreach ($internships_by_company as $i) {
                         $i->cluster_id = $cluster->id;
@@ -84,7 +84,7 @@ class ClusterController extends Controller
 
                 } elseif ($counter >= 1 && $counter <  $company_visit_per_day) {
 
-                    $internships_by_company = Internship::whereNull('cluster_id')->where('is_deleted', '=', '0')->where('start_date', 'LIKE', '%' . $request->year . '%')->where('company_id', '=', $c->id)->orderBy('id', 'ASC')->get();
+                    $internships_by_company = Internship::whereNull('cluster_id')->where('is_deleted', '=', '0')->where('schoolyear', 'LIKE', '%' . $request->year . '%')->where('company_id', '=', $c->id)->orderBy('id', 'ASC')->get();
 
                     //check if the next internships is in the same city
                     foreach ($internships_by_company as $i) {
@@ -109,7 +109,7 @@ class ClusterController extends Controller
                     $cluster = Cluster::create($request->all());
                     $cluster->save();
 
-                    $internships_by_company = Internship::whereNull('cluster_id')->where('is_deleted', '=', '0')->where('start_date', 'LIKE', '%' . $request->year . '%')->where('company_id', '=', $c->id)->orderBy('id', 'ASC')->get();
+                    $internships_by_company = Internship::whereNull('cluster_id')->where('is_deleted', '=', '0')->where('schoolyear', 'LIKE', '%' . $request->year . '%')->where('company_id', '=', $c->id)->orderBy('id', 'ASC')->get();
 
                     
                     foreach ($internships_by_company as $i) {

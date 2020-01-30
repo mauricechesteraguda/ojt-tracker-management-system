@@ -644,7 +644,7 @@ class Visitation extends Component {
                                   
                                   {this.state.schoolyears.map((data, i) => {
                                       return (
-                                        <option key={i} value={data[i]}>{data[i]} </option>
+                                        <option key={i} value={data}>{data}</option>
                                         
                                       )
                                     })}
