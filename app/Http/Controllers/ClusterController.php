@@ -138,6 +138,11 @@ class ClusterController extends Controller
     public function delete($id)
     {
         $cluster = Cluster::findOrFail($id);
+        $internships = Internship::where('cluster_id','=',$cluster->i)->get();
+        foreach ($internships as $i) {
+            $i->cluster_id = null;
+            $i->save();
+        }
         $cluster->is_deleted="1";
         $cluster->save();
         return response()->json(null, 204);
