@@ -164,7 +164,7 @@ class InternshipController extends Controller
                 'message' => 'Internship updated successfully!'
             ], 200);
         }
-        public function printPDF()
+        public function printPDF(Request $request)
         {
             $data = ['title' => 'First PDF for Medium',
             'heading' => 'Hello from 99Points.info',
@@ -172,7 +172,7 @@ class InternshipController extends Controller
         ];
     
             $pdf = PDF::loadView('pdf_view', $data)->setPaper('legal', 'landscape');  
-            return $pdf->download('medium.pdf');
+            return $pdf->download('report.pdf');
         }
         
 }
