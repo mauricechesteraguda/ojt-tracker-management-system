@@ -36,6 +36,14 @@ class Internship extends Component {
       internships: [],
       campuses:[],
       campus:'',
+      schoolyears:[],
+      schoolyear:'',
+      semesters:[],
+      semester:'',
+      colleges:[],
+      college:'',
+      courses:[],
+      course:'',
 
       print_form: false,
       add_form: false,
@@ -90,7 +98,114 @@ class Internship extends Component {
     this.get_companies = this.get_companies.bind(this);
     this.go_back = this.go_back.bind(this);
     this.toggle_detail_page = this.toggle_detail_page.bind(this);
+    this.get_campuses = this.get_campuses.bind(this);
+    this.get_schoolyears = this.get_schoolyears.bind(this);
+    this.get_semesters = this.get_semesters.bind(this);
+    this.get_colleges = this.get_colleges.bind(this);
+    this.get_courses = this.get_courses.bind(this);
+    
+    this.disable_print_button = this.disable_print_button.bind(this);
+    this.enable_print_button = this.enable_print_button.bind(this);
   
+  }
+
+  get_courses(college){
+    var self = this;
+    axios.get('/api/internships/courses/'+college)
+        .then(res => {
+          if (res.status == 200) {
+            
+              self.setState({courses:res.data})
+            
+          }
+
+        }).catch(err => {
+          console.log(err)
+          alert('Server disconnected.')
+        })
+  }
+
+  get_colleges(){
+    var self = this;
+    axios.get('/api/internships/colleges')
+        .then(res => {
+          if (res.status == 200) {
+            
+              self.setState({colleges:res.data})
+            
+          }
+
+        }).catch(err => {
+          console.log(err)
+          alert('Server disconnected.')
+        })
+  }
+
+  get_semesters(){
+    var self = this;
+    axios.get('/api/internships/semesters')
+        .then(res => {
+          if (res.status == 200) {
+            
+              self.setState({semesters:res.data})
+            
+          }
+
+        }).catch(err => {
+          console.log(err)
+          alert('Server disconnected.')
+        })
+  }
+
+  get_schoolyears(){
+    var self = this;
+    axios.get('/api/internships/schoolyears')
+        .then(res => {
+          if (res.status == 200) {
+            
+              self.setState({schoolyears:res.data})
+            
+          }
+
+        }).catch(err => {
+          console.log(err)
+          alert('Server disconnected.')
+        })
+  }
+
+  get_campuses(){
+    var self = this;
+    axios.get('/api/internships/campuses')
+        .then(res => {
+          if (res.status == 200) {
+            
+              self.setState({campuses:res.data})
+            
+          }
+
+        }).catch(err => {
+          console.log(err)
+          alert('Server disconnected.')
+        })
+  }
+
+  disable_print_button(){
+    this.setState(
+      {
+        print_button_is_disabled: true,
+      }
+    ) 
+  }
+  enable_print_button(){
+
+   
+      this.setState(
+        {
+          print_button_is_disabled: false,
+        })
+       
+   
+    
   }
 
   go_back(){
@@ -140,7 +255,7 @@ class Internship extends Component {
 
   check_print_inputs() {
 
-    if (this.state.campus =='' ) {
+    if (this.state.campus =='' || this.state.schoolyear =='' || this.state.semester =='' || this.state.college =='' ) {
       console.log('Incomplete print form values!')
       this.disable_print_button()
     }else{
@@ -368,9 +483,14 @@ class Internship extends Component {
   toggle_print_form() {
     this.setState({
       campus: '',
+      schoolyear:'',
+      semester:'',
+      college:'',
+      course:'',
       user_id: window.current_user_id,
       
       print_form: !this.state.print_form,
+      print_button_is_disabled:true,
 
       alert_message: '',
       alert_type: 'primary',
@@ -471,6 +591,10 @@ class Internship extends Component {
 
     this.get_data()
     this.get_companies()
+    this.get_campuses()
+    this.get_schoolyears()
+    this.get_semesters()
+    this.get_colleges()
 
   }
 
@@ -538,8 +662,87 @@ class Internship extends Component {
                                 <Col xs="12" md="9">
                                   <Input  value={this.state.campus} onChange={this.handle_input_change_print} type="select" name="campus" id="campus">
                                   <option value=""></option>
-                                  <option value="ALANGILAN">ALANGILAN</option>
-                                  
+                                  {this.state.campuses.map((data, i) => {
+                                      return (
+                                        <option key={i} value={data.code}>{data.code} - {data.description}</option>
+                                        
+                                      )
+                                    })}
+                                      
+
+                                    </Input>
+                                </Col>
+                              </FormGroup>
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="schoolyear">Academic Year</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                  <Input  value={this.state.schoolyear} onChange={this.handle_input_change_print} type="select" name="schoolyear" id="schoolyear">
+                                  <option value=""></option>
+                                  {this.state.schoolyears.map((data, i) => {
+                                      return (
+                                        <option key={i} value={data}>{data}</option>
+                                        
+                                      )
+                                    })}
+                                      
+
+                                    </Input>
+                                </Col>
+                              </FormGroup>
+
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="semester">Semester</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                  <Input  value={this.state.semester} onChange={this.handle_input_change_print} type="select" name="semester" id="semester">
+                                  <option value=""></option>
+                                  {this.state.semesters.map((data, i) => {
+                                      return (
+                                        <option key={i} value={data}>{data}</option>
+                                        
+                                      )
+                                    })}
+                                      
+
+                                    </Input>
+                                </Col>
+                              </FormGroup>
+
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="college">College</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                  <Input  value={this.state.college} onChange={this.handle_input_change_print} type="select" name="college" id="college">
+                                  <option value=""></option>
+                                  {this.state.colleges.map((data, i) => {
+                                      return (
+                                        <option key={i} value={data.code}>{data.code} - {data.description}</option>
+                                        
+                                      )
+                                    })}
+                                      
+
+                                    </Input>
+                                </Col>
+                              </FormGroup>
+
+                              <FormGroup row>
+                                <Col md="3">
+                                  <Label htmlFor="course">Course</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                  <Input  value={this.state.course} onChange={this.handle_input_change_print} type="select" name="course" id="course">
+                                  <option value=""></option>
+                                  {this.state.courses.map((data, i) => {
+                                      return (
+                                        <option key={i} value={data.code}>{data.code} - {data.description}</option>
+                                        
+                                      )
+                                    })}
                                       
 
                                     </Input>

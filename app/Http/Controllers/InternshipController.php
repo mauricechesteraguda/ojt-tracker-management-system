@@ -17,6 +17,41 @@ use App\Classes\batsu_api;
 
 class InternshipController extends Controller
 {
+    public function majors($course){
+        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
+        $majors = json_decode($api->fetch_majors($course),true);
+
+        return response()->json($majors, 200);
+
+    }
+    public function courses($college){
+        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
+        $courses = json_decode($api->fetch_courses($college),true);
+
+        return response()->json($courses, 200);
+
+    }
+    public function colleges(){
+        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
+        $colleges = json_decode($api->fetch_colleges(),true);
+
+        return response()->json($colleges, 200);
+
+    }
+    public function semesters(){
+        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
+        $semesters = json_decode($api->fetch_semester(),true);
+
+        return response()->json($semesters, 200);
+
+    }
+    public function campuses(){
+        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
+        $campuses = json_decode($api->fetch_campuses(),true);
+
+        return response()->json($campuses, 200);
+
+    }
     public function schoolyears(){
         $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
         $schoolyears = json_decode($api->fetch_schoolyear(),true);

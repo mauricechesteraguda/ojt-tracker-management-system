@@ -39,6 +39,11 @@ Route::get('/companies/status/{id}/{year}', 'CompanyController@company_status')-
 
 
 Route::get('/internships/schoolyears', 'InternshipController@schoolyears')->middleware('auth');
+Route::get('/internships/campuses', 'InternshipController@campuses')->middleware('auth');
+Route::get('/internships/semesters', 'InternshipController@semesters')->middleware('auth');
+Route::get('/internships/colleges', 'InternshipController@colleges')->middleware('auth');
+Route::get('/internships/courses/{college}', 'InternshipController@courses')->middleware('auth');
+Route::get('/internships/majors/{course}', 'InternshipController@majors')->middleware('auth');
 Route::get('/internships', 'InternshipController@index')->middleware('auth');
 Route::get('/internships/{id}', 'InternshipController@show')->middleware('auth');
 Route::post('/internships/{id}', 'InternshipController@update')->middleware('auth');
