@@ -83,6 +83,17 @@ class RegisterController extends Controller
             ->withErrors($validator,'sr_code')
             ->withInput();
         }
+
+        $data = json_decode($api->authenticate_student($request->input('sr_code'),$request->input('password')),true);
+
+        if(empty($data))
+        {
+            $validator->getMessageBag()->add('password', 'Incorrect sr code/password.');
+            return redirect('/register')
+            ->withErrors($validator,'password')
+            ->withInput();
+        }
+
         if ($validator->fails()) {
             return redirect('/register')
             ->withErrors($validator)
@@ -117,6 +128,15 @@ class RegisterController extends Controller
             }
 
         }
+
+        $auth_data = json_decode($api->authenticate_student($data['sr_code'],$data['password']),true);
+
+        $photo_url = '';
+        if (!empty($auth_data)) {
+            $token = $auth_data[0]['token'];
+            $photo_url = $api->fetch_student_photo_url($data['sr_code'],$token);
+        }
+                
             return User::create([
             'name' => $user_enrollment_record[0]['middlename'],
             'first_name' => $user_enrollment_record[0]['firstname'],
@@ -130,6 +150,7 @@ class RegisterController extends Controller
             'contact_no' => $data['contact_no'],
             'parent' => $data['parent'],
             'parent_contact_no' => $data['parent_contact_no'],
+            'photo_url' => $photo_url,
             
         ]);
     }
