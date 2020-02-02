@@ -392,17 +392,29 @@ class Internship extends Component {
     
     const form_data = new FormData();
     form_data.append('campus',self.state.campus);
-    form_data.append('updated_by',window.current_user_id);
+    form_data.append('schoolyear',self.state.schoolyear);
+    form_data.append('semester',self.state.semester);
+    form_data.append('college',self.state.college);
+    form_data.append('course',self.state.course);
 
     
     axios.post('/internships/print-pdf', form_data,{
+      responseType: 'arraybuffer',
       headers:{
-        'Content-Type':'multipart/form-data'
+        'Content-Type':'multipart/form-data',
+        'Accept': 'application/pdf'
       }
     })
       .then(function (response) {
         console.log(response);
-        
+
+        const url = window.URL.createObjectURL(new Blob([response.data],{type:"application/pdf"}));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'file.pdf'); //or any other extension
+        document.body.appendChild(link);
+        link.click();
+
         self.toggle_print_form();
       })
       .catch(function (error) {

@@ -225,7 +225,7 @@ class InternshipController extends Controller
 
             $final_internships = [];
             $internships_collection = [];
-            $counter = 0;
+            $counter = 0;            
             foreach ($internships_result as $i) {
                 if ($counter < 10) {
                     array_push($internships_collection,$i);
@@ -254,7 +254,7 @@ class InternshipController extends Controller
         ];
     
             $pdf = PDF::loadView('pdf_view', $data)->setPaper('legal', 'landscape');  
-            return $pdf->download('report.pdf');
+            return $pdf->stream();
         }
         
 }

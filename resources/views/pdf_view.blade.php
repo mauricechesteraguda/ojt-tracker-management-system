@@ -128,8 +128,7 @@
 <img src="{{'img/bsu_logo.jpg'}}" width=120 height=120>
 <br clear=left>
 <!-- ************************************************************************** -->
-</div>
+</div></body></html>
 @endforeach
-</body>
 
-</html>
+
