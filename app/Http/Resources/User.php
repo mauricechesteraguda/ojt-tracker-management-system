@@ -30,6 +30,7 @@ class User extends JsonResource
         'current_schoolyear'       => $this->current_schoolyear,
         'current_course_code'       => $this->current_course_code,
         'photo_url'       => $this->photo_url,
+        'address'       => $this->address,
     ];
 }
 }

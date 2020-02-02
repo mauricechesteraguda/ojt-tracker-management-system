@@ -151,6 +151,7 @@ class RegisterController extends Controller
             'parent' => $data['parent'],
             'parent_contact_no' => $data['parent_contact_no'],
             'photo_url' => $photo_url,
+            'address' => $data['address'],
             
         ]);
     }
