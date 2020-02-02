@@ -40,6 +40,7 @@ class Users extends Component {
       email: '',
       password: '',
       confirm_password: '',
+      photo_url: '',
 
       is_add_process_type: true,
       save_button_is_disabled: true,
@@ -213,7 +214,7 @@ class Users extends Component {
         role: this.state.users[this.state.current_index].role,
         email: this.state.users[this.state.current_index].email,
         update_button_is_disabled: true,
-  
+        
       })
   
       
@@ -456,6 +457,7 @@ class Users extends Component {
         role: this.state.users[i].role,
         email: this.state.users[i].email,
         password:'********',
+        photo_url: this.state.users[i].photo_url,
       });
     }else{
       this.setState({
@@ -741,6 +743,15 @@ class Users extends Component {
               </CardHeader>
                           <CardBody>
                             <Form action="" method="post" encType="multipart/form-data" className="form-horizontal">
+                            <FormGroup hidden={!this.state.photo_url} row>
+                                <Col md="3">
+                                  <Label htmlFor="photo_url">Avatar</Label>
+                                </Col>
+                                <Col xs="12" md="9">
+                                <img src={this.state.photo_url} className="img-avatar" alt=""/>
+                                  
+                                </Col>
+                              </FormGroup>
                               <FormGroup row>
                                 <Col md="3">
                                   <Label htmlFor="code">SRCODE / Username</Label>

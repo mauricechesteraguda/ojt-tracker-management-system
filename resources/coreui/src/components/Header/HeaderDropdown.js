@@ -18,6 +18,7 @@ class HeaderDropdown extends Component {
     this.state = {
       dropdownOpen: false,
       user_name: '',
+      user_photo_url :window.current_user_photo_url
     };
   }
 
@@ -60,7 +61,7 @@ class HeaderDropdown extends Component {
     return (
       <Dropdown nav isOpen={this.state.dropdownOpen} toggle={this.toggle}>
         <DropdownToggle nav>
-          <img src={'img/avatars/6.jpg'} className="img-avatar" alt=""/>
+          <img src={this.state.user_photo_url || 'img/avatars/7.jpg'} className="img-avatar" alt=""/>
           {this.state.user_name}
         </DropdownToggle>
         <DropdownMenu right>
