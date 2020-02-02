@@ -254,8 +254,13 @@ class InternshipController extends Controller
             'course' => $course,
             'final_internships' => $final_internships,
         ];
-    
-            $pdf = PDF::loadView('pdf_view', $data)->setPaper('legal', 'landscape');  
+
+        $pdf = \App::make('dompdf.wrapper');
+        /* Careful: use "enable_php" option only with local html & script tags you control.
+        used with remote html or scripts is a major security problem (remote php injection) */
+        $pdf->getDomPDF()->set_option("isPhpEnabled", true)->set_paper('legal', 'landscape');
+
+            $pdf->loadView('pdf_view', $data);  
             return $pdf->stream();
         }
         

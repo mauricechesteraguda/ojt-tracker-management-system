@@ -19,11 +19,47 @@
 		.page-break{
 			page-break-after: always;
 		}
+		#header,
+		#footer {
+		position: fixed;
+		left: 0;
+			right: 0;
+			color: #aaa;
+			font-size: 0.9em;
+		}
+		#header {
+		top: 0;
+			border-bottom: 0.1pt solid #aaa;
+		}
+		#footer {
+		bottom: 0;
+		border-top: 0.1pt solid #aaa;
+		}
+		.page-number:before {
+		content: "Page " counter(page);
+		}
 	</style>
+
+
 	
 </head>
 
 <body>
+		<script type="text/php">
+			if ( isset($pdf) ) { 
+				$pdf->page_script('
+					if ($PAGE_COUNT > 1) {
+						$font = $fontMetrics->get_font("Arial, Helvetica, sans-serif", "normal");
+						$size = 12;
+						$pageText = "Page " . $PAGE_NUM . " of " . $PAGE_COUNT;
+						$y = 15;
+						$x = 520;
+						$pdf->text($x, $y, $pageText, $font, $size);
+					} 
+				');
+			}
+			</script>
+		
 	@foreach($final_internships as $internships)
 	<div class="page-break">
 <table align="left" cellspacing="0" border="0">
