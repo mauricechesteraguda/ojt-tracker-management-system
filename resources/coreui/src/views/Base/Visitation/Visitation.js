@@ -90,6 +90,31 @@ class Visitation extends Component {
     this.get_company_status = this.get_company_status.bind(this);
     this.get_schoolyears = this.get_schoolyears.bind(this);
     
+    this.load_local_storage = this.load_local_storage.bind(this);
+    this.store_to_local_storage = this.store_to_local_storage.bind(this);
+
+    this.store_data_to_state = this.store_data_to_state.bind(this);
+  
+  }
+
+  load_local_storage(key){
+    if (localStorage.getItem(key)) {
+      this.setState({[key]:JSON.parse(localStorage.getItem(key))})
+    }
+  }
+
+  store_to_local_storage(key,value){
+
+    localStorage.setItem(key,JSON.stringify(value))
+
+  }
+
+
+  componentDidMount() {
+
+    this.get_data()
+    this.get_schoolyears()
+
   }
 
   xupdate_item(e) {
@@ -446,6 +471,8 @@ class Visitation extends Component {
       items_count_per_page:data.meta.per_page,
       total_items_count:data.meta.total,
      })
+
+     self.store_to_local_storage('clusters',data.data)
      
       for (let i = 0; i < data.data.length; i++) {
         data.data[i].status = self.get_cluster_status(data.data[i].id) ;
@@ -461,7 +488,8 @@ class Visitation extends Component {
         self.store_data_to_state(res.data)
       }).catch(err => {
         console.log(err)
-        alert('Server disconnected.')
+        self.load_local_storage('clusters')
+        // alert('Server disconnected.')
       })
   }
   
@@ -472,13 +500,15 @@ class Visitation extends Component {
       axios.get('/api/companies/cluster/' + cluster_id)
         .then(res => {
           self.setState({companies:res.data.data})
+          self.store_to_local_storage('companies',res.data.data)
             for (let i = 0; i < res.data.data.length; i++) {
               res.data.data[i].status = self.get_company_status(res.data.data[i].id) ;
               
             }
+            
         }).catch(err => {
           console.log(err)
-          alert('Server disconnected.')
+          // alert('Server disconnected.')
         })
     // }
 
@@ -565,21 +595,17 @@ class Visitation extends Component {
           if (res.status == 200) {
             
               self.setState({schoolyears:res.data})
-            
+              self.store_to_local_storage('cschoolyearsompanies',res.data)
           }
 
         }).catch(err => {
           console.log(err)
+          self.load_local_storage('schoolyears')
           alert('Server disconnected.')
         })
   }
 
-  componentDidMount() {
 
-    this.get_data()
-    this.get_schoolyears()
-
-  }
 
   handle_page_change(page_number) {
     console.log(`active page is ${page_number}`);

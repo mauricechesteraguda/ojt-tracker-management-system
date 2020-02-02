@@ -70,6 +70,30 @@ class Company extends Component {
     this.handle_search_input_change = this.handle_search_input_change.bind(this);
     this.toggle_detail_page = this.toggle_detail_page.bind(this);
     this.go_back = this.go_back.bind(this);
+
+    this.load_local_storage = this.load_local_storage.bind(this);
+    this.store_to_local_storage = this.store_to_local_storage.bind(this);
+
+    this.store_data_to_state = this.store_data_to_state.bind(this);
+  
+  }
+
+  load_local_storage(key){
+    if (localStorage.getItem(key)) {
+      this.setState({[key]:JSON.parse(localStorage.getItem(key))})
+    }
+  }
+
+  store_to_local_storage(key,value){
+
+    localStorage.setItem(key,JSON.stringify(value))
+
+  }
+
+  componentDidMount() {
+
+    this.get_data()
+
   }
 
   go_back(){
@@ -333,6 +357,9 @@ class Company extends Component {
       items_count_per_page:data.meta.per_page,
       total_items_count:data.meta.total,
      })
+
+     this.store_to_local_storage('companies',data.data)
+
   }
 
   get_data(page_number) {
@@ -342,15 +369,12 @@ class Company extends Component {
         self.store_data_to_state(res.data)
       }).catch(err => {
         console.log(err)
-        alert('Server disconnected.')
+        self.load_local_storage('companies')
+        // alert('Server disconnected.')
       })
   }
 
-  componentDidMount() {
 
-    this.get_data()
-
-  }
 
   handle_page_change(page_number) {
     console.log(`active page is ${page_number}`);

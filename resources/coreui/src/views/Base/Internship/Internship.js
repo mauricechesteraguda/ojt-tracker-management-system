@@ -106,6 +106,11 @@ class Internship extends Component {
     
     this.disable_print_button = this.disable_print_button.bind(this);
     this.enable_print_button = this.enable_print_button.bind(this);
+
+    this.load_local_storage = this.load_local_storage.bind(this);
+    this.store_to_local_storage = this.store_to_local_storage.bind(this);
+
+    this.store_data_to_state = this.store_data_to_state.bind(this);
   
   }
 
@@ -132,12 +137,12 @@ class Internship extends Component {
           if (res.status == 200) {
             
               self.setState({colleges:res.data})
-            
+              self.store_to_local_storage('colleges',res.data)
           }
 
         }).catch(err => {
           console.log(err)
-          alert('Server disconnected.')
+          // alert('Server disconnected.')
         })
   }
 
@@ -148,12 +153,12 @@ class Internship extends Component {
           if (res.status == 200) {
             
               self.setState({semesters:res.data})
-            
+              self.store_to_local_storage('semesters',res.data)
           }
 
         }).catch(err => {
           console.log(err)
-          alert('Server disconnected.')
+          // alert('Server disconnected.')
         })
   }
 
@@ -164,12 +169,12 @@ class Internship extends Component {
           if (res.status == 200) {
             
               self.setState({schoolyears:res.data})
-            
+              self.store_to_local_storage('schoolyears',res.data)
           }
 
         }).catch(err => {
           console.log(err)
-          alert('Server disconnected.')
+          // alert('Server disconnected.')
         })
   }
 
@@ -180,12 +185,13 @@ class Internship extends Component {
           if (res.status == 200) {
             
               self.setState({campuses:res.data})
+              self.store_to_local_storage('campuses',res.data)
             
           }
 
         }).catch(err => {
           console.log(err)
-          alert('Server disconnected.')
+          // alert('Server disconnected.')
         })
   }
 
@@ -586,6 +592,7 @@ class Internship extends Component {
       items_count_per_page:data.meta.per_page,
       total_items_count:data.meta.total,
      })
+     this.store_to_local_storage('internships',data.data)
   }
 
   get_data(page_number) {
@@ -595,7 +602,7 @@ class Internship extends Component {
         self.store_data_to_state(res.data)
       }).catch(err => {
         console.log(err)
-        alert('Server disconnected.')
+        // alert('Server disconnected.')
       })
   }
   
@@ -605,15 +612,35 @@ class Internship extends Component {
       axios.get('/api/companies/all')
         .then(res => {
           self.setState({companies:res.data.data})
+          self.store_to_local_storage('companies',res.data.data)
         }).catch(err => {
           console.log(err)
-          alert('Server disconnected.')
+          // alert('Server disconnected.')
         })
     // }
 
   }
 
+  load_local_storage(key){
+    if (localStorage.getItem(key)) {
+      this.setState({[key]:JSON.parse(localStorage.getItem(key))})
+    }
+  }
+
+  store_to_local_storage(key,value){
+
+    localStorage.setItem(key,JSON.stringify(value))
+
+  }
+
   componentDidMount() {
+
+    this.load_local_storage('internships')
+    this.load_local_storage('campuses')
+    this.load_local_storage('schoolyears')
+    this.load_local_storage('semesters')
+    this.load_local_storage('colleges')
+    
 
     this.get_data()
     this.get_companies()

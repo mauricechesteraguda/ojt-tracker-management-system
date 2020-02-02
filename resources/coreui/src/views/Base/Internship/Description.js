@@ -67,6 +67,8 @@ class Description extends Component {
     this.enable_button = this.enable_button.bind(this);
     this.handle_page_change = this.handle_page_change.bind(this);
     this.handle_search_input_change = this.handle_search_input_change.bind(this);
+    
+    this.store_data_to_state = this.store_data_to_state.bind(this);
   
   }
 

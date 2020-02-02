@@ -75,6 +75,29 @@ class Users extends Component {
     this.toggle_detail_page = this.toggle_detail_page.bind(this);
     this.handle_search_input_change = this.handle_search_input_change.bind(this);
     
+    this.load_local_storage = this.load_local_storage.bind(this);
+    this.store_to_local_storage = this.store_to_local_storage.bind(this);
+
+    this.store_data_to_state = this.store_data_to_state.bind(this);
+  
+  }
+
+  load_local_storage(key){
+    if (localStorage.getItem(key)) {
+      this.setState({[key]:JSON.parse(localStorage.getItem(key))})
+    }
+  }
+
+  store_to_local_storage(key,value){
+
+    localStorage.setItem(key,JSON.stringify(value))
+
+  }
+
+  componentDidMount() {
+
+    this.get_data()
+
   }
 
   go_back(){
@@ -476,6 +499,7 @@ class Users extends Component {
       items_count_per_page:data.meta.per_page,
       total_items_count:data.meta.total,
      })
+     this.store_to_local_storage('users',data.data)
   }
 
   get_data(page_number) {
@@ -485,15 +509,11 @@ class Users extends Component {
         self.store_data_to_state(res.data)
       }).catch(err => {
         console.log(err)
-        alert('Server disconnected.')
+        self.load_local_storage('users')
+        // alert('Server disconnected.')
       })
   }
 
-  componentDidMount() {
-
-    this.get_data()
-
-  }
 
   handle_page_change(page_number) {
     console.log(`active page is ${page_number}`);

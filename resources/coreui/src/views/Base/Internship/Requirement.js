@@ -66,6 +66,8 @@ class Requirement extends Component {
     this.handle_search_input_change = this.handle_search_input_change.bind(this);
     this.get_users = this.get_users.bind(this);
     this.get_user = this.get_user.bind(this);
+
+    this.store_data_to_state = this.store_data_to_state.bind(this);
   
   }
 

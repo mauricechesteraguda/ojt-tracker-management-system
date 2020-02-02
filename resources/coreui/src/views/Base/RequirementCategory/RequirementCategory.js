@@ -70,8 +70,32 @@ class RequirementCategory extends Component {
     this.get_users = this.get_users.bind(this);
     this.get_user = this.get_user.bind(this);
     
+    this.load_local_storage = this.load_local_storage.bind(this);
+    this.store_to_local_storage = this.store_to_local_storage.bind(this);
+
+    this.store_data_to_state = this.store_data_to_state.bind(this);
+  
   }
 
+  load_local_storage(key){
+    if (localStorage.getItem(key)) {
+      this.setState({[key]:JSON.parse(localStorage.getItem(key))})
+    }
+  }
+
+  store_to_local_storage(key,value){
+
+    localStorage.setItem(key,JSON.stringify(value))
+
+  }
+
+
+  componentDidMount() {
+
+    this.get_data()
+    this.get_users()
+
+  }
   go_back(){
     if (this.state.is_detail_page == true) {
       this.setState({is_detail_page:false})
@@ -334,6 +358,7 @@ class RequirementCategory extends Component {
       items_count_per_page:data.meta.per_page,
       total_items_count:data.meta.total,
      })
+     this.store_to_local_storage('categories',data.data)
   }
 
   get_data(page_number) {
@@ -343,7 +368,8 @@ class RequirementCategory extends Component {
         self.store_data_to_state(res.data)
       }).catch(err => {
         console.log(err)
-        alert('Server disconnected.')
+        self.load_local_storage('categories')
+        // alert('Server disconnected.')
       })
   }
 
@@ -371,12 +397,7 @@ class RequirementCategory extends Component {
 
   
 
-  componentDidMount() {
 
-    this.get_data()
-    this.get_users()
-
-  }
 
   handle_page_change(page_number) {
     console.log(`active page is ${page_number}`);
