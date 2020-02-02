@@ -221,7 +221,9 @@ class InternshipController extends Controller
             // $college = 'CICS';
             // $course =  'BSCOSCI';
 
-            $internships_result = Internship::where('is_deleted','=','0')->where('campus', '=',$campus)->where('schoolyear', '=',$schoolyear)->where('semester', '=',$semester)->where('college_code', '=',$college)->where('course_code', '=',$course)->get();
+            $internships_result = Internship::join('users', 'users.id', '=', 'internships.user_id') // or leftJoin
+            ->orderBy('users.first_name', 'asc')
+            ->where('is_deleted','=','0')->where('campus', '=',$campus)->where('schoolyear', '=',$schoolyear)->where('semester', '=',$semester)->where('college_code', '=',$college)->where('course_code', '=',$course)->get(['internships.*']); 
 
             $final_internships = [];
             $internships_collection = [];

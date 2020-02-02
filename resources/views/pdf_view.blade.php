@@ -48,7 +48,7 @@
 		<td colspan=9 height="23" align="center" valign=middle bgcolor="#FFFFFF" sdnum="13321;0;@"><b><font face="Times New Roman" size=3>DIRECTORY OF STUDENT-TRAINEES</font></b></td>
 		</tr>
 	<tr>
-  <td colspan=9 height="18" align="center" valign=middle bgcolor="#FFFFFF" sdnum="13321;0;@"><b><font face="Times New Roman" size=3>{{$campus}}</font></b></td>
+  <td colspan=9 height="18" align="center" valign=middle bgcolor="#FFFFFF" sdnum="13321;0;@"><b><font face="Times New Roman" size=3>{{$campus}} CAMPUS</font></b></td>
 		</tr>
 	<tr>
   <td colspan=9 height="18" align="center" valign=middle bgcolor="#FFFFFF" sdnum="13321;0;@"><b><font face="Times New Roman" size=3>{{$semester}} SEMESTER, ACADEMIC YEAR {{$schoolyear}}</font></b></td>
