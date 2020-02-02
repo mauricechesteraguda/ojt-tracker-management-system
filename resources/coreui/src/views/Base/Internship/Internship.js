@@ -109,9 +109,9 @@ class Internship extends Component {
   
   }
 
-  get_courses(college){
+  get_courses(college_code){
     var self = this;
-    axios.get('/api/internships/courses/'+college)
+    axios.get('/api/internships/courses/'+college_code)
         .then(res => {
           if (res.status == 200) {
             
@@ -244,23 +244,26 @@ class Internship extends Component {
   }
 
   check_inputs() {
-
-    if (this.state.user_id =='' || this.state.company_id == '' ) {
-      console.log('Incomplete form values!')
-      this.disable_buttons()
-    }else{
-      this.enable_button()
-    }
+    setTimeout(() => {
+      if (this.state.user_id == '' || this.state.company_id == '') {
+        console.log('Incomplete form values!')
+        this.disable_buttons()
+      } else {
+        this.enable_button()
+      }
+    }, 300);
   }
 
   check_print_inputs() {
+    setTimeout(() => {
+      if (this.state.campus == '' || this.state.schoolyear == '' || this.state.semester == '' || this.state.college == '' || this.state.course == '') {
+        console.log('Incomplete print form values!')
+        this.disable_print_button()
+      } else {
+        this.enable_print_button()
+      }
+    }, 300);
 
-    if (this.state.campus =='' || this.state.schoolyear =='' || this.state.semester =='' || this.state.college =='' ) {
-      console.log('Incomplete print form values!')
-      this.disable_print_button()
-    }else{
-      this.enable_print_button()
-    }
   }
 
   delete_item(i) {
@@ -455,26 +458,37 @@ class Internship extends Component {
       has_alert_hidden: true,
     })
 
-    this.setState({ [e.target.name]: e.target.value });
-    
-    
-    this.check_inputs(e.target.name, e.target.value);
+    if (typeof e.target != undefined) {
 
+      this.setState({ [e.target.name]: e.target.value });
 
+      this.check_inputs();
+
+    }
 
   }
+
   handle_input_change_print(e) {
     // clear alert status
-   this.setState({
-     alert_message: '',
-     alert_type: 'primary',
-     has_alert_hidden: true,
-   })
+    this.setState({
+      alert_message: '',
+      alert_type: 'primary',
+      has_alert_hidden: true,
+    })
 
-   this.setState({ [e.target.name]: e.target.value });
-   
-   
-   this.check_print_inputs(e.target.name, e.target.value);
+    if (typeof e.target != undefined && e.target != null) {
+
+      this.setState({ [e.target.name]: e.target.value });
+
+      this.check_print_inputs();
+
+      if (e.target.name == 'college') {
+        var college_code = e.target.value;
+        this.get_courses(college_code);
+      }
+    }
+    
+  
 
 
 
