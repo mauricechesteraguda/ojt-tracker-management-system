@@ -209,9 +209,48 @@ class InternshipController extends Controller
         }
         public function printPDF(Request $request)
         {
-            $data = ['title' => 'First PDF for Medium',
-            'heading' => 'Hello from 99Points.info',
-            'content' => 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.'        
+            $campus = request('campus');
+            $schoolyear = request('schoolyear');
+            $semester = request('semester');
+            $college = request('college');
+            $course = request('course');
+
+            // $campus = 'ALANGILAN';
+            // $schoolyear = '2019-2020';
+            // $semester = 'SECOND';
+            // $college = 'CICS';
+            // $course =  'BSCOSCI';
+
+            $internships_result = Internship::where('is_deleted','=','0')->where('campus', '=',$campus)->where('schoolyear', '=',$schoolyear)->where('semester', '=',$semester)->where('college_code', '=',$college)->where('course_code', '=',$course)->get();
+
+            $final_internships = [];
+            $internships_collection = [];
+            $counter = 0;
+            foreach ($internships_result as $i) {
+                if ($counter < 10) {
+                    array_push($internships_collection,$i);
+                    $counter++;
+                }else{
+                    array_push($final_internships,$internships_collection);
+                    $internships_collection = [];
+                    $counter=0;
+                }
+            }
+            if ($internships_collection) {
+                array_push($final_internships,$internships_collection);
+            }
+            // $a=0;
+            // while ($a <= 3) {
+            //     array_push($final_internships,$internships_collection);
+            //     $a++;
+            // }
+
+            $data = ['campus' => $campus,
+            'schoolyear' => $schoolyear,
+            'semester' => $semester,
+            'college' => $college,
+            'course' => $course,
+            'final_internships' => $final_internships,
         ];
     
             $pdf = PDF::loadView('pdf_view', $data)->setPaper('legal', 'landscape');  
