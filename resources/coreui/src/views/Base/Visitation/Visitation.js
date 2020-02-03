@@ -21,6 +21,7 @@ import axios from 'axios';
 // import Select from 'react-select';
 import Paginations from "react-js-pagination";
 // import UpdateModal from './UpdateModal';
+import Can from '../../../Can';
 
 
 
@@ -639,8 +640,15 @@ class Visitation extends Component {
                 
                 
                   <Col xs="4" lg="4">
+
+                  <Can
+                      role={user.role}
+                      perform="cluster:generate"
+                      yes={() => <Button className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-gear"></i> Generate</Button>}
+                      no={() => <div></div>}
+                      />
                         
-                        <Button className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-gear"></i> Generate</Button>
+                        
                         
                   </Col>
                 </Row>

@@ -689,7 +689,14 @@ class Internship extends Component {
                       yes={() => <Button className="float-lg-right" color="primary" onClick={this.toggle_add_form}><i className="fa fa-plus-circle"></i> Add</Button>}
                       no={() => <div></div>}
                       />
-                        <Button className="float-lg-right" color="danger" onClick={this.toggle_print_form}><i className="fa fa-print"></i> Print</Button>
+
+<Can
+                      role={user.role}
+                      perform="internship:print"
+                      yes={() => <Button className="float-lg-right" color="danger" onClick={this.toggle_print_form}><i className="fa fa-print"></i> Print</Button>}
+                      no={() => <div></div>}
+                      />
+                        
                        
                         
                   </Col>

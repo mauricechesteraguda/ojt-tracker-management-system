@@ -30,6 +30,8 @@ const rules = {
         "requirement:verify",
         "user-report:validate",
         "internship:approve",
+        "internship:print",
+        "cluster:generate",
       ]
     },
     superuser: {
@@ -48,7 +50,8 @@ const rules = {
         "internship:delete",
         "student-report:delete",
         "user-role:change",
-
+        "internship:print",
+        "cluster:generate",
       ]
     }
   };
