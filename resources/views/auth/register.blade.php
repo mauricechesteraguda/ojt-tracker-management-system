@@ -141,9 +141,9 @@
                             <div class="col-md-6">
                                 <input id="parent" type="text" class="form-control{{ $errors->has('parent') ? ' is-invalid' : '' }}" name="parent" value="{{ old('parent') }}" required autofocus>
 
-                                @if ($errors->has('name'))
+                                @if ($errors->has('parent'))
                                     <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $errors->first('name') }}</strong>
+                                        <strong>{{ $errors->first('parent') }}</strong>
                                     </span>
                                 @endif
                             </div>
