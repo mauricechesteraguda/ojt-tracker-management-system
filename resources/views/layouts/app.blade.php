@@ -24,6 +24,8 @@
     <!-- Styles -->
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 
+    <link rel="manifest" href="/manifest.json">
+
     <script>
         window.Laravel = {!! json_encode([
             'csrfToken' => csrf_token(),
