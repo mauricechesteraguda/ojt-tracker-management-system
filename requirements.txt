@@ -26,3 +26,4 @@ composer dump-autoload
 # 2. virtualhost is correct and default virtualhost:80 is disabled/removed
 # 3. check php version
 # 4. change mix('js/app.js) to assets('js/app.js') in app.blade.php 
+# 5. check .htaccess in base directory and public directory
