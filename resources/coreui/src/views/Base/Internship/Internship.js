@@ -142,6 +142,7 @@ class Internship extends Component {
 
         }).catch(err => {
           console.log(err)
+          self.load_local_storage('colleges')
           // alert('Server disconnected.')
         })
   }
@@ -158,6 +159,7 @@ class Internship extends Component {
 
         }).catch(err => {
           console.log(err)
+          self.load_local_storage('semesters')
           // alert('Server disconnected.')
         })
   }
@@ -174,6 +176,7 @@ class Internship extends Component {
 
         }).catch(err => {
           console.log(err)
+          self.load_local_storage('schoolyears')
           // alert('Server disconnected.')
         })
   }
@@ -191,6 +194,7 @@ class Internship extends Component {
 
         }).catch(err => {
           console.log(err)
+          self.load_local_storage('campuses')
           // alert('Server disconnected.')
         })
   }
@@ -602,6 +606,7 @@ class Internship extends Component {
         self.store_data_to_state(res.data)
       }).catch(err => {
         console.log(err)
+        self.load_local_storage('internships')
         // alert('Server disconnected.')
       })
   }
@@ -615,6 +620,7 @@ class Internship extends Component {
           self.store_to_local_storage('companies',res.data.data)
         }).catch(err => {
           console.log(err)
+          self.load_local_storage('companies')
           // alert('Server disconnected.')
         })
     // }
@@ -634,13 +640,6 @@ class Internship extends Component {
   }
 
   componentDidMount() {
-
-    this.load_local_storage('internships')
-    this.load_local_storage('campuses')
-    this.load_local_storage('schoolyears')
-    this.load_local_storage('semesters')
-    this.load_local_storage('colleges')
-    
 
     this.get_data()
     this.get_companies()

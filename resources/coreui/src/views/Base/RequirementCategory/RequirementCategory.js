@@ -378,8 +378,10 @@ class RequirementCategory extends Component {
     axios.get('/api/users/internship/requirement')
       .then(res => {
         self.setState({users:res.data.data})
+        self.store_to_local_storage('users',res.data.data)
       }).catch(err => {
         console.log(err)
+        self.load_local_storage('users')
         alert('Server disconnected.')
       })
   }
