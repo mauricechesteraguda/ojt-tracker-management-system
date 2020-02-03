@@ -17,3 +17,12 @@ $user->save();
 php artisan passport:install
 
 composer dump-autoload
+
+
+
+
+# Production Server Deployment checklist:
+1. .env file is present
+2. virtualhost is correct and default virtualhost:80 is disabled/removed
+3. check php version
+4. change mix('js/app.js) to assets('js/app.js') in app.blade.php 
