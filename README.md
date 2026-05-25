@@ -1,8 +1,8 @@
-# OJT Tracker Management System (Batangas State University)
+# OJT Tracker Management System - DEMO Only
 
 ## Project Overview
 
-This repository contains the OJT Tracker Management System, a research project designed to streamline the tracking and management of On-the-Job Training (OJT) activities for college students at Batangas State University. This system facilitates the monitoring, reporting, and evaluation of OJT performances for both students and supervisors, helping maintain an organized and efficient workflow throughout the OJT program.
+This repository contains the OJT Tracker Management System, a research project designed to streamline the tracking and management of On-the-Job Training (OJT) activities for college students at a University. This system facilitates the monitoring, reporting, and evaluation of OJT performances for both students and supervisors, helping maintain an organized and efficient workflow throughout the OJT program.
 Key Features
 
     Student Management: Manage student profiles, OJT schedules, and track progress.
@@ -170,7 +170,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Contact
 
-For any questions or inquiries, please reach out to https://www.linkedin.com/in/maurice-chester-aguda-09b93981/.
+For any questions or inquiries, please reach out to www.linkedin.com/in/agudatech/.
 
 ## Support
 
