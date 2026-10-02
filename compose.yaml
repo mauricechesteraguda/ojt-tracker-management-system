@@ -1,0 +1,103 @@
+# infra-10022026-Maurice
+# Modification type: add the single-command legacy stabilization runtime.
+name: ${COMPOSE_PROJECT_NAME:-ojt-tracker-local}
+
+services:
+  mariadb:
+    build:
+      context: .
+      dockerfile: docker/mariadb/Dockerfile
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE:-ojt_tracker}
+      MARIADB_USER: ${DB_USERNAME:-ojt_tracker}
+      MARIADB_ROOT_PASSWORD_FILE: /run/ojt-secrets/db.root.password
+      MARIADB_PASSWORD_FILE: /run/ojt-secrets/db.app.password
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      # infra-10032026-Maurice
+      # Modification type: keep MariaDB credentials in a DB-scoped named volume.
+      - db_secrets:/run/ojt-secrets
+      # infra-10032026-Maurice
+      # Modification type: write the app-scoped APP_KEY and app password copy.
+      - app_secrets:/run/ojt-app-secrets
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "healthcheck.sh --connect --innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  php-fpm:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    user: "1000:1000"
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_KEY: ${APP_KEY:-runtime-generated}
+      PROVIDER_MODE: ${PROVIDER_MODE:-fake}
+      DB_CONNECTION: mysql
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-ojt_tracker}
+      DB_USERNAME: ${DB_USERNAME:-ojt_tracker}
+      DB_PASSWORD: ${DB_PASSWORD:-runtime-generated}
+    volumes:
+      - runtime_storage:/var/www/html/storage
+      # infra-10032026-Maurice
+      # Modification type: expose only app-scoped secrets to PHP-FPM read-only.
+      - app_secrets:/run/ojt-secrets:ro
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "APP_KEY=$$(cat /run/ojt-secrets/app.key) php artisan --version >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    user: "101:101"
+    ports:
+      - "${APP_PORT:-8088}:8080"
+    volumes:
+      - runtime_storage:/var/www/html/storage:ro
+    networks:
+      - frontend
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      php-fpm:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:8080/healthz | grep -Eq '\\{\\\"status\\\":\\\"ok\\\"\\}' && wget -q --spider http://127.0.0.1:8080/login"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+
+volumes:
+  app_secrets:
+    name: ${COMPOSE_PROJECT_NAME:-ojt-tracker-local}_app_secrets
+  db_secrets:
+    name: ${COMPOSE_PROJECT_NAME:-ojt-tracker-local}_db_secrets
+  mariadb_data:
+    name: ${COMPOSE_PROJECT_NAME:-ojt-tracker-local}_mariadb_data
+  runtime_storage:
+    name: ${COMPOSE_PROJECT_NAME:-ojt-tracker-local}_runtime_storage
+
+networks:
+  frontend:
+    name: ${COMPOSE_PROJECT_NAME:-ojt-tracker-local}_frontend
+  backend:
+    name: ${COMPOSE_PROJECT_NAME:-ojt-tracker-local}_backend

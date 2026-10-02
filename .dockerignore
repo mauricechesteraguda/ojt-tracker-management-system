@@ -1,0 +1,13 @@
+# infra-10022026-Maurice
+# Modification type: add a portable build-context exclusion policy.
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+ojt.sql
+storage/logs/*
+vendor
+node_modules
+.trailmap
+tests
