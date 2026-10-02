@@ -1,0 +1,250 @@
+Test Case ID,Title,Module / Feature,Test Case Description,Pre-Conditions,Test Steps,Test Data,Expected Result,Actual Result,Status (Pass/Fail),Severity,Priority,Tester Name,Test Date,Remarks / Defects ID,Requirement ID,Test Type,Automated Test Ref.
+TC-OJT-0001,Runtime inventory,Runtime,[Current characterization] Record runtime and test baseline,1. Repository is unchanged,"1. Read composer.json and package.json
+2. Read phpunit.xml and test paths",versions and file paths,"1. [Current characterization] Versions and two example tests are recorded
+2. Docker absence is recorded without runtime claims",,Not Run,Medium,P1,,,,REQ-01,Positive,
+TC-OJT-0002,Login roles,Authentication,[Current characterization] Characterize sr_code/password login and roles,1. Source is readable,"1. Inspect LoginController and User
+2. Record role vocabulary",sr_code=STU-1001; password=synthetic,"1. [Current characterization] Login uses sr_code/password
+2. Roles guest/student/coordinator/superuser are vocabulary only",,Not Run,Medium,P1,,,,REQ-02,Positive,
+TC-OJT-0003,Placement inputs,Placement,[Current characterization] Characterize placement owner/company inputs,1. No source edit is made,"1. Inspect Internship model
+2. Describe create payload",user_id=101; company_id=201,"1. [Current characterization] user_id and company_id are documented
+2. Ownership gap remains characterization",,Not Run,Medium,P1,,,,REQ-03,Boundary,
+TC-OJT-0004,Evidence fields,Evidence,[Current characterization plus Stage 1 target] Characterize evidence fields and enforce the resolved report date/hour contract,"1. Placement 301 has internship_start=2026-09-01 and internship_end=2026-12-31
+2. A synthetic student owns the placement","1. Inspect requirement creation
+2. Inspect description/report validation
+3. Submit a report with date=2026-10-01 and hours=8
+4. Compare the report target with the boundary cases",internship_id=301; description=Orientation; date=2026-10-01; hours=8,"1. [Current characterization] Requirements link to placement and active categories
+2. Description needs internship_id and description
+3. [Stage 1 target] A report date is within the inclusive internship dates and hours are numeric in the approved range/increment
+4. No description approval gate is introduced",,Not Run,Medium,P1,,,,REQ-04,Positive,
+TC-OJT-0005,Approved flow boundary,Lifecycle,"[Stage 1 target] Prove approval prerequisites drive lifecycle completion and is_approved, while status is display-only","1. Core placement fields are complete
+2. Every active requirement is verified
+3. At least one report is non-deleted and valid
+4. Descriptions may be absent because they are optional narrative
+5. Student and authorized coordinator fixtures exist","1. Submit the complete placement for coordinator review
+2. Attempt approval as the student
+3. Approve as the authorized coordinator
+4. Inspect is_approved and completion behavior
+5. Change/read the free-string status and verify it does not authorize or complete the placement
+6. Request the approved filtered view and PDF projection",student=STU-1001; coordinator=COORD-1001,"1. [Stage 1 target] Student submission reaches coordinator review
+2. Student approval is denied
+3. Authorized coordinator approval succeeds because all three prerequisites are satisfied
+4. Approval sets/reflects is_approved and drives completion
+5. Approval succeeds with no description present
+6. Free-string status does not drive authorization or completion
+7. Filtered view and PDF provide safe, traceable output",,Not Run,Medium,P1,,,,REQ-05,Positive,
+TC-OJT-0006,Incomplete evidence,Lifecycle,[Stage 1 target] Prove missing approval prerequisites block is_approved/completion while status and descriptions remain non-gating,"1. A placement and authorized coordinator fixture exist
+2. Three independent variants can be prepared
+3. Descriptions are absent or present only as optional narrative","1. Attempt approval with an incomplete core placement field
+2. Attempt approval with one active requirement unverified
+3. Attempt approval with no non-deleted valid report
+4. Attempt approval with all three prerequisites complete but no description
+5. Set/read a free-string status during each variant",placement=301; missing=Safety Orientation,"1. [Stage 1 target] Missing core placement fields block approval and leave is_approved incomplete
+2. Any unverified active requirement blocks approval and completion
+3. No non-deleted valid report blocks approval and completion
+4. Approval is allowed and completion derives from is_approved when all three prerequisites are complete, regardless of description presence
+5. Free-string status does not authorize, block, or complete the placement",,Not Run,Medium,P1,,,,REQ-05,Negative,
+TC-OJT-0007,Input validation,Validation,[Stage 1 target] Exercise missing required fields,1. Validation boundary is acknowledged,"1. Omit user_id/company_id
+2. Omit description/internship_id",missing fields one at a time,"1. [Stage 1 target] Invalid payloads are rejected
+2. No unrelated record is created",,Not Run,Medium,P1,,,,REQ-03,Negative,
+TC-OJT-0008,Role ownership denial,Roles/Permissions,[Stage 1 target] Verify backend mirrors existing frontend RBAC for role and ownership boundaries,1. Synthetic users and placements exist,"1. Send the same allowed student/coordinator/superuser actions represented by the frontend
+2. Send an unauthenticated API request
+3. Send authenticated forbidden and cross-owner requests
+4. Send a request for a nonexistent resource",owner=101; other=102; placement=301,"1. [Stage 1 target] Backend decisions mirror the existing frontend RBAC
+2. Unauthenticated API returns 401
+3. Authenticated forbidden and cross-owner requests return 403
+4. Nonexistent resource returns 404 without disclosure",,Not Run,Medium,P1,,,,REQ-07,Permission,
+TC-OJT-0009,State representation,Preconditions/State,[Current characterization plus Stage 1 target] Record flags and prove free-string status is display/backward-compatibility only,1. No lifecycle enum is approved,"1. Inspect model/resources
+2. Compare UI labels and fields
+3. Identify is_approved and related 0/1 fields
+4. Verify the Stage 1 target uses approval prerequisites and is_approved, not status, for completion/authorization",status=existing; flags=0/1,"1. [Current characterization] status remains free string
+2. is_approved/is_valid/is_deleted are observed 0/1
+3. No enum is declared
+4. [Stage 1 target] status is not an authorization or completion source; approval prerequisites and is_approved are authoritative",,Not Run,Medium,P1,,,,REQ-04,Boundary,
+TC-OJT-0010,Pre-approval edit and soft-delete correction,Edit/Delete/Undo/Correction,[Stage 1 target] Prove a student may edit or soft-delete their own descriptions/reports before approval,"1. Placement is owned by the synthetic student
+2. Placement is not approved
+3. Synthetic description and report exist","1. Edit the student’s own description
+2. Soft-delete the student’s own report
+3. Read the resulting records
+4. Inspect placement approval state",description=401; report=501,"1. [Stage 1 target] Own description edit is allowed before approval
+2. Own report soft-delete is allowed before approval
+3. Deleted report is excluded from active evidence
+4. Placement remains unapproved until approval prerequisites are satisfied",,Not Run,Medium,P1,,,,REQ-04,Positive,
+TC-OJT-0011,Partial failure rollback,Data Integrity/Concurrency/Partial Failure/Rollback,[Stage 1 target] Characterize compound failure persistence,1. Synthetic reset/backup exists,"1. Submit valid plus invalid evidence
+2. Inspect records after failure",valid item + missing internship_id,"1. [Stage 1 target] Persistence/rollback behavior is recorded
+2. No transaction guarantee is invented
+3. No unrelated record changes",,Not Run,Medium,P1,,,,REQ-04,Integration,
+TC-OJT-0012,Concurrent update,Data Integrity/Concurrency/Partial Failure/Rollback,[Stage 1 target] Characterize two updates to one record,1. Two isolated synthetic sessions exist,"1. Read record in A/B
+2. Submit different updates
+3. Inspect final value",A=Activity A; B=Activity B,"1. [Stage 1 target] Conflict/lost-update behavior is recorded
+2. Prevention is not claimed without evidence",,Not Run,Medium,P1,,,,REQ-07,Boundary,
+TC-OJT-0013,Safe errors,Errors/Messages,"[Stage 1 target] Verify safe JSON responses for missing, unauthorized, forbidden, and validation errors",1. Synthetic identifiers are used,"1. Request a missing record
+2. Request another owner’s record while authenticated
+3. Submit malformed placement/evidence input
+4. Request a synthetic provider failure",id=999999; failure=synthetic-timeout,"1. [Stage 1 target] Missing resource returns 404
+2. Cross-owner or forbidden request returns 403
+3. Validation failure returns 422 with safe JSON errors
+4. Provider failure is bounded and does not expose secrets",,Not Run,Medium,P1,,,,REQ-07,Negative,
+TC-OJT-0014,Empty UI and PDF result,Empty/Loading/No-results,[Stage 1 target] Prove no-result filtered UI and PDF behavior,"1. Authorized requester is logged in
+2. Filter combination matches no authorized records
+3. PDF generation is available","1. Load the filtered UI result
+2. Request the PDF with the identical filters
+3. Inspect the UI empty state
+4. Extract visible PDF text",campus=NO-SUCH-CAMPUS; schoolyear=2026; semester=1; college=COE; course=BSIT,"1. [Stage 1 target] UI shows a clear empty state
+2. PDF is valid and states `No matching records`
+3. Neither output contains unrelated or unauthorized records",,Not Run,Medium,P1,,,,REQ-05,Positive,
+TC-OJT-0015,Fake provider known synthetic credentials,Integration Success,[Stage 1 target] Prove the default fake provider makes no network call and normalizes known synthetic SR credentials,"1. Fake provider is the default mode
+2. Network access is observable/blocked for this case
+3. Known synthetic SR credentials are approved","1. Request the academic profile for known synthetic SR credentials
+2. Observe network activity
+3. Inspect the normalized profile, placeholder photo, and enrollment metadata
+4. Inspect logs for secrets and PII",sr_code=SR-SYN-1001; password=synthetic-placeholder; term=2026-1,"1. [Stage 1 target] No network call is made by default
+2. Known synthetic credentials return a normalized profile
+3. Response includes a placeholder photo and enrollment metadata
+4. Logs contain no password, credential, token, or PII",,Not Run,Medium,P1,,,,REQ-03,Integration,
+TC-OJT-0016,Fake provider unknown credentials,Integration Failure,[Stage 1 target] Prove unknown synthetic SR credentials fail safely without network access,"1. Fake provider is the default mode
+2. Network access is observable/blocked for this case","1. Request the academic profile with unknown synthetic SR credentials
+2. Observe network activity
+3. Inspect response and logs",sr_code=SR-SYN-9999; password=unknown-synthetic; term=2026-1,"1. [Stage 1 target] No network call is made
+2. Unknown credentials return HTTP 422 with safe JSON errors
+3. Response and logs contain no secrets or PII",,Not Run,Medium,P1,,,,REQ-03,Integration,
+TC-OJT-0017,Fake provider timeout or unavailable,Integration Timeout,[Stage 1 target] Prove explicit fake-provider timeout and unavailable scenarios return safe service errors,"1. Fake provider failure injection is enabled
+2. No real provider credentials are available in the test data","1. Trigger the synthetic timeout scenario
+2. Trigger the synthetic unavailable scenario
+3. Inspect response duration, status, body, and logs",failure=timeout|unavailable; correlation_id=synthetic-provider-failure,"1. [Stage 1 target] Timeout returns HTTP 503 with safe JSON
+2. Unavailable returns HTTP 503 with safe JSON
+3. Neither scenario hangs or exposes secrets/PII",,Not Run,Medium,P1,,,,REQ-03,Integration,
+TC-OJT-0018,Real provider opt-in and malformed response,Integration Bad Payload,[Stage 1 target] Prove real provider access is opt-in with environment-held credentials and malformed responses are safe,"1. Fake provider remains default when opt-in is absent
+2. Real-provider credentials, if enabled, are environment-held synthetic values
+3. A malformed provider response can be supplied without real PII","1. Request a profile with real-provider opt-in absent
+2. Enable explicit opt-in using environment configuration
+3. Supply a malformed provider response
+4. Inspect response and logs",provider_mode=fake then explicit-real; env credential=synthetic-placeholder; payload=malformed,"1. [Stage 1 target] Real provider is not called without explicit opt-in
+2. Opt-in reads credentials only from environment-backed configuration
+3. Malformed response fails safely without exposing raw credentials or PII
+4. Logs never contain secrets or PII",,Not Run,Medium,P1,,,,REQ-03,Integration,
+TC-OJT-0019,Security boundary,Security Unauthorized/Injection/Session Expiry,"[Stage 1 target] Verify 401/403 security boundaries for injection-like, expired-session, and cross-owner requests",1. Security target is acknowledged,"1. Send an injection-like filter while unauthenticated
+2. Send an expired-session API request
+3. Send an authenticated cross-owner identifier request
+4. Request a filtered UI/PDF view outside requester scope
+5. Inspect response bodies and output for sensitive disclosure",filter=' OR 1=1 --; token=expired; id=302,"1. [Stage 1 target] Unauthenticated API returns 401
+2. Expired-session request returns 401
+3. Cross-owner request returns 403
+4. Filtered UI/PDF never includes unauthorized records
+5. Responses and outputs contain safe JSON/PDF content with no secret/token/PII leakage",,Not Run,Medium,P1,,,,REQ-07,Security,
+TC-OJT-0020,Known defects regression,Regression,[Current characterization] Pin search role bug and cluster-delete typo,1. Synthetic fixtures and policy are acknowledged,"1. Run internship search by role
+2. Attempt authorized cluster deletion
+3. Record current result",search=STU-1001; cluster=601,"1. [Current characterization] Role scope result is traceable
+2. Delete outcome is traceable
+3. No correction is claimed",,Not Run,Medium,P1,,,,REQ-07,Regression,
+TC-OJT-0021,Safe remediation boundary,Security,[Stage 1 target] Characterize sensitive artifacts and runbook boundary,1. Read-only review is authorized,"1. Confirm ojt.sql exists
+2. Identify provider key without copying it
+3. Review rotation/history-purge plan",artifact paths only; no secrets,"1. [Stage 1 target] Sensitive artifacts are named without values
+2. Rotation/purge remain approval-gated and unexecuted",,Not Run,Medium,P1,,,,REQ-08,Security,
+TC-OJT-0022,Filtered UI/PDF exact parity and ordering,Reporting,"[Stage 1 target] Prove filtered UI and PDF use identical authorized semantics, stable ordering, and exact requester-visible values","1. Authorized requester is logged in
+2. Synthetic records span all supported filter dimensions
+3. PDF generation is available","1. Request the filtered UI listing
+2. Request the PDF with the identical filters
+3. Compare record identifiers in order
+4. Compare every requester-visible key value
+5. Repeat the same requests to check stable ordering",campus=MAIN; schoolyear=2026; semester=1; college=COE; course=BSIT,"1. [Stage 1 target] UI and PDF apply identical authorized filter semantics
+2. PDF contains exactly the same records visible to the requester
+3. PDF key values exactly match the UI values
+4. Repeated requests preserve stable ordering
+5. Unauthorized records are absent from both outputs",,Not Run,Medium,P1,,,,REQ-05,Positive,
+TC-OJT-0023,Traceability package,Documentation,[Stage 1 target] Verify every case points to a sequential requirement and sealed-document finding is explicit,1. Requirements and CSV are present,"1. Match each Requirement ID to the requirements document
+2. Check no sealed happy-flow document is claimed",REQ-OJT-0001 through REQ-OJT-0010,"1. [Stage 1 target] Every requirement has at least one case
+2. No existing happy-flow artifact is claimed
+3. Traceability is mechanically verifiable",,Not Run,Low,P2,,,,REQ-09,Regression,
+TC-OJT-0024,Stage 1 scope and happy-flow sealing gate,Scope,[Stage 1 target] Verify Stage 1 exclusions and the explicit gate for sealing future happy-flow documentation,"1. Ticket 1 scope is approved
+2. Compose startup/reset evidence, authoritative browser journey, linked API/domain/security/regression test evidence, and local timing evidence are available for review
+3. Explicit user approval can be recorded","1. Review Out of Scope and Stage 1/Stage 2 boundary
+2. Verify Compose startup and reset passed
+3. Verify the authoritative browser journey passed
+4. Verify linked API, domain, security, and regression tests passed
+5. Verify the local quality gate completed in under ten minutes
+6. Check whether explicit user approval was recorded before sealing",Ticket 1 documentation only,"1. [Stage 1 target] Stage 1 stabilization is separated from Stage 2 modernization
+2. All four technical evidence groups and the under-10-minute gate are required
+3. A future happy-flow document remains unsealed if any prerequisite fails
+4. It becomes sealed only after every prerequisite passes and explicit user approval is recorded
+5. Excluded artifacts remain unmodified",,Not Run,Low,P2,,,,REQ-10,Boundary,
+TC-OJT-0025,Report date/hour inclusive boundaries,Reports,[Stage 1 target] Prove inclusive internship date and hour boundaries with quarter-hour increments,"1. Internship start date is 2026-09-01
+2. Internship end date is 2026-12-31
+3. Placement is owned by the requesting student","1. Submit a report dated 2026-09-01 with 0.25 hours
+2. Submit a report dated 2026-12-31 with 24 hours
+3. Submit a report dated 2026-10-01 with 8.25 hours","internship_id=301; dates=2026-09-01,2026-12-31,2026-10-01; hours=0.25,24,8.25","1. [Stage 1 target] The start-date report is accepted
+2. The end-date report is accepted
+3. The 8.25-hour report is accepted
+4. Each accepted value is numeric and on a 0.25-hour increment",,Not Run,Medium,P1,,,,REQ-04,Boundary,
+TC-OJT-0026,Report date/hour invalid boundaries,Reports,[Stage 1 target] Reject report dates outside the internship and hours outside or between approved quarter-hour values,"1. Internship start date is 2026-09-01
+2. Internship end date is 2026-12-31
+3. Placement is owned by the requesting student","1. Submit a report dated 2026-08-31
+2. Submit a report dated 2027-01-01
+3. Submit reports with hours 0, 24.25, and 8.1
+4. Inspect each validation response","internship_id=301; dates=2026-08-31,2027-01-01; hours=0,24.25,8.1","1. [Stage 1 target] A date before the start is rejected
+2. A date after the end is rejected
+3. 0 and 24.25 hours are rejected
+4. 8.1 hours is rejected because it is not a 0.25-hour increment
+5. Validation responses are safe JSON errors",,Not Run,High,P1,,,,REQ-04,Negative,
+TC-OJT-0027,Student correction before approval,Descriptions and Reports,[Stage 1 target] Prove student-owned descriptions and reports can be corrected before approval,"1. Placement belongs to student 101
+2. Placement is unapproved
+3. Student-owned description and report exist","1. Update the own description
+2. Update the own report with valid date/hours
+3. Read both records",student=101; placement=301; description=401; report=501,"1. [Stage 1 target] Both own records can be edited before approval
+2. Updated values are placement-scoped
+3. No approval state is granted by editing",,Not Run,Medium,P1,,,,REQ-04,Positive,
+TC-OJT-0028,Approved record immutability,Descriptions and Reports,[Stage 1 target] Prove approved descriptions and reports are immutable to student changes,"1. Placement is approved
+2. Student owns the placement and records
+3. Approved description and report exist","1. Attempt to edit the approved description
+2. Attempt to soft-delete the approved report
+3. Read approval and record values",student=101; placement=301; approved description=401; approved report=501,"1. [Stage 1 target] Student changes to approved records are denied
+2. Approved records remain unchanged
+3. Placement remains approved
+4. Denial follows the 403 contract where the operation is forbidden",,Not Run,High,P1,,,,REQ-05,Negative,
+TC-OJT-0029,Coordinator audited reopen,Approval and Correction,[Stage 1 target] Prove an authorized coordinator can reopen with an audit reason for student correction,"1. Placement is approved
+2. Authorized coordinator is in policy scope
+3. Student owns the placement","1. Submit an explicit reopen request as coordinator
+2. Supply audit reason
+3. Inspect approval state
+4. Have the student correct an own description/report",placement=301; coordinator=201; audit_reason=Correct invalid report date,"1. [Stage 1 target] Reopen succeeds with a non-empty audit reason
+2. Placement returns to unapproved state
+3. Student corrections are allowed after reopen
+4. Reopen and reason are audit-visible",,Not Run,High,P1,,,,REQ-05,Permission,
+TC-OJT-0030,Blocked reopen and cross-owner correction,Approval and Correction,[Stage 1 target] Prove reopen requires coordinator permission and an audit reason,"1. Placement is approved
+2. Student 101, other student 102, and coordinator 201 are available","1. Attempt reopen as student 101
+2. Attempt reopen as coordinator without an audit reason
+3. Attempt reopen by coordinator outside policy scope
+4. Attempt edit as student 102",placement=301; audit_reason=blank; other_owner=102,"1. [Stage 1 target] Student reopen is denied with 403
+2. Missing audit reason is rejected with 422 safe JSON
+3. Out-of-scope coordinator reopen is denied with 403
+4. Cross-owner edit is denied with 403
+5. Approved state remains unchanged",,Not Run,High,P1,,,,REQ-06,Negative,
+TC-OJT-0031,Approval reopen regression state,Lifecycle Regression,"[Stage 1 target] Prevent regressions across approval, immutability, audited reopen, correction, and reapproval","1. Placement can be prepared with complete prerequisites
+2. Student and authorized coordinator fixtures exist","1. Approve the complete placement
+2. Attempt a student edit while approved
+3. Reopen with coordinator audit reason
+4. Correct an own report
+5. Reapprove after prerequisites remain complete",placement=301; audit_reason=Correct report evidence,"1. [Stage 1 target] Approval makes records immutable
+2. Reopen returns placement to unapproved state
+3. Student correction is allowed only after reopen
+4. Reapproval succeeds only after prerequisites are complete
+5. is_approved and completion state follow the approved transitions",,Not Run,High,P1,,,,REQ-05,Regression,
+TC-OJT-0032,Filtered output authorization boundary,Filtered UI and PDF,[Stage 1 target] Prove unauthorized records never leak through filtered UI or PDF output,"1. Student 101 is authorized only for own records
+2. Another student’s matching record exists
+3. UI listing and PDF endpoints are available","1. Request a filter that would match both own and other-owner records
+2. Load the UI result
+3. Request the PDF with the same filter
+4. Inspect record identifiers and key values",requester=student-101; own_record=301; other_record=302; filter=campus=MAIN,"1. [Stage 1 target] UI includes only records authorized for student 101
+2. PDF includes exactly that same authorized set
+3. Other-owner record 302 and its key values never appear
+4. Forbidden direct access remains 403",,Not Run,Critical,P1,,,,REQ-06,Security,
+TC-OJT-0033,Synthetic local fixtures and deterministic reset,Seed/Reset/Auth Fixtures,[Stage 1 target] Prove the published demo identities are synthetic local-only fixtures and reset deterministically restores them,"1. Local/demo mode is active
+2. No production deployment mode is active
+3. Reset operation is available","1. Inspect seeded student, coordinator, and admin identities
+2. Authenticate using each documented local-only demo password
+3. Confirm email domains and fixture values contain no real PII
+4. Run the deterministic local reset
+5. Inspect identities and safe synthetic data after reset",DEMO-STUDENT-001 / demo.student.001@test.example / DemoOnly-Student-001!; DEMO-COORD-001 / demo.coord.001@test.example / DemoOnly-Coord-001!; DEMO-ADMIN-001 / demo.admin.001@test.example / DemoOnly-Admin-001!,"1. [Stage 1 target] All three documented identities exist with their .test emails and local-only passwords
+2. Identities are never enabled as production defaults
+3. No real PII or secrets are present
+4. Reset deterministically restores the same identities and safe synthetic fixture state
+5. Reset does not call the external provider",,Not Run,High,P1,,,,REQ-09,Positive,
