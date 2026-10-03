@@ -2,159 +2,121 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\User;
+use App\Contracts\AcademicProvider;
+use App\Exceptions\AcademicProviderException;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+use App\Support\SessionTracer;
+use App\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
-use App\Classes\batsu_api;
+/* fix-10032026-Maurice: registration consumes the provider boundary only. */
 class RegisterController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Register Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
-
     use RegistersUsers;
 
-    /**
-     * Where to redirect users after registration.
-     *
-     * @var string
-     */
     protected $redirectTo = '/home';
+    protected $provider;
+    protected $academicProfile;
+    protected $correlationId;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function __construct(AcademicProvider $provider)
     {
+        SessionTracer::enter('registration.controller.construct', 'startup', array('mode' => config('academic.mode')));
+        try {
+        $this->provider = $provider;
         $this->middleware('guest');
+        SessionTracer::leave('registration.controller.construct', 'startup', microtime(true), 'success');
+        } catch (\Throwable $exception) {
+            SessionTracer::exception('registration.controller.construct', 'startup', microtime(true), 'controller_unexpected', $exception);
+            throw $exception;
+        }
     }
 
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
     protected function validator(array $data)
     {
-            return Validator::make($data, [
-                'name' => ['required', 'string', 'max:255'],
-                'first_name' => ['required', 'string', 'max:255'],
-                'last_name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-                'password' => ['required', 'string', 'min:6', 'confirmed'],
-                'sr_code' => ['required','string','max:255','unique:users'],
-                'contact_no' => ['string', 'max:255'],
-                'parent' => ['string', 'max:255'],
-                'parent_contact_no' => ['string', 'max:255'],
-                'current_schoolyear' => ['string', 'max:255'],
-                'current_course_code' => ['string', 'max:255']
-            ]);
+        $started = microtime(true);
+        SessionTracer::enter('registration.validator', 'validation', array('mode' => config('academic.mode')));
+        try {
+        $validator = Validator::make($data, array(
+            'name' => array('required', 'string', 'max:255'), 'first_name' => array('required', 'string', 'max:255'), 'last_name' => array('required', 'string', 'max:255'),
+            'email' => array('required', 'string', 'email', 'max:255', 'unique:users'), 'password' => array('required', 'string', 'min:6', 'confirmed'),
+            'sr_code' => array('required', 'string', 'max:255', 'unique:users'), 'contact_no' => array('string', 'max:255'), 'parent' => array('string', 'max:255'),
+            'parent_contact_no' => array('string', 'max:255'), 'current_schoolyear' => array('string', 'max:255'), 'current_course_code' => array('string', 'max:255'),
+        ));
+        SessionTracer::leave('registration.validator', 'validation', $started, 'success');
+        return $validator;
+        } catch (\Throwable $exception) {
+            SessionTracer::exception('registration.validator', 'validation', $started, 'validation_unexpected', $exception);
+            throw $exception;
+        }
     }
 
-    /**
-     *
-     * Override Trait RegistersUsers : vendor/laravel/framework/src/Illuminate/Foundation/Auth/RegistersUsers.php
-     *
-    */
     public function register(Request $request)
     {
+        $correlationId = SessionTracer::id($request->header('X-Correlation-ID'));
+        $this->correlationId = $correlationId;
+        $started = microtime(true);
+        SessionTracer::enter('registration.academic_profile', $correlationId, array('mode' => config('academic.mode')));
         $validator = $this->validator($request->all());
-
-        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
-        $user = json_decode($api->fetch_student_profile( $request->input('sr_code')),true);
-
-        if (!$user) {
-            $validator->getMessageBag()->add('sr_code', 'Incorrect code.');
-            return redirect('/register')
-            ->withErrors($validator,'sr_code')
-            ->withInput();
-        }
-
-        $data = json_decode($api->authenticate_student($request->input('sr_code'),$request->input('password')),true);
-
-        if(empty($data))
-        {
-            $validator->getMessageBag()->add('password', 'Incorrect sr code/password.');
-            return redirect('/register')
-            ->withErrors($validator,'password')
-            ->withInput();
-        }
-
         if ($validator->fails()) {
-            return redirect('/register')
-            ->withErrors($validator)
-            ->withInput();
+            SessionTracer::leave('registration.academic_profile', $correlationId, $started, 'validation');
+            if ($request->expectsJson()) {
+                return response()->json(array('error' => array('code' => 'validation_failed', 'message' => 'Registration fields are invalid.'), 'correlation_id' => $correlationId), 422);
+            }
+            return redirect('/register')->withErrors($validator)->withInput();
         }
-
-        $created_user = $this->create($request->all());
-        \Auth::login($created_user);
-
+        try {
+            $this->academicProfile = $this->provider->profile($request->input('sr_code'), $request->input('password'), $correlationId);
+        } catch (AcademicProviderException $exception) {
+            $field = $exception->category() === 'academic_credentials_invalid' ? 'password' : 'sr_code';
+            $validator->getMessageBag()->add($field, $exception->category() === 'academic_credentials_invalid' ? 'Incorrect sr code/password.' : 'Academic profile is temporarily unavailable.');
+            SessionTracer::exception('registration.academic_profile', $correlationId, $started, $exception->category(), $exception);
+            if ($request->expectsJson()) {
+                return response()->json(array('error' => array('code' => $exception->category(), 'message' => 'Academic profile is unavailable.'), 'correlation_id' => $correlationId), $exception->category() === 'academic_credentials_invalid' ? 422 : 503);
+            }
+            return redirect('/register')->withErrors($validator)->withInput();
+        } catch (\Throwable $exception) {
+            SessionTracer::exception('registration.academic_profile', $correlationId, $started, 'academic_provider_unexpected', $exception);
+            $validator->getMessageBag()->add('sr_code', 'Academic profile is temporarily unavailable.');
+            if ($request->expectsJson()) {
+                return response()->json(array('error' => array('code' => 'academic_provider_unavailable', 'message' => 'Academic profile is unavailable.'), 'correlation_id' => $correlationId), 503);
+            }
+            return redirect('/register')->withErrors($validator)->withInput();
+        }
+        $createdUser = $this->create($request->all());
+        \Auth::login($createdUser);
+        SessionTracer::leave('registration.academic_profile', $correlationId, $started, 'success');
         return redirect($this->redirectPath());
     }
 
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return \App\User
-     */
     protected function create(array $data)
     {
-        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
-        $schoolyears = json_decode($api->fetch_schoolyear(),true);
-        $semesters = json_decode($api->fetch_semester(),true);
-        krsort($semesters);
-        foreach ($schoolyears as $sy) {
-            # code...
-            foreach ($semesters as $sem) {
-                $user_enrollment_record = json_decode($api->fetch_enrollment_records($sy,$sem,$data['sr_code']),true);
-                if ($user_enrollment_record) {
-                    break 2;
-                }
-            }
-
+        $started = microtime(true);
+        $correlationId = $this->correlationId ?: 'missing-correlation';
+        SessionTracer::enter('registration.create', $correlationId, array('mode' => config('academic.mode')));
+        try {
+        $profile = $this->academicProfile ?: $this->provider->profile($data['sr_code'], $data['password'], $correlationId);
+        $enrollment = isset($profile['enrollment']) ? $profile['enrollment'] : array();
+        $person = isset($profile['profile']) ? $profile['profile'] : array();
+        $user = User::create(array(
+            'name' => isset($person['middle_name']) ? $person['middle_name'] : '', 'first_name' => isset($person['first_name']) ? $person['first_name'] : $data['first_name'],
+            'last_name' => isset($person['last_name']) ? $person['last_name'] : $data['last_name'], 'current_schoolyear' => isset($enrollment['schoolyear']) ? $enrollment['schoolyear'] : '',
+            'current_course_code' => isset($enrollment['course_code']) ? $enrollment['course_code'] : '', 'email' => $data['email'], 'password' => Hash::make($data['password']),
+            'role' => 'student', 'sr_code' => $data['sr_code'], 'contact_no' => isset($data['contact_no']) ? $data['contact_no'] : '',
+            'parent' => isset($data['parent']) ? $data['parent'] : '', 'parent_contact_no' => isset($data['parent_contact_no']) ? $data['parent_contact_no'] : '',
+            'photo_url' => isset($profile['photo']['url']) ? $profile['photo']['url'] : '', 'address' => isset($data['address']) ? $data['address'] : '',
+        ));
+        SessionTracer::leave('registration.create', $correlationId, $started, 'success');
+        return $user;
+        } catch (AcademicProviderException $exception) {
+            SessionTracer::exception('registration.create', $correlationId, $started, $exception->category(), $exception);
+            throw $exception;
+        } catch (\Throwable $exception) {
+            SessionTracer::exception('registration.create', $correlationId, $started, 'registration_unexpected', $exception);
+            throw $exception;
         }
-
-        $auth_data = json_decode($api->authenticate_student($data['sr_code'],$data['password']),true);
-
-        $photo_url = '';
-        if (!empty($auth_data)) {
-            $token = $auth_data[0]['token'];
-            $photo_url = $api->fetch_student_photo_url($data['sr_code'],$token);
-        }
-                
-            return User::create([
-            'name' => $user_enrollment_record[0]['middlename'],
-            'first_name' => $user_enrollment_record[0]['firstname'],
-            'last_name' => $user_enrollment_record[0]['lastname'],
-            'current_schoolyear' => $user_enrollment_record[0]['schoolyear'],
-            'current_course_code' => $user_enrollment_record[0]['coursecode'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'role' => 'student',
-            'sr_code' => $data['sr_code'],
-            'contact_no' => $data['contact_no'],
-            'parent' => $data['parent'],
-            'parent_contact_no' => $data['parent_contact_no'],
-            'photo_url' => $photo_url,
-            'address' => $data['address'],
-            
-        ]);
     }
-
-    
 }

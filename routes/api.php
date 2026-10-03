@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 |
 */
 
+/* feature-10032026-Maurice: unauthenticated POST-only, rate-limited provider boundary. */
+Route::post('/academic/profile', 'AcademicProfileController@profile')->middleware('throttle:20,1');
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

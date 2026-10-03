@@ -7,13 +7,14 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
+    /* feature-10032026-Maurice: safe provider probe registration. */
     /**
      * The Artisan commands provided by your application.
      *
      * @var array
      */
     protected $commands = [
-        //
+        \App\Console\Commands\AcademicProviderProbe::class,
     ];
 
     /**

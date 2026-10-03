@@ -3,6 +3,7 @@
 FROM php:7.4.33-fpm-bullseye@sha256:3ac7c8c74b2b047c7cb273469d74fc0d59b857aa44043e6ea6a0084372811d5b
 
 # build-10032026-Maurice
+# fix-10032026-Maurice: install PHP cURL for bounded verified real-provider probes.
 # Install the exact official Composer PHAR over verified HTTPS inside the
 # immutable PHP base; no separate mutable Composer image stage is required.
 # The legacy Bullseye base has expired live-repository metadata; pin all Debian
@@ -14,13 +15,13 @@ RUN printf '%s\n' \
     > /etc/apt/sources.list \
     && rm -f /etc/apt/sources.list.d/* \
     && apt-get -o Acquire::Check-Valid-Until=false update \
-    && apt-get install -y --no-install-recommends ca-certificates curl libzip-dev \
+    && apt-get install -y --no-install-recommends ca-certificates curl libcurl4-openssl-dev libzip-dev \
     && rm -rf /var/lib/apt/lists/* \
     && curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 https://getcomposer.org/download/1.10.27/composer.phar -o /tmp/composer.phar \
     && printf '%s  %s\n' '230d28fb29f3c6c07ab2382390bef313e36de17868b2bd23b2e070554cae23d2' /tmp/composer.phar | sha256sum -c - \
     && install -m 0755 /tmp/composer.phar /usr/local/bin/composer \
     && rm -f /tmp/composer.phar \
-    && docker-php-ext-install pdo_mysql zip
+    && docker-php-ext-install curl pdo_mysql zip
 
 RUN groupadd --gid 1000 app \
     && useradd --uid 1000 --gid 1000 --create-home --shell /usr/sbin/nologin app

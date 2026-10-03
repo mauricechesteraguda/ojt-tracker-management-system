@@ -92,36 +92,63 @@ TC-OJT-0014,Empty UI and PDF result,Empty/Loading/No-results,[Stage 1 target] Pr
 4. Extract visible PDF text",campus=NO-SUCH-CAMPUS; schoolyear=2026; semester=1; college=COE; course=BSIT,"1. [Stage 1 target] UI shows a clear empty state
 2. PDF is valid and states `No matching records`
 3. Neither output contains unrelated or unauthorized records",,Not Run,Medium,P1,,,,REQ-05,Positive,
-TC-OJT-0015,Fake provider known synthetic credentials,Integration Success,[Stage 1 target] Prove the default fake provider makes no network call and normalizes known synthetic SR credentials,"1. Fake provider is the default mode
-2. Network access is observable/blocked for this case
-3. Known synthetic SR credentials are approved","1. Request the academic profile for known synthetic SR credentials
-2. Observe network activity
-3. Inspect the normalized profile, placeholder photo, and enrollment metadata
-4. Inspect logs for secrets and PII",sr_code=SR-SYN-1001; password=synthetic-placeholder; term=2026-1,"1. [Stage 1 target] No network call is made by default
-2. Known synthetic credentials return a normalized profile
-3. Response includes a placeholder photo and enrollment metadata
-4. Logs contain no password, credential, token, or PII",,Not Run,Medium,P1,,,,REQ-03,Integration,
-TC-OJT-0016,Fake provider unknown credentials,Integration Failure,[Stage 1 target] Prove unknown synthetic SR credentials fail safely without network access,"1. Fake provider is the default mode
-2. Network access is observable/blocked for this case","1. Request the academic profile with unknown synthetic SR credentials
-2. Observe network activity
-3. Inspect response and logs",sr_code=SR-SYN-9999; password=unknown-synthetic; term=2026-1,"1. [Stage 1 target] No network call is made
-2. Unknown credentials return HTTP 422 with safe JSON errors
-3. Response and logs contain no secrets or PII",,Not Run,Medium,P1,,,,REQ-03,Integration,
-TC-OJT-0017,Fake provider timeout or unavailable,Integration Timeout,[Stage 1 target] Prove explicit fake-provider timeout and unavailable scenarios return safe service errors,"1. Fake provider failure injection is enabled
-2. No real provider credentials are available in the test data","1. Trigger the synthetic timeout scenario
-2. Trigger the synthetic unavailable scenario
-3. Inspect response duration, status, body, and logs",failure=timeout|unavailable; correlation_id=synthetic-provider-failure,"1. [Stage 1 target] Timeout returns HTTP 503 with safe JSON
-2. Unavailable returns HTTP 503 with safe JSON
-3. Neither scenario hangs or exposes secrets/PII",,Not Run,Medium,P1,,,,REQ-03,Integration,
-TC-OJT-0018,Real provider opt-in and malformed response,Integration Bad Payload,[Stage 1 target] Prove real provider access is opt-in with environment-held credentials and malformed responses are safe,"1. Fake provider remains default when opt-in is absent
-2. Real-provider credentials, if enabled, are environment-held synthetic values
-3. A malformed provider response can be supplied without real PII","1. Request a profile with real-provider opt-in absent
-2. Enable explicit opt-in using environment configuration
-3. Supply a malformed provider response
-4. Inspect response and logs",provider_mode=fake then explicit-real; env credential=synthetic-placeholder; payload=malformed,"1. [Stage 1 target] Real provider is not called without explicit opt-in
-2. Opt-in reads credentials only from environment-backed configuration
-3. Malformed response fails safely without exposing raw credentials or PII
-4. Logs never contain secrets or PII",,Not Run,Medium,P1,,,,REQ-03,Integration,
+TC-OJT-0015,Fake provider known synthetic credentials,Integration Success,[Stage 1 target] Verify the unauthenticated rate-limited POST registration boundary and safe known-credential response,"1. Fake adapter is default and has no network transport
+2. A local sentinel/isolated endpoint records any hit
+3. Known synthetic credentials are approved
+4. Controller, manager, and provider logging/tracing are observable","1. POST /api/academic/profile with body sr_code and password (never GET/query credentials)
+2. Add any `sr_code` or `password` query parameter to a POST that also contains a valid credential body and assert rejection before provider invocation, with zero provider calls
+3. Repeat valid requests past the rate-limit threshold and inspect limiting
+4. Assert the local sentinel received zero hits
+5. Inspect status, correlation_id, JSON fields, logs, and traces
+6. Exercise browser registration HTML path and preserve redirect/field-error behavior",sr_code=SR-SYN-1001; password=synthetic-placeholder,"1. [Stage 1 target] Registration verification is unauthenticated and rate-limited
+2. Body credentials return HTTP 200 JSON with one correlation_id and only normalized safe profile/photo/enrollment fields
+3. Any `sr_code` or `password` query parameter is rejected, including alongside a valid POST body, before provider invocation
+4. The same correlation_id appears in controller/manager/provider logs/traces and response
+5. No provider token/password, raw credentials, arbitrary forbidden field, or PII appears in response/logs/traces
+6. Fake response completes under 1 second and sentinel hit count is zero
+7. Browser HTML preserves redirect and field-level errors",,Not Run,Medium,P1,,,,REQ-03,Integration,
+TC-OJT-0016,Fake provider unknown credentials,Integration Failure,[Stage 1 target] Verify unknown credentials and JSON validation fail safely without network access,"1. Fake adapter is default and has no network transport
+2. A local sentinel/isolated endpoint records any hit
+3. Controller, manager, and provider logging/tracing are observable","1. POST /api/academic/profile with unknown sr_code/password in the body
+2. Submit query-only credentials and missing/malformed body fields as JSON
+3. Assert validation completes before any provider invocation
+4. Assert the local sentinel received zero hits for rejected inputs
+5. Inspect response, correlation_id, logs, and traces",sr_code=SR-SYN-9999; password=unknown-synthetic,"1. [Stage 1 target] Unknown credentials return HTTP 422 JSON `{error:{code:academic_credentials_invalid,message:safe generic},correlation_id}`
+2. Validation failures return HTTP 422 before provider invocation; query credentials are rejected
+3. One correlation_id propagates across controller/manager/provider logs/traces and response
+4. Expected invalid credentials may log only WARN/INFO; no unexpected failure is downgraded from structured ERROR
+5. No GET/query credentials, network hit, raw payload, secret, token, password, or PII is exposed",,Not Run,Medium,P1,,,,REQ-03,Integration,
+TC-OJT-0017,Fake provider timeout or unavailable,Integration Timeout,[Stage 1 target] Verify deterministic fake-only timeout and unavailable service errors,"1. Fake failure injection is enabled
+2. Fake adapter has no network transport and a local sentinel/isolated endpoint records hits
+3. No real provider credentials are available
+4. Structured logs/traces are captured","1. Trigger local synthetic timeout
+2. Trigger local synthetic unavailable
+3. Assert validation completed before either provider invocation
+4. Assert sentinel hit count is zero
+5. Inspect status, code, one propagated correlation_id, duration, body, logs, and traces",failure=timeout|unavailable; correlation_id=synthetic-provider-failure,"1. [Stage 1 target] Timeout returns HTTP 503 code `academic_provider_timeout`
+2. Unavailable returns HTTP 503 code `academic_provider_unavailable`
+3. Both complete under 1 second, do not hang, and expose no secrets/PII or raw payloads
+4. Correlation_id is identical across controller/manager/provider logs/traces and response
+5. Unexpected failures are structured ERROR entries with exception class, message-safe category, stack, cause, and correlation_id",,Not Run,Medium,P1,,,,REQ-03,Integration,
+TC-OJT-0018,Real provider opt-in and malformed response,Integration Bad Payload,[Stage 1 target] Verify explicit environment-only real mode; transport security; strict normalization; and safe malformed/upstream failures,"1. Fake mode is default and real provider is never contacted without explicit mode
+2. Local test sentinel is available for real malformed/non-2xx responses; live provider is prohibited
+3. Environment values are synthetic and isolated
+4. Controller, manager, provider logs/traces, and response correlation are observable","1. Confirm absent opt-in uses fake mode and sentinel has zero hits
+2. Add any `sr_code` or `password` query parameter, including to a POST with a valid credential body, and submit malformed body input; assert 422 rejection before provider invocation
+3. Enable only ACADEMIC_PROVIDER_MODE; ACADEMIC_PROVIDER_BASE_URL; ACADEMIC_PROVIDER_KEY; ACADEMIC_PROVIDER_CONNECT_TIMEOUT_SECONDS=2; and ACADEMIC_PROVIDER_TIMEOUT_SECONDS=5 as applicable
+4. Verify missing real configuration fails closed
+5. Verify non-HTTPS real base URLs are rejected, except an explicit 127.0.0.1/::1/localhost sentinel when APP_ENV is local/testing
+6. Verify cURL TLS peer and host verification are enabled
+7. Send malformed, forbidden-field/token/password/raw-PII, and upstream non-2xx responses from the local sentinel, never live provider; for each malformed, forbidden-field, and non-2xx scenario, record the starting hit count, require exactly one additional sentinel hit, and require respectively `503 academic_provider_malformed`, `503 academic_provider_malformed`, and `503 academic_provider_unavailable` (a pre-transport configuration failure does not satisfy the case)
+8. Inspect status, strict normalized schema parity with fake, raw-body absence, correlation_id propagation, and logs/traces",ACADEMIC_PROVIDER_MODE=real; ACADEMIC_PROVIDER_BASE_URL=local-test-sentinel; ACADEMIC_PROVIDER_KEY=synthetic-only; APP_ENV=testing; connect=2s; timeout=5s; payload=malformed/non-2xx/forbidden-fields,"1. [Stage 1 target] Missing real configuration returns HTTP 503 and never calls live provider
+2. The malformed sentinel response produces exactly one additional sentinel hit and returns HTTP 503 code `academic_provider_malformed`; the forbidden-field sentinel response likewise produces exactly one additional hit and returns HTTP 503 code `academic_provider_malformed`; the non-2xx sentinel response produces exactly one additional hit and returns HTTP 503 code `academic_provider_unavailable` (pre-transport configuration failure does not satisfy any scenario)
+3. Non-HTTPS real URLs fail closed; only explicit loopback sentinel URLs are allowed under APP_ENV local/testing
+4. cURL TLS peer and host verification remain enabled
+5. Real success uses exactly the fake provider's strict whitelist schema; arbitrary forbidden fields/tokens/passwords/raw PII are rejected or omitted
+6. Raw provider payload is absent; credentials, key, token, password, and PII never appear in response/logs/traces
+7. One correlation_id is identical across controller/manager/provider logs/traces and response
+8. Every unexpected failure has a structured ERROR with exception class, message-safe category, stack, cause, and correlation_id; invalid credentials may be WARN/INFO only
+9. Real credentials are environment-only and never sourced from or returned by the request",,Not Run,Medium,P1,,,,REQ-03,Integration,
 TC-OJT-0019,Security boundary,Security Unauthorized/Injection/Session Expiry,"[Stage 1 target] Verify 401/403 security boundaries for injection-like, expired-session, and cross-owner requests",1. Security target is acknowledged,"1. Send an injection-like filter while unauthenticated
 2. Send an expired-session API request
 3. Send an authenticated cross-owner identifier request

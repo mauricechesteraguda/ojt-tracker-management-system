@@ -2,10 +2,7 @@
 
 namespace App\Classes;
 
-error_reporting(E_ALL);
-ini_set('display_errors', '1'); 
-/* insert your api key below */
-$my_api_key = "02f56c7e26b713ab877cff2fc5c3ea8a"; 
+/* fix-10032026-Maurice: legacy transport no longer carries embedded credentials or endpoints. */
 
 
 /*
@@ -92,20 +89,13 @@ $my_api_key = "02f56c7e26b713ab877cff2fc5c3ea8a";
 
 */
 
-if(strlen($my_api_key)>0)
-{
-	$api_key =$my_api_key;
-}
-
-/* PLEASE DO NOT MODIFY THE CODES BELOW */
-/* FOR REQUIRED ARGUMENT/S, PLEASE CHECK THE FUNCTIONS BELOW */
-
 class batsu_api
 {	
-	public $my_api_key="";
-	function __construct($key) {
-       $this->my_api_key=$key;
-    }
+    public $my_api_key = '';
+
+    public function __construct($key = '') { $started = microtime(true); \App\Support\SessionTracer::enter('legacy.transport.construct', 'legacy', array('mode' => 'legacy')); try { $this->my_api_key = $key; \App\Support\SessionTracer::leave('legacy.transport.construct', 'legacy', $started, 'success'); } catch (\Throwable $exception) { \App\Support\SessionTracer::exception('legacy.transport.construct', 'legacy', $started, 'legacy_unexpected', $exception); throw $exception; } }
+
+    public function __call($name, $arguments) { $started = microtime(true); \App\Support\SessionTracer::enter('legacy.transport.call', 'legacy', array('mode' => 'legacy')); try { $result = $this->api_request(array('operation' => $name, 'arguments' => $arguments), 'legacy'); \App\Support\SessionTracer::leave('legacy.transport.call', 'legacy', $started, 'success'); return $result; } catch (\Throwable $exception) { \App\Support\SessionTracer::exception('legacy.transport.call', 'legacy', $started, 'academic_provider_unexpected', $exception); throw $exception; } }
 
     /* added 11/26/2018 */
     function fetch_cardtag_info($cardtag)
@@ -494,42 +484,60 @@ class batsu_api
 			return $this->api_request($param);
 	}
 
-	function api_request($param)
+	function api_request($param, $correlationId = 'legacy')
 	{
-		global $api_key;
-
-		if(strlen($this->my_api_key)==0){
-			$this->my_api_key =	$api_key;
+		$started = microtime(true);
+		\App\Support\SessionTracer::enter('legacy.transport.request', $correlationId, array('mode' => 'legacy'));
+		try {
+		$url = config('academic.base_url', '');
+		$parts = parse_url($url);
+		$https = is_array($parts) && isset($parts['scheme']) && strtolower($parts['scheme']) === 'https' && !empty($parts['host']);
+		$local = is_array($parts) && isset($parts['host']) && in_array(strtolower($parts['host']), array('127.0.0.1', '::1', 'localhost', 'host.docker.internal'), true);
+		$localAllowed = config('academic.allow_local', false) && app()->environment('local', 'testing') && $local;
+		if ($url === '' || !filter_var($url, FILTER_VALIDATE_URL) || (!$https && !$localAllowed)) {
+			\App\Support\SessionTracer::leave('legacy.transport.request', $correlationId, $started, 'unavailable', array('error_category' => 'academic_provider_unavailable'));
+			return json_encode(array());
 		}
-
-		$API_URL ="dWdnYzovL3F2YmFyLm9uZ2ZnbmdyLWgucnFoLmN1L2Nob3l2cC9mdmdyZi9uY3Yvbnduay5jdWM/bmN2X3hybD0="; 
-		$DATA = implode('&', array_map(function($key,$val){return ''.urlencode($key).'='.urlencode($val);},array_keys($param),$param));
-		$DATA = base64_encode($DATA);
-		$REQUEST_URL = str_rot13(base64_decode($API_URL)) . $this->my_api_key . '&data=' . $DATA;
-		
-		//echo $REQUEST_URL;
-
-		// echo $REQUEST_URL;
-	    $API_RETURN = file_get_contents($REQUEST_URL);
-
-	   	/* use this option in-case the host disable file_get_contents() function */
-	    /*
-	    $API_RETURN = $this->url_get_contents($REQUEST_URL);
-	    */
-
-		return $API_RETURN;
+		$result = $this->url_get_contents($url, $param, $correlationId);
+		\App\Support\SessionTracer::leave('legacy.transport.request', $correlationId, $started, 'success');
+		return $result;
+		} catch (\Throwable $exception) {
+		\App\Support\SessionTracer::exception('legacy.transport.request', $correlationId, $started, 'legacy_unexpected', $exception);
+		throw $exception;
+		}
 	}
 
-	function url_get_contents ($Url) {
+	function url_get_contents ($Url, array $param = array(), $correlationId = 'legacy') {
+	    $started = microtime(true);
+	    \App\Support\SessionTracer::enter('legacy.transport.curl', $correlationId, array('mode' => 'legacy'));
+	    try {
 	    if (!function_exists('curl_init')){ 
-	        die('CURL is not installed!');
+	        \App\Support\SessionTracer::leave('legacy.transport.curl', $correlationId, $started, 'unavailable', array('error_category' => 'academic_provider_unavailable'));
+	        return json_encode(array());
 	    }
 	    $ch = curl_init();
 	    curl_setopt($ch, CURLOPT_URL, $Url);
+	    curl_setopt($ch, CURLOPT_POST, true);
+	    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($param));
+	    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+	    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+	    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+	    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+	    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
 	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	    $output = curl_exec($ch);
+	    $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
 	    curl_close($ch);
+	    if ($output === false || $status < 200 || $status >= 300) {
+	        \App\Support\SessionTracer::leave('legacy.transport.curl', $correlationId, $started, 'unavailable', array('error_category' => 'academic_provider_unavailable'));
+	        return json_encode(array());
+	    }
+	    \App\Support\SessionTracer::leave('legacy.transport.curl', $correlationId, $started, 'success');
 	    return $output;
+	    } catch (\Throwable $exception) {
+	        \App\Support\SessionTracer::exception('legacy.transport.curl', $correlationId, $started, 'legacy_unexpected', $exception);
+	        throw $exception;
+	    }
 	}
 }
 

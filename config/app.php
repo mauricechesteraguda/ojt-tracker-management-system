@@ -1,5 +1,7 @@
 <?php
 
+/* feature-10032026-Maurice: register the fail-closed academic provider seam. */
+
 return [
 
     /*
@@ -168,7 +170,8 @@ return [
         /*
          * Application Service Providers...
          */
-        App\Providers\AppServiceProvider::class,
+         App\Providers\AppServiceProvider::class,
+         App\Providers\AcademicProviderServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,

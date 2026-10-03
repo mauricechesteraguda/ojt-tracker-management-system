@@ -13,51 +13,65 @@ use App\Http\Resources\InternshipCollection;
 
 use \PDF;
 
-use App\Classes\batsu_api;
+use App\Contracts\AcademicProvider;
+use App\Support\SessionTracer;
 
 class InternshipController extends Controller
 {
-    public function majors($course){
-        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
-        $majors = json_decode($api->fetch_majors($course),true);
+    /* fix-10032026-Maurice: academic catalog and enrollment access uses the provider seam. */
+    protected $provider;
 
-        return response()->json($majors, 200);
+    public function __construct(AcademicProvider $provider)
+    {
+        SessionTracer::enter('internship.controller.construct', 'startup', array('mode' => config('academic.mode')));
+        try {
+        $this->provider = $provider;
+        SessionTracer::leave('internship.controller.construct', 'startup', microtime(true), 'success');
+        } catch (\Throwable $exception) {
+            SessionTracer::exception('internship.controller.construct', 'startup', microtime(true), 'controller_unexpected', $exception);
+            throw $exception;
+        }
+    }
+
+    public function majors($course){
+        $started = microtime(true); $correlationId = SessionTracer::id(); SessionTracer::enter('internship.majors', $correlationId, array('mode' => config('academic.mode'))); try { $result = $this->catalogResponse('majors', function ($id) use ($course) { return $this->provider->majors($course, $id); }); SessionTracer::leave('internship.majors', $correlationId, $started, 'success'); return $result; } catch (\Throwable $exception) { SessionTracer::exception('internship.majors', $correlationId, $started, 'academic_provider_unexpected', $exception); throw $exception; }
 
     }
     public function courses($college){
-        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
-        $courses = json_decode($api->fetch_courses($college),true);
-
-        return response()->json($courses, 200);
+        $started = microtime(true); $correlationId = SessionTracer::id(); SessionTracer::enter('internship.courses', $correlationId, array('mode' => config('academic.mode'))); try { $result = $this->catalogResponse('courses', function ($id) use ($college) { return $this->provider->courses($college, $id); }); SessionTracer::leave('internship.courses', $correlationId, $started, 'success'); return $result; } catch (\Throwable $exception) { SessionTracer::exception('internship.courses', $correlationId, $started, 'academic_provider_unexpected', $exception); throw $exception; }
 
     }
     public function colleges(){
-        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
-        $colleges = json_decode($api->fetch_colleges(),true);
-
-        return response()->json($colleges, 200);
+        $started = microtime(true); $correlationId = SessionTracer::id(); SessionTracer::enter('internship.colleges', $correlationId, array('mode' => config('academic.mode'))); try { $result = $this->catalogResponse('colleges', function ($id) { return $this->provider->colleges($id); }); SessionTracer::leave('internship.colleges', $correlationId, $started, 'success'); return $result; } catch (\Throwable $exception) { SessionTracer::exception('internship.colleges', $correlationId, $started, 'academic_provider_unexpected', $exception); throw $exception; }
 
     }
     public function semesters(){
-        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
-        $semesters = json_decode($api->fetch_semester(),true);
-
-        return response()->json($semesters, 200);
+        $started = microtime(true); $correlationId = SessionTracer::id(); SessionTracer::enter('internship.semesters', $correlationId, array('mode' => config('academic.mode'))); try { $result = $this->catalogResponse('semesters', function ($id) { return $this->provider->semesters($id); }); SessionTracer::leave('internship.semesters', $correlationId, $started, 'success'); return $result; } catch (\Throwable $exception) { SessionTracer::exception('internship.semesters', $correlationId, $started, 'academic_provider_unexpected', $exception); throw $exception; }
 
     }
     public function campuses(){
-        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
-        $campuses = json_decode($api->fetch_campuses(),true);
-
-        return response()->json($campuses, 200);
+        $started = microtime(true); $correlationId = SessionTracer::id(); SessionTracer::enter('internship.campuses', $correlationId, array('mode' => config('academic.mode'))); try { $result = $this->catalogResponse('campuses', function ($id) { return $this->provider->campuses($id); }); SessionTracer::leave('internship.campuses', $correlationId, $started, 'success'); return $result; } catch (\Throwable $exception) { SessionTracer::exception('internship.campuses', $correlationId, $started, 'academic_provider_unexpected', $exception); throw $exception; }
 
     }
     public function schoolyears(){
-        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
-        $schoolyears = json_decode($api->fetch_schoolyear(),true);
+        $started = microtime(true); $correlationId = SessionTracer::id(); SessionTracer::enter('internship.schoolyears', $correlationId, array('mode' => config('academic.mode'))); try { $result = $this->catalogResponse('schoolyears', function ($id) { return $this->provider->schoolYears($id); }); SessionTracer::leave('internship.schoolyears', $correlationId, $started, 'success'); return $result; } catch (\Throwable $exception) { SessionTracer::exception('internship.schoolyears', $correlationId, $started, 'academic_provider_unexpected', $exception); throw $exception; }
 
-        return response()->json($schoolyears, 200);
+    }
 
+    protected function catalogResponse($operation, callable $callback)
+    {
+        $correlationId = SessionTracer::id();
+        $started = microtime(true);
+        SessionTracer::enter('internship.catalog.' . $operation, $correlationId, array('mode' => config('academic.mode')));
+        try {
+            $result = call_user_func($callback, $correlationId);
+            SessionTracer::leave('internship.catalog.' . $operation, $correlationId, $started, 'success');
+            return response()->json($result, 200);
+        } catch (\Throwable $exception) {
+            $category = $exception instanceof \App\Exceptions\AcademicProviderException ? $exception->category() : 'academic_provider_unexpected';
+            SessionTracer::exception('internship.catalog.' . $operation, $correlationId, $started, $category, $exception);
+            throw $exception;
+        }
     }
     public function index()
     {
@@ -96,6 +110,9 @@ class InternshipController extends Controller
 
     public function store(Request $request)
     {
+        $correlationId = SessionTracer::id($request->header('X-Correlation-ID'));
+        $started = microtime(true);
+        SessionTracer::enter('internship.store', $correlationId, array('mode' => config('academic.mode')));
         $request->validate([
             'user_id' => 'required|max:255',
             'company_id' => 'required|max:255',
@@ -104,19 +121,22 @@ class InternshipController extends Controller
 
         $user = \Auth::user();
         
-        $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
-        $schoolyears = json_decode($api->fetch_schoolyear(),true);
-        $semesters = json_decode($api->fetch_semester(),true);
-        krsort($semesters);
-        foreach ($schoolyears as $sy) {
-            # code...
-            foreach ($semesters as $sem) {
-                $user_enrollment_record = json_decode($api->fetch_enrollment_records($sy,$sem,$user->sr_code),true);
-                if ($user_enrollment_record) {
-                    break 2;
+        try {
+            $schoolyears = $this->provider->schoolYears($correlationId);
+            $semesters = $this->provider->semesters($correlationId);
+            krsort($semesters);
+            foreach ($schoolyears as $sy) {
+                foreach ($semesters as $sem) {
+                    $user_enrollment_record = $this->provider->enrollmentRecords($sy, $sem, $user->sr_code, $correlationId);
+                    if ($user_enrollment_record) {
+                        break 2;
+                    }
                 }
             }
-
+        } catch (\Throwable $exception) {
+            $category = $exception instanceof \App\Exceptions\AcademicProviderException ? $exception->category() : 'academic_provider_unexpected';
+            SessionTracer::exception('internship.store', $correlationId, $started, $category, $exception);
+            throw $exception;
         }
 
         $internship = Internship::create($request->all());
@@ -142,9 +162,11 @@ class InternshipController extends Controller
 
         
 
-        return (new InternshipResource($internship))
+        $response = (new InternshipResource($internship))
                 ->response()
                 ->setStatusCode(201);
+        SessionTracer::leave('internship.store', $correlationId, $started, 'success');
+        return $response;
     
     }
 

@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Classes\batsu_api;
+use App\Support\SessionTracer;
 
 class HomeController extends Controller
 {
+    /* fix-10032026-Maurice: remove legacy credential-bearing provider code from dashboard. */
     /**
      * Create a new controller instance.
      *
@@ -14,7 +15,14 @@ class HomeController extends Controller
      */
     public function __construct()
     {
+        SessionTracer::enter('home.controller.construct', 'startup', array('mode' => 'application'));
+        try {
         $this->middleware('auth');
+        SessionTracer::leave('home.controller.construct', 'startup', microtime(true), 'success');
+        } catch (\Throwable $exception) {
+            SessionTracer::exception('home.controller.construct', 'startup', microtime(true), 'home_unexpected', $exception);
+            throw $exception;
+        }
     }
 
     /**
@@ -24,24 +32,17 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $started = microtime(true);
+        $correlationId = SessionTracer::id();
+        SessionTracer::enter('home.index', $correlationId, array('mode' => 'application'));
+        try {
         $user = \Auth::user();
-        // $api = new batsu_api('02f56c7e26b713ab877cff2fc5c3ea8a');
-        // $schoolyears = json_decode($api->fetch_schoolyear(),true);
-        // $semesters = json_decode($api->fetch_semester(),true);
-        // krsort($semesters);
-        // foreach ($schoolyears as $sy) {
-        //     # code...
-        //     foreach ($semesters as $sem) {
-        //         $user_enrollment_record = json_decode($api->fetch_enrollment_records($sy,$sem,'18-04852'),true);
-        //         if ($user_enrollment_record) {
-        //             break;
-        //         }
-        //     }
-
-        // }
-        
-
-        
-        return view('home',['user'=>$user]);
+        $view = view('home',['user'=>$user]);
+        SessionTracer::leave('home.index', $correlationId, $started, 'success');
+        return $view;
+        } catch (\Throwable $exception) {
+            SessionTracer::exception('home.index', $correlationId, $started, 'home_unexpected', $exception);
+            throw $exception;
+        }
     }
 }
