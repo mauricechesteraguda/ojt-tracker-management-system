@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Support\SessionTracer;
 
 class Internship extends Model
 {
@@ -39,5 +40,11 @@ class Internship extends Model
     public function cluster()
     {
         return $this->belongsTo('App\Cluster');
+    }
+    public function lifecycleEvents()
+    {
+        $started = microtime(true); $cid = SessionTracer::id(); SessionTracer::enter('internship.lifecycle_events.relationship', $cid, array('resource_type' => 'internship', 'resource_id' => (string) $this->id));
+        try { /* catch (?Throwable $trace contract */ $result = $this->hasMany('App\InternshipLifecycleEvent')->orderBy('created_at', 'ASC')->orderBy('id', 'ASC'); SessionTracer::leave('internship.lifecycle_events.relationship', $cid, $started, 'success', array('resource_type' => 'internship', 'resource_id' => (string) $this->id)); return $result; }
+        catch (\Throwable $exception) { SessionTracer::exception('internship.lifecycle_events.relationship', $cid, $started, 'internship_model_unexpected', $exception); throw $exception; }
     }
 }

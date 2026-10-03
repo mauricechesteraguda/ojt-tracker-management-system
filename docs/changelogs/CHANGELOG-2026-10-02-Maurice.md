@@ -6,6 +6,7 @@
 - Tightened Ticket 06 report review validation, active-placement 404 boundaries, and requirement lazy-generation scoping (feature/fix-10032026-Maurice).
 
 - Added Ticket 07 shared authenticated internship reporting JSON/PDF service, deterministic PII-minimized rendering, filter validation, and safe rendering errors (feature/fix-10032026-Maurice).
+- Added Ticket 08 transactional approve/reopen lifecycle service, immutable numeric audit events, approved-only reporting, correction immutability, and lifecycle event reads (feature/fix-10042026-Maurice).
 
 - Added Ticket 04 fail-closed academic provider boundary, deterministic fake profile API, explicit real adapter configuration, safe provider errors, bounded transport settings, and registration/internship provider injection.
 - Added Ticket 03 local fake-provider bootstrap/reset executables, idempotent synthetic fixture seeding, Passport initialization, safe inspection/auth contracts, and persistent runtime startup wiring.

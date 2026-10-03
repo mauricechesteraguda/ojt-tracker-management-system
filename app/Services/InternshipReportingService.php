@@ -19,7 +19,8 @@ class InternshipReportingService
             $errors = array(); $result = array();
             foreach ($this->filters as $key) {
                 $value = $request->input($key);
-                if (!is_string($value) || $value === '' || strlen($value) > 100 || !preg_match('/^[A-Za-z0-9 _-]+$/D', $value)) { $errors[$key] = 'The '.$key.' filter is invalid.'; }
+                /* feature/fix-10042026-Maurice: an omitted filter set means all approved records; supplied filters remain strict. */
+                if ($value !== null && (!is_string($value) || $value === '' || strlen($value) > 100 || !preg_match('/^[A-Za-z0-9 _-]+$/D', $value))) { $errors[$key] = 'The '.$key.' filter is invalid.'; }
                 $result[$key] = $value;
             }
             foreach (array('page' => 1, 'per_page' => 15) as $key => $default) {
@@ -38,7 +39,8 @@ class InternshipReportingService
         $started = microtime(true); $cid = SessionTracer::id($request->header('X-Correlation-ID')); SessionTracer::enter('internship.reporting.query', $cid, array('resource_type' => 'internship'));
         try { /* catch (?Throwable $trace contract */
             $user = $request->user();
-            $query = Internship::with(array('user', 'company'))->where('internships.is_deleted', '0')->where('campus', $filters['campus'])->where('schoolyear', $filters['schoolyear'])->where('semester', $filters['semester'])->where('college_code', $filters['college'])->where('course_code', $filters['course']);
+            $query = Internship::with(array('user', 'company'))->where('internships.is_deleted', '0')->where('internships.is_approved', '1');
+            foreach (array('campus' => 'campus', 'schoolyear' => 'schoolyear', 'semester' => 'semester', 'college' => 'college_code', 'course' => 'course_code') as $filter => $column) { if ($filters[$filter] !== null) $query->where($column, $filters[$filter]); }
             if (!$user || !in_array((string) $user->role, array('student', 'coordinator', 'superuser'), true)) { $query->where('internships.user_id', -1); }
             elseif ($user->role === 'student') { $query->where('internships.user_id', (int) $user->id); }
             $result = $query->join('users', 'users.id', '=', 'internships.user_id')->orderBy('users.first_name', 'asc')->orderBy('users.last_name', 'asc')->orderBy('internships.id', 'asc')->select('internships.*')->paginate($filters['per_page'], array('internships.*'), 'page', $filters['page']);

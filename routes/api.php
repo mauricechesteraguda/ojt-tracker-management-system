@@ -54,6 +54,10 @@ Route::post('/internships/report/pdf', 'InternshipReportingController@pdf')->mid
 Route::match(array('GET'), '/internships/{id}', 'InternshipController@show');
 Route::post('/internships/{id}', 'InternshipController@update');
 Route::post('/internships/{id}/approve', 'InternshipController@approve')->middleware('role:coordinator,superuser');
+Route::post('/internships/{id}/reopen', 'InternshipController@reopen')->middleware('role:coordinator,superuser');
+Route::match(array('GET'), '/internships/{id}/lifecycle-events', 'InternshipController@lifecycleEvents');
+/* feature/fix-10042026-Maurice: retained short alias for existing clients. */
+Route::match(array('GET'), '/internships/{id}/events', 'InternshipController@lifecycleEvents');
 Route::post('/internships/clusters/companies/{id}', 'InternshipController@visit_company');
 Route::post('/internships', 'InternshipController@store');
 Route::delete('/internships/{id}', 'InternshipController@delete');

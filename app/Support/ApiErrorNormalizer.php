@@ -11,7 +11,7 @@ class ApiErrorNormalizer
         $id = SessionTracer::id($correlationId ?: $request->header('X-Correlation-ID'));
         SessionTracer::enter('api.error.normalize', $id, array('resource_type' => 'api', 'status' => (int) $status));
         try {
-            $message = $status === 401 ? 'Unauthenticated.' : ($status === 403 ? 'Forbidden.' : ($status === 404 ? 'Not found.' : 'Invalid request.'));
+            $message = $status === 401 ? 'Unauthenticated.' : ($status === 403 ? 'Forbidden.' : ($status === 404 ? 'Not found.' : ($status === 409 ? 'Conflict.' : 'Invalid request.')));
             $response = self::jsonResponse(array('error' => array('code' => $code, 'message' => $message), 'correlation_id' => $id), $status);
             SessionTracer::leave('api.error.normalize', $id, $started, 'success', array('resource_type' => 'api'));
             return $response;

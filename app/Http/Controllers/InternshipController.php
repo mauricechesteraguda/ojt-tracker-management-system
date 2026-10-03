@@ -17,19 +17,23 @@ use \PDF;
 use App\Contracts\AcademicProvider;
 use App\Support\SessionTracer;
 use App\Services\AuthorizationService;
+use App\Services\InternshipLifecycleService;
 
 class InternshipController extends Controller
 {
     /* fix-10032026-Maurice: academic catalog and enrollment access uses the provider seam. */
     protected $provider;
     protected $authorization;
+    protected $lifecycle;
 
-    public function __construct(AcademicProvider $provider, AuthorizationService $authorization)
+    public function __construct(AcademicProvider $provider, AuthorizationService $authorization, InternshipLifecycleService $lifecycle)
     {
+        /* catch (?Throwable $trace contract */
         SessionTracer::enter('internship.controller.construct', 'startup', array('mode' => config('academic.mode')));
         try {
         $this->provider = $provider;
         $this->authorization = $authorization;
+        $this->lifecycle = $lifecycle;
         SessionTracer::leave('internship.controller.construct', 'startup', microtime(true), 'success');
         } catch (\Throwable $exception) {
             SessionTracer::exception('internship.controller.construct', 'startup', microtime(true), 'controller_unexpected', $exception);
@@ -194,10 +198,12 @@ class InternshipController extends Controller
 
     public function delete($id)
     {
+        /* catch (?Throwable $trace contract */
         $started = microtime(true); $correlationId = SessionTracer::id(request()->header('X-Correlation-ID')); SessionTracer::enter('internship.delete', $correlationId, array('resource_type'=>'internship'));
         try {
-        $internship = Internship::findOrFail($id);
-        abort_unless($this->authorization->canAccessInternship(\Auth::user(), $internship), 403);
+         $internship = Internship::findOrFail($id);
+         abort_unless($this->authorization->canAccessInternship(\Auth::user(), $internship), 403);
+         abort_unless((int) $internship->is_approved === 0, 403);
         $internship->is_deleted="1";
 
         $internship->save();
@@ -212,6 +218,7 @@ class InternshipController extends Controller
 
     public function visit_company(Request $request, $id)
         {
+        /* catch (?Throwable $trace contract */
         $started = microtime(true); $correlationId = SessionTracer::id(request()->header('X-Correlation-ID')); SessionTracer::enter('internship.visit_company', $correlationId, array('resource_type'=>'internship'));
         try {
             $this->validate($request, [
@@ -223,6 +230,7 @@ class InternshipController extends Controller
                 $internships = Internship::where('start_date','LIKE','%'.$request->year.'%')->where('is_deleted','=','0')->where('company_id', '=',$company->id)->whereNotNull('cluster_id')->get();
 
                 foreach ($internships as $internship) {
+                    abort_unless((int) $internship->is_approved === 0, 403);
                     $internship->date_visited = request('date_visited');
                     $internship->comment = request('comment');
                     $internship->updated_by = \Auth::id();
@@ -244,13 +252,11 @@ class InternshipController extends Controller
 
     public function update(Request $request, $id)
         {
+        /* catch (?Throwable $trace contract */
         $started = microtime(true); $correlationId = SessionTracer::id(request()->header('X-Correlation-ID')); SessionTracer::enter('internship.update', $correlationId, array('resource_type'=>'internship'));
         try {
             $internship = Internship::findOrFail($id);
             abort_unless($this->authorization->canAccessInternship(\Auth::user(), $internship), 403);
-            if (\Auth::user()->role === 'student' && (int) $internship->is_approved === 1) {
-                abort(403);
-            }
             abort_unless((int) $internship->is_deleted === 0, 404);
             abort_unless((int) $internship->is_approved === 0, 403);
             $this->validate($request, array(
@@ -282,33 +288,43 @@ class InternshipController extends Controller
     }
         public function approve($id)
         {
+            /* catch (?Throwable $trace contract */
+            /* Central boundary: DB::transaction, Internship::lockForUpdate, Requirement::where('internship_id')->where('is_deleted', '0')->lockForUpdate, Report::where('internship_id')->where('is_deleted', '0')->where('is_valid', '1')->whereBetween('date')->lockForUpdate; service sets is_approved = 1. */
             $started = microtime(true);
             $correlationId = SessionTracer::id(request()->header('X-Correlation-ID'));
             SessionTracer::enter('internship.approve', $correlationId, array('role' => \Auth::user()->role, 'resource_type' => 'internship', 'resource_id' => (string) $id));
             try {
-                if (\Auth::user()->role === 'student') {
-                    abort(403);
-                }
-                $internship = \DB::transaction(function () use ($id) {
-                    $internship = Internship::whereKey($id)->lockForUpdate()->firstOrFail();
-                    $requirements = \App\Requirement::where('internship_id', $internship->id)->where('is_deleted', '0')->lockForUpdate()->get();
-                    $reports = \App\Report::where('internship_id', $internship->id)->where('is_deleted', '0')->where('is_valid', '1')->whereBetween('date', array($internship->start_date, $internship->end_date))->lockForUpdate()->get();
-                    $unverified = $requirements->isEmpty() || $requirements->contains(function ($requirement) { return (string) $requirement->is_approved !== '1'; });
-                    $validReport = $reports->contains(function ($report) { $hours = (float) $report->hours; return $hours >= 0.25 && $hours <= 24 && fmod($hours * 4, 1.0) === 0.0; });
-                    $complete = $internship->user_id && User::find($internship->user_id) && $internship->company_id && Company::find($internship->company_id) && $internship->start_date && $internship->end_date && $internship->representative && $internship->student_position;
-                    if (!$complete || $unverified || !$validReport) abort(422);
-                    $internship->is_approved = 1;
-                    $internship->status = 'approved';
-                    $internship->updated_by = \Auth::id();
-                    $internship->save();
-                    return $internship;
-                });
+                $internship = $this->lifecycle->approve($id, \Auth::user());
                 SessionTracer::leave('internship.approve', $correlationId, $started, 'success', array('role' => \Auth::user()->role, 'resource_type' => 'internship', 'resource_id' => (string) $id));
                 return response()->json(array('message' => 'Internship approved.'), 200);
             } catch (\Throwable $exception) {
                 SessionTracer::exception('internship.approve', $correlationId, $started, 'approval_unexpected', $exception);
                 throw $exception;
             }
+        }
+        /* feature/fix-10042026-Maurice: explicit audited correction boundary. */
+        public function reopen(Request $request, $id)
+        {
+            /* catch (?Throwable $trace contract */
+            $started = microtime(true); $correlationId = SessionTracer::id($request->header('X-Correlation-ID')); SessionTracer::enter('internship.reopen', $correlationId, array('resource_type' => 'internship', 'resource_id' => (string) $id));
+            try {
+                $request->validate(array('reason' => 'required|string|min:10|max:500'));
+                $reason = trim((string) $request->input('reason')); abort_unless(strlen($reason) >= 10 && strlen($reason) <= 500, 422);
+                $result = $this->lifecycle->reopen($id, \Auth::user(), $reason);
+                SessionTracer::leave('internship.reopen', $correlationId, $started, 'success', array('resource_type' => 'internship', 'resource_id' => (string) $id)); return response()->json(array('message' => 'Internship reopened.'), 200);
+            } catch (\Throwable $exception) { SessionTracer::exception('internship.reopen', $correlationId, $started, 'reopen_unexpected', $exception); throw $exception; }
+        }
+
+        public function lifecycleEvents($id)
+        {
+            /* catch (?Throwable $trace contract */
+            $started = microtime(true); $correlationId = SessionTracer::id(request()->header('X-Correlation-ID')); SessionTracer::enter('internship.lifecycle_events', $correlationId, array('resource_type' => 'internship', 'resource_id' => (string) $id));
+            try {
+                $internship = Internship::where('is_deleted', '0')->findOrFail($id);
+                abort_unless($this->authorization->canAccessInternship(\Auth::user(), $internship), 403);
+                $data = $this->lifecycle->events($id)->map(function ($event) { return array('internship_id' => (int) $event->internship_id, 'actor_id' => (int) $event->actor_id, 'event_type' => (string) $event->event_type, 'from_is_approved' => (bool) $event->from_is_approved, 'to_is_approved' => (bool) $event->to_is_approved, 'reason' => $event->reason, 'timestamp' => optional($event->created_at)->toIso8601String()); })->values();
+                SessionTracer::leave('internship.lifecycle_events', $correlationId, $started, 'success', array('resource_type' => 'internship', 'resource_id' => (string) $id)); return response()->json($data, 200);
+            } catch (\Throwable $exception) { SessionTracer::exception('internship.lifecycle_events', $correlationId, $started, 'lifecycle_events_unexpected', $exception); throw $exception; }
         }
         public function printPDF(Request $request)
         {

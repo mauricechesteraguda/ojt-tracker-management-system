@@ -53,11 +53,12 @@ class Handler extends ExceptionHandler
     {
         $started = microtime(true); $correlationId = SessionTracer::id($request->header('X-Correlation-ID')); SessionTracer::enter('exception.handler.render', $correlationId, array('resource_type' => 'api'));
         try {
+            /* catch (?Throwable $trace contract */
             if ($request->expectsJson() || $request->is('api/*')) {
                 $prepared = $this->prepareException($exception);
                 $status = $this->isHttpException($prepared) ? (int) $prepared->getStatusCode() : ($prepared instanceof AuthenticationException ? 401 : ($prepared instanceof ModelNotFoundException ? 404 : ($prepared instanceof ValidationException ? 422 : 500)));
-                if (in_array($status, array(401, 403, 404, 422), true)) {
-                    $result = ApiErrorNormalizer::response($request, $status, $status === 422 ? 'validation_error' : ($status === 404 ? 'not_found' : ($status === 403 ? 'forbidden' : 'unauthenticated')));
+                if (in_array($status, array(401, 403, 404, 409, 422), true)) {
+                    $result = ApiErrorNormalizer::response($request, $status, $status === 422 ? 'validation_error' : ($status === 409 ? 'conflict' : ($status === 404 ? 'not_found' : ($status === 403 ? 'forbidden' : 'unauthenticated'))));
                     SessionTracer::leave('exception.handler.render', $correlationId, $started, 'safe_api_error', array('resource_type' => 'api', 'status' => $status)); return $result;
                 }
             }
