@@ -1,4 +1,4 @@
-# OJT Tracker Management System - DEMO Only
+# OJT Tracker Management System
 
 ## Project Overview
 
