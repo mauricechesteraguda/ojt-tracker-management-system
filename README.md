@@ -108,12 +108,12 @@ sequenceDiagram
 
 ## Sample Screenshots
 
-These screenshots show selected current application surfaces without embedding demo credentials, tokens, or personal data; they are not proof of the entire happy flow.
+These screenshots show visible application pages without embedding demo credentials, tokens, or personal data; they are not proof of the entire happy flow.
 
-| Login | Student dashboard | Coordinator dashboard |
+| Login | Student internship page | Coordinator company page |
 | --- | --- | --- |
-| ![OJT Tracker login screen](docs/screenshots/login.png) | ![OJT Tracker student dashboard](docs/screenshots/student-dashboard.png) | ![OJT Tracker coordinator dashboard](docs/screenshots/coordinator-dashboard.png) |
-| Authentication entry point. | Student dashboard surface. | Coordinator/reviewer dashboard surface. |
+| ![OJT Tracker login screen](docs/screenshots/login.png) | ![Student internship page](docs/screenshots/student-internships.png) | ![Coordinator company page](docs/screenshots/coordinator-companies.png) |
+| Authentication entry point. | Student internship page showing the placement/evidence surface. | Coordinator company page showing the company management surface. |
 
 ## Quick Start with Docker Compose
 

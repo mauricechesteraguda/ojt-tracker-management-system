@@ -14,6 +14,6 @@
 - Added Ticket 1 OJT lifecycle stabilization requirements and acceptance boundaries.
 - Added the traceable, not-run OJT lifecycle stabilization CSV.
 - Added the evidence-led current baseline, risks, coverage summary, and open questions.
-- Docs-only: updated the README with verified capabilities, current Laravel monolith structure, route/auth boundaries, deterministic local demo accounts, and Compose readiness semantics; preserved the Mermaid and screenshot sections.
+- Docs-only: updated the README with verified capabilities, current Laravel monolith structure, route/auth boundaries, deterministic local demo accounts, Compose readiness semantics, and screenshots of the login, student internship (placement/evidence), and coordinator company (company management) pages; preserved the Mermaid sections.
 
 Author Name: Aguda, Maurice
