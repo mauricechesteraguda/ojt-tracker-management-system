@@ -60,8 +60,8 @@ Route::get('/internships/search/{value}', 'InternshipController@search');
 
 Route::get('/descriptions', 'DescriptionController@index');
 Route::get('/descriptions/internship/{id}', 'DescriptionController@by_internship_id');
-// Route::get('/descriptions/{id}', 'DescriptionController@show');
-// Route::post('/descriptions/{id}', 'DescriptionController@update');
+/* feature-10032026-Maurice: authenticated, ownership-checked evidence resources. */
+Route::get('/descriptions/{id}', 'DescriptionController@show');
 Route::post('/descriptions', 'DescriptionController@store');
 Route::post('/descriptions/{id}', 'DescriptionController@update');
 Route::delete('/descriptions/{id}', 'DescriptionController@delete');
@@ -83,7 +83,7 @@ Route::get('/requirements/search/{value}/internship/{id}', 'RequirementControlle
 
 Route::get('/reports', 'ReportController@index');
 Route::get('/reports/internship/{id}', 'ReportController@by_internship_id');
-// Route::get('/reports/{id}', 'ReportController@show');
+Route::get('/reports/{id}', 'ReportController@show');
 Route::post('/reports/{id}', 'ReportController@update');
 Route::post('/reports', 'ReportController@store');
 Route::delete('/reports/{id}', 'ReportController@delete');

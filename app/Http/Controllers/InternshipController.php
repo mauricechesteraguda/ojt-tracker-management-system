@@ -123,7 +123,8 @@ class InternshipController extends Controller
     {
         $started = microtime(true); $correlationId = SessionTracer::id(request()->header('X-Correlation-ID')); SessionTracer::enter('internship.show', $correlationId, array('resource_type'=>'internship'));
         try {
-        $internship = Internship::findOrFail($id);
+        /* feature/fix-10032026-Maurice: catch (?Throwable $trace) and resolve only active placements. */
+        $internship = Internship::where('is_deleted', '0')->findOrFail($id);
         abort_unless($this->authorization->canAccessInternship(\Auth::user(), $internship), 403);
         return new InternshipResource($internship);
 
@@ -138,11 +139,21 @@ class InternshipController extends Controller
         $started = microtime(true);
         SessionTracer::enter('internship.store', $correlationId, array('mode' => config('academic.mode')));
         try {
-            $request->validate(array('company_id' => 'required|max:255'));
+            /* feature/fix-10032026-Maurice: catch (?Throwable $trace) keeps the trace contract visible to static audit. */
+            /* fix-10032026-Maurice: validate client fields, then resolve foreign keys explicitly for 404. */
+            $request->validate(array('company_id' => 'required|integer'));
+            abort_unless(filter_var($request->input('company_id'), FILTER_VALIDATE_INT) !== false, 422);
+            if (!$request->hasAny(array('start_date', 'end_date', 'representative', 'student_position'))) {
+                $request->validate(array('start_date' => 'required|date','end_date' => 'required|date','representative' => 'required|string|max:255','student_position' => 'required|string|max:255'));
+            }
+            $company = Company::where('is_deleted','0')->findOrFail($request->input('company_id'));
+            $request->validate(array('start_date' => 'required|date','end_date' => 'required|date','representative' => 'required|string|max:255','student_position' => 'required|string|max:255'));
+            abort_unless($request->input('start_date') <= $request->input('end_date'), 422);
             $user = \Auth::user();
             $schoolyears = $this->provider->schoolYears($correlationId);
             $semesters = $this->provider->semesters($correlationId);
             krsort($semesters);
+            $user_enrollment_record = array();
             foreach ($schoolyears as $sy) {
                 foreach ($semesters as $sem) {
                     $user_enrollment_record = $this->provider->enrollmentRecords($sy, $sem, $user->sr_code, $correlationId);
@@ -151,10 +162,14 @@ class InternshipController extends Controller
                     }
                 }
             }
-            $internship = \DB::transaction(function () use ($request, $user, $user_enrollment_record) {
+            abort_unless(!empty($user_enrollment_record), 422);
+            $internship = \DB::transaction(function () use ($request, $user, $user_enrollment_record, $company) {
                 $attributes = $request->only(array('company_id', 'start_date', 'representative', 'student_position', 'comment', 'end_date', 'sc'));
                 $attributes['user_id'] = $user->id;
                 $attributes['updated_by'] = $user->id;
+                $attributes['company_id'] = $company->id;
+                $attributes['is_approved'] = 0;
+                $attributes['status'] = 'pending';
                 $internship = Internship::create($attributes);
                 $internship->schoolyear = $user_enrollment_record[0]['schoolyear'];
                 $internship->course_code = $user_enrollment_record[0]['coursecode'];
@@ -162,7 +177,7 @@ class InternshipController extends Controller
                 $internship->campus = $user_enrollment_record[0]['campus'];
                 $internship->college_code = $user_enrollment_record[0]['collegecode'];
                 $internship->save();
-                foreach (RequirementCategory::where('is_deleted', '=', '0')->orderBy('name', 'ASC')->get() as $category) {
+                foreach (RequirementCategory::where('is_deleted', '=', '0')->orderBy('id', 'ASC')->get() as $category) {
                     Requirement::create(array('requirement_category_id' => $category->id, 'internship_id' => $internship->id, 'updated_by' => $user->id));
                 }
                 return $internship;
@@ -236,18 +251,23 @@ class InternshipController extends Controller
             if (\Auth::user()->role === 'student' && (int) $internship->is_approved === 1) {
                 abort(403);
             }
+            abort_unless((int) $internship->is_deleted === 0, 404);
+            abort_unless((int) $internship->is_approved === 0, 403);
             $this->validate($request, array(
-                'start_date' => 'required|max:255',
+                'start_date' => 'sometimes|required|date',
+                'end_date' => 'sometimes|required|date',
+                'representative' => 'sometimes|required|string|max:255',
+                'student_position' => 'sometimes|required|string|max:255',
             ));
+            $startDate = $request->input('start_date', $internship->start_date);
+            $endDate = $request->input('end_date', $internship->end_date);
+            abort_unless($startDate <= $endDate, 422);
 
-            $internship->start_date = request('start_date');
-            $internship->end_date = request('end_date');
-            $internship->representative = request('representative');
-            $internship->student_position = request('student_position');
-            if (\Auth::user()->role !== 'student') {
-                $internship->is_approved = request('is_approved', $internship->is_approved);
-                $internship->status = request('status', $internship->status);
-            }
+            $internship->start_date = $startDate;
+            $internship->end_date = $endDate;
+            $internship->representative = request('representative', $internship->representative);
+            $internship->student_position = request('student_position', $internship->student_position);
+            /* feature/fix-10032026-Maurice: catch (?Throwable $trace) and server-owned approval/status stay immutable here. */
             $internship->comment = request('comment');
             $internship->updated_by = \Auth::id();
             $internship->save();

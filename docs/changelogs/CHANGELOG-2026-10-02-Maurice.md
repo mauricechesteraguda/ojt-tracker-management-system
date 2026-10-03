@@ -1,6 +1,9 @@
 # Changelog — 2026-10-03
 
 - Added Ticket 05 backend role fail-closed authorization, ownership policy seams, safe API errors, scoped internship search, and transactional cluster detachment.
+- Added Ticket 06 authenticated placement/evidence ownership checks, atomic active-category requirements, strict validation, paginated evidence resources, and approval immutability (feature/fix-10032026-Maurice).
+- Fixed Ticket 06 fake enrollment fixtures for synthetic users, company validation status boundaries, legacy boolean normalization, and the probe container URL propagation; preserved staff report review boundaries (test-10032026-Maurice).
+- Tightened Ticket 06 report review validation, active-placement 404 boundaries, and requirement lazy-generation scoping (feature/fix-10032026-Maurice).
 
 - Added Ticket 04 fail-closed academic provider boundary, deterministic fake profile API, explicit real adapter configuration, safe provider errors, bounded transport settings, and registration/internship provider injection.
 - Added Ticket 03 local fake-provider bootstrap/reset executables, idempotent synthetic fixture seeding, Passport initialization, safe inspection/auth contracts, and persistent runtime startup wiring.

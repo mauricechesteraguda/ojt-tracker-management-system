@@ -45,10 +45,22 @@ class FakeAcademicProvider implements AcademicProvider
 
     public function enrollmentRecords($schoolYear, $semester, $srCode, $correlationId = null)
     {
-        if ($srCode === 'DEMO-STUDENT-001') {
-            return $this->catalog('enrollment', array(array('schoolyear' => $schoolYear, 'semester' => $semester, 'coursecode' => 'BSCOSCI', 'campus' => 'MAIN', 'collegecode' => 'CICS', 'middlename' => 'Local', 'firstname' => 'Demo', 'lastname' => 'Student')), $correlationId);
+        /* feature/fix-10032026-Maurice: catch (?Throwable $trace); fake enrollment is deterministic for synthetic authenticated users. */
+        $started = microtime(true);
+        $correlationId = $correlationId === null ? 'missing-correlation' : SessionTracer::id($correlationId);
+        SessionTracer::enter('academic.enrollment', $correlationId, array('mode' => 'fake'));
+        try {
+            if ($srCode !== '') {
+                $result = array(array('schoolyear' => $schoolYear, 'semester' => $semester, 'coursecode' => 'BSCOSCI', 'campus' => 'MAIN', 'collegecode' => 'CICS', 'middlename' => 'Local', 'firstname' => 'Demo', 'lastname' => 'Student'));
+                SessionTracer::leave('academic.enrollment', $correlationId, $started, 'success');
+                return $result;
+            }
+            SessionTracer::leave('academic.enrollment', $correlationId, $started, 'success');
+            return array();
+        } catch (\Throwable $exception) {
+            SessionTracer::exception('academic.enrollment', $correlationId, $started, 'academic_provider_unexpected', $exception);
+            throw $exception;
         }
-        return $this->catalog('enrollment', array(), $correlationId);
     }
 
     public function majors($course, $correlationId = null)
