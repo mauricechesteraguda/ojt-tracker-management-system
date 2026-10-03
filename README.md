@@ -2,157 +2,173 @@
 
 ## Project Overview
 
-This repository contains the OJT Tracker Management System, a research project designed to streamline the tracking and management of On-the-Job Training (OJT) activities for college students at a University. This system facilitates the monitoring, reporting, and evaluation of OJT performances for both students and supervisors, helping maintain an organized and efficient workflow throughout the OJT program.
-Key Features
+This repository contains a Laravel monolith for tracking college On-the-Job Training (OJT) placements.
 
-    Student Management: Manage student profiles, OJT schedules, and track progress.
-    Supervisor Access: Allow supervisors to review and update students' performance, attendance, and provide feedback.
-    Task & Report Submission: Enables students to submit tasks, progress reports, and final evaluations online.
-    Evaluation System: Provide detailed evaluations for student progress and completion.
-    Notification System: Email and dashboard notifications for deadlines, reports, and evaluations.
+## Current capabilities
 
-## Tech Stack
+- Role-based student, coordinator, and superuser access.
+- Placement creation with automatic active requirements.
+- Placement descriptions and reports, with authorization and ownership checks.
+- Coordinator/superuser verification and validation, transactional approval, and reopen audit events.
+- Approved-only internship reporting in JSON and PDF with shared filtering.
+- A deterministic fake academic provider for local use; a real provider is explicit opt-in.
 
-## Frontend:
+## Architecture & Tech Stack
 
-    CoreUI (ReactJS): The frontend of the system is built using CoreUI for React, a powerful open-source dashboard template for React.js. It provides an intuitive user interface with a modern and responsive design.
-    React Router: For routing and managing the various views and states of the application.
-    Axios: For handling HTTP requests between the frontend and backend.
+This is a portfolio view of the current, tested deployment shape. It documents **legacy runtime stabilization**, not current supported framework modernization.
 
-## Backend:
+**Project status:** Legacy stabilization with a tested local Compose contract; modernization and sealed final acceptance remain later milestones.
 
-    Laravel: The backend is developed using Laravel, a PHP framework that provides a robust API for managing student data, evaluations, and tasks. It also handles authentication and manages database operations using Eloquent ORM.
+| Area | Current stack / boundary |
+| --- | --- |
+| Frontend | React 16 with CoreUI and bundled static assets |
+| Web/runtime | Nginx → PHP 7.4-FPM; Laravel 5.7 legacy stabilization |
+| Authentication | Laravel Passport |
+| Database | MariaDB 10.11 |
+| Reporting | Dompdf, with shared reporting data rendered as JSON or PDF |
+| Delivery and validation | Docker Compose and fail-fast shell contracts; screenshots were captured with Playwright |
+| Academic data | Fake academic provider by default; real provider is explicit opt-in |
 
-## Database:
+```mermaid
+flowchart LR
+    B[Browser] --> N[Nginx]
+    N --> P[PHP 7.4-FPM]
+    subgraph FN[Frontend network]
+        B
+    end
+    subgraph BN[Backend network]
+        N
+        P
+        D[(MariaDB 10.11)]
+    end
+    P --> D
+    P -. scoped app secret .-> AS[(App secret volume)]
+    D -. scoped DB secret .-> DS[(DB secret volume)]
+    P --> RV[(Runtime volume)]
+    D --> DV[(Database volume)]
+    P --> RP[Shared reporting]
+    RP --> J[JSON]
+    RP --> PDF[PDF / Dompdf]
+    P --> FP[Fake academic provider default]
+    FP -. explicit opt-in .-> Real[Real academic provider]
+```
 
-    MySQL: The system uses a MySQL database to store student data, supervisor feedback, task submissions, and evaluation results.
+## Happy Flow
 
-## Installation & Setup
+This is the tested current contract and will only become sealed after final acceptance.
 
-## Prerequisites
+```mermaid
+sequenceDiagram
+    participant Ops as Operator
+    participant Compose as Docker Compose
+    participant Browser
+    participant Web as Nginx
+    participant App as PHP-FPM
+    participant DB as MariaDB
+    participant Academic as Fake academic provider
+    participant Student
+    participant Coordinator
+    participant Report as Shared reporting
 
-## Ensure the following software is installed on your local machine:
+    Ops->>Compose: One-command start of services and health checks
+    Compose->>DB: Start MariaDB and wait for healthy status
+    Compose->>App: Start PHP-FPM after MariaDB is healthy
+    App->>DB: entrypoint/demo-bootstrap runs migrations
+    App->>DB: demo-seed initializes Passport and synthetic fixtures
+    Compose->>App: Check PHP-FPM health
+    Compose->>Web: Start Nginx and check /healthz and /login
+    Student->>Web: Log in with seeded student account
+    Web->>App: Forward application request
+    App->>Academic: Fetch academic profile
+    Academic-->>App: Return deterministic fake profile
+    Student->>Web: Create placement
+    Web->>App: Forward placement request
+    App->>DB: Transaction: placement + automatic requirements
+    DB-->>App: Commit active placement
+    Student->>Web: Submit evidence
+    Web->>App: Forward evidence request
+    Coordinator->>Web: Verify evidence and validate report
+    Web->>App: Forward review request
+    Coordinator->>Web: Approve placement
+    Web->>App: Forward approval request
+    App->>DB: Lock approval and append audit event
+    Coordinator->>Report: Request approved-only filtered report
+    Report-->>Coordinator: JSON and PDF with parity
+    alt Correction required
+        Coordinator->>Web: Reopen with correction reason
+        Web->>App: Forward reopen request
+        App->>DB: Record reopen audit event
+        Student->>Web: Correct and resubmit evidence
+        Web->>App: Forward correction request
+        Coordinator->>Web: Reverify and reapprove
+        Web->>App: Forward reapproval request
+        App->>DB: Lock reapproval and append audit event
+    end
+```
 
-    Node.js (v14 or later)
-    Composer (for Laravel dependencies)
-    MySQL (or any supported database system)
-    PHP (v7.3 or later)
-    NPM/Yarn (for React dependencies)
+## Sample Screenshots
 
-## Backend (Laravel) Setup
+These screenshots show selected current application surfaces without embedding demo credentials, tokens, or personal data; they are not proof of the entire happy flow.
 
-Clone the repository:
+| Login | Student dashboard | Coordinator dashboard |
+| --- | --- | --- |
+| ![OJT Tracker login screen](docs/screenshots/login.png) | ![OJT Tracker student dashboard](docs/screenshots/student-dashboard.png) | ![OJT Tracker coordinator dashboard](docs/screenshots/coordinator-dashboard.png) |
+| Authentication entry point. | Student dashboard surface. | Coordinator/reviewer dashboard surface. |
 
-    
+## Quick Start with Docker Compose
 
-    git clone https://github.com/yourusername/ojt-tracker.git
-    cd ojt-tracker/backend
+Requires Docker with Compose. The default setup generates local app/database secrets and synthetic fixtures; no live provider credentials are required.
 
-## Install dependencies:
+```sh
+git clone https://github.com/mauricechesteraguda/ojt-tracker-management-system.git
+cd ojt-tracker-management-system
+docker compose up --build -d
+```
 
-    composer install
+Open the app at <http://localhost:8088>. `/healthz` is Nginx edge liveness only; it does not prove that the application is ready. Compose health checks cover MariaDB and PHP-FPM, and the Nginx check also requests `/login` for application readiness.
 
-## Set up environment:
+To reset the local synthetic demo data:
 
-Create a .env file based on .env.example:
+```sh
+docker compose exec php-fpm demo-reset
+```
 
-    cp .env.example .env
+Stop the stack cleanly with `docker compose down`; to also remove its local named volumes and generated data, use `docker compose down -v`.
 
-    Configure the database settings and other environment variables in the .env file.
+### Demo Accounts
 
-Generate the application key:
+These deterministic, synthetic accounts are local-only demo fixtures. They are non-production credentials: never reuse them in a deployed environment. `demo-reset` recreates the fixture graph deterministically. Do not log these values during validation.
 
-    php artisan key:generate
-    
-Run migrations to set up the database tables:
-
-    php artisan migrate
-
-Serve the application:
-
-    php artisan serve
-
-The backend API will now be accessible at http://localhost:8000.
-
-## Frontend (ReactJS) Setup
-
-Navigate to the frontend directory:
-    
-    cd ../frontend
-
-Install dependencies:
-
-    npm install
-
-Set up environment variables:
-
-    Create a .env file in the frontend folder.
-    Set the API URL (provided by Laravel backend):
-
-
-
-    REACT_APP_API_URL=http://localhost:8000/api
-
-Start the development server:
-
-    npm start
-    
-    The frontend will now be accessible at http://localhost:3000.
-
-Usage
-
-    Login: Students and supervisors will need to authenticate using their credentials.
-    Dashboard: Students will see their assigned tasks, submission deadlines, and progress tracking.
-    Task Management: Supervisors can assign tasks, review submissions, and provide feedback directly from their dashboard.
-    Evaluation: At the end of the OJT, supervisors can submit a final evaluation which students can review.
+| Role | Synthetic ID | Email | Password |
+| --- | --- | --- | --- |
+| Student | `DEMO-STUDENT-001` | `demo.student.001@test.example` | `DemoOnly-Student-001!` |
+| Coordinator | `DEMO-COORD-001` | `demo.coord.001@test.example` | `DemoOnly-Coord-001!` |
+| Superuser | `DEMO-ADMIN-001` | `demo.admin.001@test.example` | `DemoOnly-Admin-001!` |
 
 ## Project Structure
 
-/backend
-
-  ├── app/               # Laravel application files
-  
-  ├── database/          # Migrations and seeders
-  
-  ├── routes/            # API routes
-  
-  └── ...                # Other Laravel-specific directories
-
-/frontend
-
-  ├── src/               # ReactJS application files
-  
-  ├── public/            # Static assets
-  
-  └── ...                # Other frontend-specific directories
+app/         # Laravel application code
+routes/      # web and API route definitions
+resources/   # views and bundled frontend resources
+database/    # migrations and seed data
+docker/      # Nginx, PHP-FPM, and MariaDB images
+tests/       # checked-in validation contracts
+docs/        # requirements, changelogs, and screenshots
+compose.yaml # local Compose runtime
 
 ## API Documentation
 
-The backend exposes a RESTful API for communication with the frontend. Below are some of the key API endpoints:
+Browser login uses Laravel's web authentication at `/login` (with the generated `Auth::routes()` flow). Protected `/api/*` routes use Laravel Passport through the `auth:api` middleware; the academic profile boundary is the unauthenticated, rate-limited exception.
 
-    Authentication:
-        POST /api/login - Authenticate user.
-        POST /api/logout - Logout user.
+The current API is organized into high-level resource groups rather than the obsolete student/task/evaluation list:
 
-    Student Management:
-        GET /api/students - Get all students.
-        POST /api/students - Add a new student.
+- Users, companies, and clusters: examples include `GET /api/users/{id}` and coordinator/superuser mutations.
+- Internships: `POST /api/internships`, `GET /api/internships/{id}`, and lifecycle actions such as `POST /api/internships/{id}/approve` and `/reopen`.
+- Evidence: descriptions, requirements, and reports under `/api/descriptions`, `/api/requirements`, and `/api/reports`, with owner and role boundaries.
+- Reporting: `POST /api/internships/report` for JSON and `POST /api/internships/report/pdf` for PDF; results are approved-only.
+- Academic data: `POST /api/academic/profile` uses the configured fake provider by default.
 
-    Task Management:
-        GET /api/tasks - Get all tasks for a student.
-        POST /api/tasks - Create a new task.
-        PUT /api/tasks/{id} - Update a task.
-        DELETE /api/tasks/{id} - Delete a task.
-
-    Evaluation:
-        POST /api/evaluations - Submit a new evaluation for a student.
-
-More detailed documentation can be found in the API Documentation (available soon).
-Future Enhancements
-
-    Mobile Responsiveness: Improving the mobile user experience.
-    Advanced Reporting: Enhanced reporting features for students and supervisors to analyze OJT progress and performance metrics.
-    Role-Based Access Control: More granular access control for admins, supervisors, and students.
+The checked-in automated validation is fail-fast Compose/shell contract coverage. Playwright was used only to capture the README screenshots; it is not a checked-in test stack.
 
 ## Contribution
 
@@ -163,10 +179,6 @@ This project is open for collaboration. If you wish to contribute:
     Commit your changes (git commit -m 'Add your feature').
     Push to the branch (git push origin feature/your-feature-name).
     Open a pull request.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
 
 ## Contact
 

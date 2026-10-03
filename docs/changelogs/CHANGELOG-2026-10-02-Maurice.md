@@ -1,4 +1,4 @@
-# Changelog — 2026-10-03
+# Changelog — 2026-10-02
 
 - Added Ticket 05 backend role fail-closed authorization, ownership policy seams, safe API errors, scoped internship search, and transactional cluster detachment.
 - Added Ticket 06 authenticated placement/evidence ownership checks, atomic active-category requirements, strict validation, paginated evidence resources, and approval immutability (feature/fix-10032026-Maurice).
@@ -14,5 +14,6 @@
 - Added Ticket 1 OJT lifecycle stabilization requirements and acceptance boundaries.
 - Added the traceable, not-run OJT lifecycle stabilization CSV.
 - Added the evidence-led current baseline, risks, coverage summary, and open questions.
+- Docs-only: updated the README with verified capabilities, current Laravel monolith structure, route/auth boundaries, deterministic local demo accounts, and Compose readiness semantics; preserved the Mermaid and screenshot sections.
 
 Author Name: Aguda, Maurice
