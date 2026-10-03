@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Support\SessionTracer;
+use App\Support\ApiErrorNormalizer;
 use Closure;
 
 /* security-10032026-Maurice: backend role boundary is deny-by-default. */
@@ -19,7 +20,7 @@ class RoleAuthorization
             $allowed = array_intersect(array('student', 'coordinator', 'superuser'), $allowedRoles);
             if (!$user || !$allowed || !in_array($role, $allowed, true)) {
                 SessionTracer::leave('authorization.role', $correlationId, $started, 'denied', array('role' => $role, 'resource_type' => 'route'));
-                return response()->json(array('error' => array('code' => $user ? 'forbidden' : 'unauthenticated', 'message' => $user ? 'Forbidden.' : 'Unauthenticated.'), 'correlation_id' => $correlationId), $user ? 403 : 401);
+                return ApiErrorNormalizer::response($request, $user ? 403 : 401, $user ? 'forbidden' : 'unauthenticated', $correlationId);
             }
             SessionTracer::leave('authorization.role', $correlationId, $started, 'allowed', array('role' => $role, 'resource_type' => 'route'));
             return $next($request);

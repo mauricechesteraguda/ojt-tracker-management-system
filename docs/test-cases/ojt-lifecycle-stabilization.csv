@@ -103,24 +103,42 @@ TC-OJT-0012,Concurrent update,Data Integrity/Concurrency/Partial Failure/Rollbac
 2. Submit different updates
 3. Inspect final value",A=Activity A; B=Activity B,"1. [Stage 1 target] Conflict/lost-update behavior is recorded
 2. Prevention is not claimed without evidence",,Not Run,Medium,P1,,,,REQ-07,Boundary,
-TC-OJT-0013,Safe errors,Errors/Messages,"[Stage 1 target] Verify safe JSON responses for unauthenticated, missing, forbidden, cross-owner, and validation errors",1. Synthetic identifiers and an expired/absent session are used,"1. Request a protected record without authentication
+TC-OJT-0013,Safe errors,Errors/Messages,"[Stage 1 target] Verify safe JSON responses for unauthenticated, missing, forbidden, cross-owner, validation, and filtered-output failures",1. Synthetic identifiers and an expired/absent session are used,"1. Request a protected record without authentication
 2. Request a missing record while authenticated
 3. Request another owner’s record while authenticated
-4. Submit malformed placement/evidence input
-5. Request a synthetic provider failure",id=999999; failure=synthetic-timeout,"1. [Stage 1 target] Unauthenticated API returns 401
+4. Submit malformed placement/evidence and each missing/malformed/injection-like filter
+5. Request a synthetic provider failure and a PDF rendering failure
+6. Inspect status, content type, body, correlation_id, and persistence
+7. Attempt filtered JSON/PDF API GET and legacy query-string forms and assert no bypass; supply X-Correlation-ID and page/per_page variants","id=999999; failure=synthetic-timeout; filters=campus,schoolyear,semester,college,course; injection=' OR 1=1 --; correlation_id=client-supplied; page=1|0|1.5; per_page=15|0|101","1. [Stage 1 target] Unauthenticated API returns 401
 2. Missing resource returns 404 without existence disclosure
 3. Cross-owner or forbidden request returns 403
-4. Validation failure returns 422
-5. Every error is safe JSON `{error:{code,message},correlation_id}` with safe generic values and no record existence details, secrets, or PII
-6. Provider failure is bounded and does not expose secrets",,Not Run,Medium,P1,,,,REQ-07,Negative,
-TC-OJT-0014,Empty UI and PDF result,Empty/Loading/No-results,[Stage 1 target] Prove no-result filtered UI and PDF behavior,"1. Authorized requester is logged in
-2. Filter combination matches no authorized records
-3. PDF generation is available","1. Load the filtered UI result
-2. Request the PDF with the identical filters
-3. Inspect the UI empty state
-4. Extract visible PDF text",campus=NO-SUCH-CAMPUS; schoolyear=2026; semester=1; college=COE; course=BSIT,"1. [Stage 1 target] UI shows a clear empty state
-2. PDF is valid and states `No matching records`
-3. Neither output contains unrelated or unauthorized records",,Not Run,Medium,P1,,,,REQ-05,Positive,
+4. Missing/malformed/injection-like filters return 422 safe JSON
+5. PDF rendering failure returns 503 safe JSON with correlation_id and no partial/raw output
+6. Every error is safe JSON `{error:{code,message},correlation_id}` with safe generic values and no record existence details, secrets, or PII
+7. Provider/PDF failures are bounded and do not expose secrets
+8. Filtered JSON and PDF APIs are POST-only; GET and legacy query-string bypass attempts are rejected or unavailable
+9. Invalid page/per_page returns 422; valid/default pagination is page=1, per_page=15
+10. Dynamic validation rejects malformed filter/pagination shapes and ranges without a role-compatibility branch
+11. Supplied X-Correlation-ID is unchanged in response, logs, and traces",,Not Run,Medium,P1,,,,REQ-07,Negative,
+TC-OJT-0014,Empty UI and PDF result,Empty/Loading/No-results,"[Stage 1 target] Prove no-result behavior through the preserved session web form and equivalent authenticated API/PDF seams, using the shared authorized query","1. Authorized requester is logged in through the existing session web form
+2. Equivalent authenticated bearer/API seam is available for the same filter service
+3. Filter combination matches no authorized records
+4. PDF generation is available","1. Submit the five filters in the existing session web form
+2. Submit the identical filters in the authenticated API POST body (bearer/session as applicable)
+3. Request the PDF with the identical POST filter body
+4. Inspect UI/API empty collections and status/content type
+5. Parse PDF text and headers
+6. Repeat with each filter missing, over 100 characters, containing an invalid character, and containing injection-like syntax
+7. Repeat JSON/PDF with omitted page/per_page and page=2/per_page=15; submit invalid page/per_page and attempt GET/query-string bypasses
+8. Supply X-Correlation-ID and inspect response/log/trace values",campus=NO-SUCH-CAMPUS; schoolyear=2026; semester=1; college=COE; course=BSIT,"1. [Stage 1 target] Session UI shows a clear empty state
+2. Equivalent authenticated API returns 200 with an empty data collection
+3. PDF returns 200 `application/pdf`, is valid/parseable, includes all five filter headers, and states exactly `No matching records`
+4. API and PDF use the same authorized query; soft-deleted and unauthorized records are absent
+5. Missing/malformed/injection-like scalar filters return 422 safe JSON
+6. No output contains unrelated records, extra raw PII, or secrets
+7. Filtered JSON and PDF APIs are POST-only with no legacy GET bypass; invalid pagination returns 422
+8. Both default to page=1/per_page=15 and honor identical page/per_page values
+9. Supplied X-Correlation-ID is unchanged in response/log/trace",,Not Run,Medium,P1,,,,REQ-05,Positive,
 TC-OJT-0015,Fake provider known synthetic credentials,Integration Success,[Stage 1 target] Verify the unauthenticated rate-limited POST registration boundary and safe known-credential response,"1. Fake adapter is default and has no network transport
 2. A local sentinel/isolated endpoint records any hit
 3. Known synthetic credentials are approved
@@ -178,17 +196,19 @@ TC-OJT-0018,Real provider opt-in and malformed response,Integration Bad Payload,
 7. One correlation_id is identical across controller/manager/provider logs/traces and response
 8. Every unexpected failure has a structured ERROR with exception class, message-safe category, stack, cause, and correlation_id; invalid credentials may be WARN/INFO only
 9. Real credentials are environment-only and never sourced from or returned by the request",,Not Run,Medium,P1,,,,REQ-03,Integration,
-TC-OJT-0019,Security boundary,Security Unauthorized/Injection/Session Expiry,"[Stage 1 target] Verify 401/403 security boundaries for injection-like, expired-session, cross-owner, and unknown-role requests",1. Security target is acknowledged,"1. Send an injection-like filter while unauthenticated
-2. Send an expired-session API request
-3. Send an authenticated cross-owner identifier request
+TC-OJT-0019,Security boundary,Security Unauthorized/Injection/Session Expiry,"[Stage 1 target] Verify filter validation and 401/403 security boundaries for injection-like, expired-session, cross-owner, guest, bearer, and unknown-role requests",1. Security target is acknowledged,"1. Send injection-like values for each of campus, schoolyear, semester, college, and course in an unauthenticated API POST
+2. Send the same malformed/injection-like body with an expired session and with a guest/no bearer
+3. Send an authenticated cross-owner filter request and direct identifier request
 4. Send an authenticated unknown-role request to each protected API action
-5. Request a filtered UI/PDF view outside requester scope
-6. Inspect response bodies and output for sensitive disclosure",filter=' OR 1=1 --; token=expired; id=302; unknown_role=auditor,"1. [Stage 1 target] Unauthenticated API returns 401
+5. Request filtered UI/PDF views outside requester scope, through both the session form and bearer/API seam
+6. Inspect response status/content type, bodies, PDF text, logs, and correlation IDs for disclosure","filters=campus,schoolyear,semester,college,course; injection=' OR 1=1 --; token=expired; id=302; unknown_role=auditor","1. [Stage 1 target] Guest/unauthenticated API returns 401, including bearer requests with no valid principal
 2. Expired-session request returns 401
-3. Cross-owner and unknown-role requests return 403
-4. Every API error uses safe JSON `{error:{code,message},correlation_id}` with no record existence details or PII
-5. Filtered UI/PDF never includes unauthorized records
-6. Responses and outputs contain safe JSON/PDF content with no secret/token/PII leakage",,Not Run,Medium,P1,,,,REQ-06; REQ-07,Security,
+3. Malformed or injection-like filter values return 422 safe JSON before query/rendering
+4. Cross-owner and unknown-role requests return 403
+5. Student filtered API/UI/PDF is own-only; coordinator/superuser may use the authorized global set
+6. Shared API/PDF query excludes soft-deleted rows and unauthorized records
+7. Every API error uses safe JSON `{error:{code,message},correlation_id}`; PDF failures are safe 503 with logged correlation_id and no partial/raw output
+8. Filtered outputs contain no record existence details, extra raw PII, secrets, or tokens",,Not Run,Medium,P1,,,,REQ-06; REQ-07,Security,
 TC-OJT-0020,Search scope and cluster delete regression,Search and Clusters,"[Current characterization plus Stage 1 target] Pin the search role bug and cluster-delete behavior against the approved authorization contract",1. Synthetic student/coordinator/superuser/unknown-role users exist; own and cross-owner records and a linked cluster exist,"1. Search as a student with a term matching own and another owner’s records
 2. Search as coordinator and superuser
 3. Search with no matches
@@ -207,17 +227,27 @@ TC-OJT-0021,Safe remediation boundary,Security,[Stage 1 target] Characterize sen
 2. Identify provider key without copying it
 3. Review rotation/history-purge plan",artifact paths only; no secrets,"1. [Stage 1 target] Sensitive artifacts are named without values
 2. Rotation/purge remain approval-gated and unexecuted",,Not Run,Medium,P1,,,,REQ-08,Security,
-TC-OJT-0022,Filtered UI/PDF exact parity and ordering,Reporting,"[Stage 1 target] Prove filtered UI and PDF use identical authorized semantics, stable ordering, and exact requester-visible values","1. Authorized requester is logged in
-2. Synthetic records span all supported filter dimensions
-3. PDF generation is available","1. Request the filtered UI listing
-2. Request the PDF with the identical filters
-3. Compare record identifiers in order
-4. Compare every requester-visible key value
-5. Repeat the same requests to check stable ordering",campus=MAIN; schoolyear=2026; semester=1; college=COE; course=BSIT,"1. [Stage 1 target] UI and PDF apply identical authorized filter semantics
-2. PDF contains exactly the same records visible to the requester
-3. PDF key values exactly match the UI values
-4. Repeated requests preserve stable ordering
-5. Unauthorized records are absent from both outputs",,Not Run,Medium,P1,,,,REQ-05,Positive,
+TC-OJT-0022,Filtered UI/PDF exact parity and ordering,Reporting,"[Stage 1 target] Prove the preserved session UI POST, filtered JSON POST API, and PDF POST API use one shared authorized query, exact page parity, and stable ordering; no legacy GET bypass exists","1. Authorized requester is logged in through the existing session web form
+2. Equivalent authenticated bearer/API seam is available and shares the filter service
+3. Synthetic records span all five filter dimensions, including soft-deleted and cross-owner records
+4. PDF generation is available","1. Submit the five filters through the session UI
+2. Submit the identical normalized POST filter body through the authenticated API seam
+3. Request the PDF with the identical POST body
+4. Compare internship IDs in order across API/UI/PDF for page=1, per_page=15
+5. Repeat with page=2, per_page=15 and compare only that page’s exact API/PDF records and values
+6. For every ID compare displayed student name, synthetic SR code, company, start/end, approval/status, and campus/schoolyear/semester/college/course
+7. Repeat API and PDF requests with omitted defaults and the same normalized page/per_page
+8. Attempt GET and legacy query-string forms for both JSON and PDF and assert no bypass
+9. Submit page=0, page=1.5, per_page=0, and per_page=101 plus malformed filters; inspect 422
+10. Supply X-Correlation-ID and inspect authorization, soft-delete exclusion, response/log/trace propagation, content type, and output fields",campus=MAIN; schoolyear=2026; semester=1; college=COE; course=BSIT,"1. [Stage 1 target] Session UI, authenticated API, and PDF apply identical shared-query filter and authorization semantics
+2. API and PDF contain exactly the same internship IDs, with no soft-deleted or unauthorized records
+3. For each internship ID, student name, synthetic SR code, company, start/end, approval/status, and all five academic fields exactly match
+4. All outputs use stable order `users.first_name ASC`, `users.last_name ASC`, `internships.id ASC`
+5. PDF returns 200 `application/pdf`; repeated identical normalized input produces deterministic PDF text
+6. No output includes extra raw PII beyond the approved template
+7. Filtered JSON and PDF APIs accept POST only; no legacy GET/query-string bypass exists
+8. Defaults are page=1/per_page=15; invalid pagination is 422; JSON/PDF exact parity applies to the requested page
+9. Supplied X-Correlation-ID is unchanged in response, logs, and traces",,Not Run,Medium,P1,,,,REQ-05,Positive,
 TC-OJT-0023,Traceability package,Documentation,[Stage 1 target] Verify every case points to a sequential requirement and sealed-document finding is explicit,1. Requirements and CSV are present,"1. Match each Requirement ID to the requirements document
 2. Check no sealed happy-flow document is claimed",REQ-OJT-0001 through REQ-OJT-0010,"1. [Stage 1 target] Every requirement has at least one case
 2. No existing happy-flow artifact is claimed
@@ -306,17 +336,26 @@ TC-OJT-0031,Approval reopen regression state,Lifecycle Regression,"[Stage 1 targ
 3. Student correction is allowed only after reopen
 4. Reapproval succeeds only after prerequisites are complete
 5. is_approved and completion state follow the approved transitions",,Not Run,High,P1,,,,REQ-05,Regression,
-TC-OJT-0032,Filtered output authorization boundary,Filtered UI and PDF,"[Stage 1 target] Prove student search and filtered UI/PDF never leak unauthorized records and return an explicit empty collection",1. Student 101 is authorized only for own records; another student’s matching record exists; coordinator and superuser fixtures exist; UI listing and PDF endpoints are available,"1. Search/filter as student for a term matching both own and other-owner records
-2. Load the UI result
-3. Request the PDF with the same filter
-4. Search as coordinator and superuser
-5. Repeat with a filter matching no records
-6. Inspect record identifiers, names, key values, and response status",requester=student-101; own_record=301; other_record=302; filter=campus=MAIN; no_match=NO-SUCH-CAMPUS,"1. [Stage 1 target] Student search/list returns 200 with only own records; other-owner names and IDs never appear
-2. PDF includes exactly the same authorized set
+TC-OJT-0032,Filtered output authorization boundary,Filtered UI and PDF,"[Stage 1 target] Prove student-only/global authorization, POST-only shared JSON/PDF filtering, exact page parity, and explicit empty output without leakage; no legacy GET bypass","1. Student 101 is authorized only for own records; another student’s matching record exists; coordinator and superuser fixtures exist
+2. Existing session UI, authenticated bearer/API seam, and PDF endpoints share the filter service
+3. Soft-deleted matching records exist","1. Submit all five filters through the student session UI POST and authenticated JSON API POST
+2. Request the PDF API with the same POST filter body
+3. Compare internship IDs, names, synthetic SR codes, companies, dates, approval/status, and five academic fields across JSON/PDF for page=1, per_page=15
+4. Repeat with page=2, per_page=15 and require exact JSON/PDF parity for that page
+5. Repeat as coordinator and superuser using only the resolved role contract
+6. Repeat with a filter matching no records
+7. Submit missing, malformed, injection-like, and invalid pagination values; attempt JSON/PDF GET/query-string bypasses
+8. Inspect statuses, content types, ordering, record identifiers, supplied X-Correlation-ID in response/log/trace, and output for sensitive disclosure",requester=student-101; own_record=301; other_record=302; filters=campus=MAIN; schoolyear=2026; semester=1; college=COE; course=BSIT; no_match=campus=NO-SUCH-CAMPUS; invalid=' OR 1=1 --,"1. [Stage 1 target] Student session/API listing returns 200 with only own records; other-owner names and IDs never appear
+2. PDF uses the same authorized query and contains exactly the same own authorized IDs and key values; soft-deleted rows are absent
 3. Coordinator and superuser may perform authorized global search; superuser inherits coordinator permissions
-4. No matches return 200 with an empty data collection
-5. Forbidden direct access remains 403 and missing resources remain 404
-6. Errors are safe JSON `{error:{code,message},correlation_id}` with no existence details or PII",,Not Run,Critical,P1,,,,REQ-06; REQ-07,Security,
+4. API no-match returns 200 with an empty data collection; no-result PDF is 200 `application/pdf`, parseable, includes filter headers, and contains exactly `No matching records`
+5. Missing/malformed/injection-like filters return 422 safe JSON; guest returns 401; unknown role returns 403
+6. Results use stable order `users.first_name ASC`, `users.last_name ASC`, `internships.id ASC`
+7. PDF rendering failure returns 503 safe JSON with logged correlation_id and no partial/raw output
+8. No output contains extra raw PII, secrets, tokens, or existence details
+9. JSON/PDF APIs are POST-only with no legacy GET bypass; invalid page/per_page returns 422 and defaults are page=1/per_page=15
+10. JSON and PDF honor identical page/per_page; soft-deleted records are always excluded with no role-compatibility branch
+11. Supplied X-Correlation-ID is unchanged in response, logs, and traces",,Not Run,Critical,P1,,,,REQ-06; REQ-07,Security,
 TC-OJT-0033,Synthetic local fixtures and deterministic reset,Seed/Reset/Auth Fixtures,[Stage 1 target] Prove the published demo identities are synthetic local-only fixtures and reset deterministically restores them,"1. Local/demo mode is active
 2. No production deployment mode is active
 3. Reset operation is available","1. Inspect seeded student, coordinator, and admin identities
@@ -379,10 +418,12 @@ TC-OJT-0038,Reset is deterministic and fake-mode only,Demo reset,[Stage 1 target
 4. Passport key/client secrets are not exposed in output, logs, or responses
 5. Behavior remains the contract even if the final executable name differs from preferred `demo-reset`",,Not Run,Critical,P1,,,,REQ-03; REQ-09,Security,
 TC-OJT-0039,Authenticated unknown-role fail-closed,Authorization,"[Stage 1 target] Prove login may succeed for an authenticated unknown-role principal, but every protected API action fails closed",1. An authenticated synthetic principal has an unsupported role; protected placement/evidence/search/cluster endpoints are available,"1. Authenticate the unknown-role principal and confirm login may succeed
-2. Attempt every protected API action represented by the frontend hierarchy, including read, create, edit, delete, submit, verify, validate, approve, search, and cluster delete
+2. Attempt every protected API action represented by the frontend hierarchy, including read, create, edit, delete, submit, verify, validate, approve, search, filtered API/PDF query, and cluster delete
 3. Attempt access to own, cross-owner, and missing identifiers
-4. Inspect every response body and correlation_id",unknown_role=auditor; own_record=301; other_record=302; missing=999999,"1. [Stage 1 target] Login may succeed, but every protected API action returns HTTP 403
+4. Submit missing, malformed, and injection-like filter bodies
+5. Inspect every response body/content type, side effect, and correlation_id",unknown_role=auditor; own_record=301; other_record=302; missing=999999,"1. Login may succeed, but every protected API action returns HTTP 403, including the filtered API and PDF seams
 2. Each denial is safe JSON `{error:{code,message},correlation_id}` with generic non-sensitive values
 3. No response discloses record existence, names, IDs, ownership, role details, or PII
-4. No create, update, delete, verify, validate, approve, search, cluster-detach, or cluster-soft-delete side effect occurs
-5. The server ignores/rejects client-supplied owner/updater/role-sensitive escalation fields",,Not Run,High,P1,,,,REQ-02; REQ-06; REQ-07,Regression,
+4. No create, update, delete, verify, validate, approve, search, filter, cluster-detach, or cluster-soft-delete side effect occurs
+5. Missing/malformed/injection-like filters do not reach an authorized query or renderer
+6. The server ignores/rejects client-supplied owner/updater/role-sensitive escalation fields",,Not Run,High,P1,,,,REQ-02; REQ-06; REQ-07,Regression,

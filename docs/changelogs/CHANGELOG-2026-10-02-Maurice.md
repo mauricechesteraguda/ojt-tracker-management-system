@@ -5,6 +5,8 @@
 - Fixed Ticket 06 fake enrollment fixtures for synthetic users, company validation status boundaries, legacy boolean normalization, and the probe container URL propagation; preserved staff report review boundaries (test-10032026-Maurice).
 - Tightened Ticket 06 report review validation, active-placement 404 boundaries, and requirement lazy-generation scoping (feature/fix-10032026-Maurice).
 
+- Added Ticket 07 shared authenticated internship reporting JSON/PDF service, deterministic PII-minimized rendering, filter validation, and safe rendering errors (feature/fix-10032026-Maurice).
+
 - Added Ticket 04 fail-closed academic provider boundary, deterministic fake profile API, explicit real adapter configuration, safe provider errors, bounded transport settings, and registration/internship provider injection.
 - Added Ticket 03 local fake-provider bootstrap/reset executables, idempotent synthetic fixture seeding, Passport initialization, safe inspection/auth contracts, and persistent runtime startup wiring.
 - Added Ticket 02 deterministic PHP-FPM/Nginx/MariaDB runtime images with pinned base digests, baked Composer dependencies, non-root app/web users, separate frontend/backend networks, app/DB-scoped generated secret volumes, Laravel/web readiness checks, and a status-only `/healthz` response.

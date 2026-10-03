@@ -37,4 +37,4 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
-Route::post('/internships/print-pdf', [ 'as' => 'internship.printpdf', 'uses' => 'InternshipController@printPDF']);
+Route::post('/internships/print-pdf', [ 'as' => 'internship.printpdf', 'uses' => 'InternshipReportingController@pdf', 'middleware' => array('auth', 'role:coordinator,superuser')]);

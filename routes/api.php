@@ -41,20 +41,23 @@ Route::get('/companies/cluster/status/{id}', 'CompanyController@cluster_status')
 Route::get('/companies/status/{id}/{year}', 'CompanyController@company_status');
 
 
-Route::get('/internships/schoolyears', 'InternshipController@schoolyears');
-Route::get('/internships/campuses', 'InternshipController@campuses');
-Route::get('/internships/semesters', 'InternshipController@semesters');
-Route::get('/internships/colleges', 'InternshipController@colleges');
-Route::get('/internships/courses/{college}', 'InternshipController@courses');
-Route::get('/internships/majors/{course}', 'InternshipController@majors');
-Route::get('/internships', 'InternshipController@index');
-Route::get('/internships/{id}', 'InternshipController@show');
+Route::match(array('GET'), '/internships/schoolyears', 'InternshipController@schoolyears');
+Route::match(array('GET'), '/internships/campuses', 'InternshipController@campuses');
+Route::match(array('GET'), '/internships/semesters', 'InternshipController@semesters');
+Route::match(array('GET'), '/internships/colleges', 'InternshipController@colleges');
+Route::match(array('GET'), '/internships/courses/{college}', 'InternshipController@courses');
+Route::match(array('GET'), '/internships/majors/{course}', 'InternshipController@majors');
+Route::match(array('GET'), '/internships', 'InternshipController@index');
+
+Route::post('/internships/report', 'InternshipReportingController@index')->middleware('role:student,coordinator,superuser');
+Route::post('/internships/report/pdf', 'InternshipReportingController@pdf')->middleware('role:coordinator,superuser');
+Route::match(array('GET'), '/internships/{id}', 'InternshipController@show');
 Route::post('/internships/{id}', 'InternshipController@update');
 Route::post('/internships/{id}/approve', 'InternshipController@approve')->middleware('role:coordinator,superuser');
 Route::post('/internships/clusters/companies/{id}', 'InternshipController@visit_company');
 Route::post('/internships', 'InternshipController@store');
 Route::delete('/internships/{id}', 'InternshipController@delete');
-Route::get('/internships/search/{value}', 'InternshipController@search');
+Route::match(array('GET'), '/internships/search/{value}', 'InternshipController@search');
 
 
 

@@ -11,7 +11,7 @@ class SessionTracer
     {
         if ($candidate !== null) {
             $candidate = preg_replace('/[^A-Za-z0-9._-]/', '', (string) $candidate);
-            return $candidate !== '' && strlen($candidate) <= 64 ? $candidate : 'invalid-correlation';
+            return $candidate !== '' && strlen($candidate) <= 64 ? $candidate : (function_exists('random_bytes') ? bin2hex(random_bytes(8)) : uniqid('', true));
         }
         return function_exists('random_bytes') ? bin2hex(random_bytes(8)) : uniqid('', true);
     }
