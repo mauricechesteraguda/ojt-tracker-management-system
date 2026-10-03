@@ -1,77 +1,17 @@
 <?php
-
 namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-
-use Illuminate\Support\Facades\Auth;
-
+use App\Http\Resources\RequirementCollection;
+use App\Internship;
 use App\Requirement;
 use App\RequirementCategory;
-use App\Http\Resources\Requirement as RequirementResource;
-use App\Http\Resources\RequirementCollection;
+use App\Support\SessionTracer;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
+/* security-10032026-Maurice: requirement verification is privileged and server-attributed. */
 class RequirementController extends Controller
 {
-    public function index($id)
-    {
-        $user_id = Auth::user()->id;
-        $is_already_exist=false;
-        $requirements = Requirement::where('is_deleted', '=', '0')->where('internship_id','=',$id)->orderBy('id', 'ASC')->get();
-
-        $requirement_categories = RequirementCategory::where('is_deleted', '=', '0')->orderBy('name', 'ASC')->get();
-            foreach($requirement_categories as $rc){
-                $is_already_exist = false;
-                foreach ($requirements as $rq) {
-                    if ($rq->requirement_category_id == $rc->id) {
-                        $is_already_exist = true;
-                    break;
-                    }else{
-                        $is_already_exist = false;
-                    }
-                }
-
-                if ($is_already_exist) {
-                    //pass
-                }else{
-                    $requirement = Requirement::create(['requirement_category_id' => $rc->id,
-                    'internship_id'=> $id,
-                    'updated_by'=>$user_id]);
-                    $requirement->save();
-                }
-
-                
-            }
-
-        return new RequirementCollection(Requirement::where('is_deleted', '=', '0')->where('internship_id','=',$id)->whereHas('requirement_category', function($q){
-            $q->where('is_deleted','=','0')->orderBy('name', 'ASC');
-        })->paginate(5));
-    }
-    public function search($value,$id)
-    {
-        return new RequirementCollection(Requirement::where('is_deleted','=','0')->where('internship_id','=',$id)->whereHas('requirement_category', function($q)use($value){
-            $q->where('name', 'LIKE', '%'.$value.'%')->where('is_deleted','=','0')->orderBy('name', 'ASC');
-        })->paginate(5));
-        
-        
-    }
-
-
-        
-    public function update(Request $request, $id)
-        {
-            $this->validate($request, [
-                'is_approved' => 'required|max:255',
-            ]);
-    
-            $requirement = Requirement::findOrFail($id);
-
-            $requirement->is_approved = request('is_approved');
-            $requirement->updated_by = request('updated_by');
-            $requirement->save();
-    
-            return response()->json([
-                'message' => 'Requirement updated successfully!'
-            ], 200);
-        }
+    public function index($id) { $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('requirement.index',$c,array('resource_type'=>'requirement','resource_id'=>(string)$id));try{$i=Internship::findOrFail($id);abort_unless(Auth::user()->role!=='student'||(int)$i->user_id===(int)Auth::id(),403);$existing=Requirement::where('is_deleted','0')->where('internship_id',$id)->get();foreach(RequirementCategory::where('is_deleted','0')->orderBy('name','ASC')->get() as $category){if(!$existing->contains('requirement_category_id',$category->id))Requirement::create(array('requirement_category_id'=>$category->id,'internship_id'=>$id,'updated_by'=>Auth::id()));}$r=\App\Support\PaginatedJson::response(Requirement::where('is_deleted','0')->where('internship_id',$id)->whereHas('requirement_category',function($q){$q->where('is_deleted','0');})->paginate(5),\App\Http\Resources\Requirement::class,request(),'requirement.pagination.index');SessionTracer::leave('requirement.index',$c,$s,'success',array('resource_type'=>'requirement','resource_id'=>(string)$id));return $r;}catch(\Throwable $e){SessionTracer::exception('requirement.index',$c,$s,'requirement_unexpected',$e);throw $e;} }
+    public function search($value,$id) { $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('requirement.search',$c,array('resource_type'=>'requirement','resource_id'=>(string)$id));try{$i=Internship::findOrFail($id);abort_unless(Auth::user()->role!=='student'||(int)$i->user_id===(int)Auth::id(),403);$r=\App\Support\PaginatedJson::response(Requirement::where('is_deleted','0')->where('internship_id',$id)->whereHas('requirement_category',function($q)use($value){$q->where('name','LIKE','%'.$value.'%')->where('is_deleted','0');})->paginate(5),\App\Http\Resources\Requirement::class,request(),'requirement.pagination.search');SessionTracer::leave('requirement.search',$c,$s,'success',array('resource_type'=>'requirement','resource_id'=>(string)$id));return $r;}catch(\Throwable $e){SessionTracer::exception('requirement.search',$c,$s,'requirement_unexpected',$e);throw $e;} }
+    public function update(Request $request,$id) { $s=microtime(true);$c=SessionTracer::id($request->header('X-Correlation-ID'));SessionTracer::enter('requirement.update',$c,array('resource_type'=>'requirement','resource_id'=>(string)$id));try{abort_unless(in_array(Auth::user()->role,array('coordinator','superuser'),true),403);$r=Requirement::findOrFail($id);abort_unless((int)$r->is_deleted===0,404);$request->validate(array('is_approved'=>'required|max:255'));$r->is_approved=$request->input('is_approved');$r->updated_by=Auth::id();$r->save();SessionTracer::leave('requirement.update',$c,$s,'success',array('resource_type'=>'requirement','resource_id'=>(string)$id));return response()->json(array('message'=>'Requirement updated successfully!'),200);}catch(\Throwable $e){SessionTracer::exception('requirement.update',$c,$s,'requirement_unexpected',$e);throw $e;} }
 }

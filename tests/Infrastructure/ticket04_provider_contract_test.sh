@@ -219,6 +219,7 @@ grep -q '"event":"exit"' "$TMP_ROOT/session-trace.jsonl" || { logger -t ojt-tick
 grep -q 'ticket04-correlation' "$TMP_ROOT/session-trace.jsonl" || { logger -t ojt-ticket04 'event=failure case=TC-OJT-0016 assertion=trace-correlation' || :; printf '%s\n' 'FAIL [TC-OJT-0016]: trace correlation ID was not propagated' >&2; exit 1; }
 if grep -Eiq 'password|token|api[_-]?key|raw_payload|provider_raw_marker|email|phone|address' "$TMP_ROOT/session-trace.jsonl"; then logger -t ojt-ticket04 'event=failure case=TC-OJT-0016 assertion=trace-redaction' || :; printf '%s\n' 'FAIL [TC-OJT-0016]: session trace contains sensitive data' >&2; exit 1; fi
 rm -f "$TMP_ROOT/sentinel.php"
-if grep -Eiq 'password|token|api[_-]?key|sentinel-malformed-body|provider_raw_marker|email|phone|address' "$TMP_ROOT"/*; then logger -t ojt-ticket04 'event=failure case=TC-OJT-0016 assertion=evidence-redaction' || :; printf '%s\n' 'FAIL [TC-OJT-0016]: runtime evidence contains secret/raw payload/PII' >&2; exit 1; fi
+# Build output contains dependency names such as egulias/email-validator; scan runtime evidence only.
+if find "$TMP_ROOT" -type f ! -name 'compose-build.log' -print0 | xargs -0 grep -Eiq 'password|token|api[_-]?key|sentinel-malformed-body|provider_raw_marker|email|phone|address'; then logger -t ojt-ticket04 'event=failure case=TC-OJT-0016 assertion=evidence-redaction' || :; printf '%s\n' 'FAIL [TC-OJT-0016]: runtime evidence contains secret/raw payload/PII' >&2; exit 1; fi
 logger -t ojt-ticket04 'event=pass status=complete test=ticket04_provider_contract_test' || :
 printf '%s\n' 'PASS: Ticket 04 academic provider contract'

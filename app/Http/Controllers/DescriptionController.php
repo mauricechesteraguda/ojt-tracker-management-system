@@ -2,80 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use App\Description;
 use App\Http\Resources\Description as DescriptionResource;
 use App\Http\Resources\DescriptionCollection;
+use App\Internship;
+use App\Support\SessionTracer;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
+/* security-10032026-Maurice: evidence is owner-scoped and immutable after approval. */
 class DescriptionController extends Controller
 {
-    public function index()
-    {
-        return new DescriptionCollection(Description::where('is_deleted', '=', '0')->orderBy('id', 'ASC')->paginate(5));
-    }
-
-    public function by_internship_id($id)
-    {
-        return new DescriptionCollection(Description::where('internship_id', '=', $id)->where('is_deleted', '=', '0')->orderBy('description', 'ASC')->paginate(5));
-    }
-
-    public function search($value,$id)
-    {
-        return new DescriptionCollection(Description::where('internship_id','=',$id)->where('is_deleted','=','0')->where('description', 'LIKE', '%'.$value.'%')->orderBy('id', 'ASC')->paginate(5));
-        
-        
-    }
-
-    public function show($id)
-    {
-        return new DescriptionResource(Description::findOrFail($id));
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'internship_id' => 'required|max:255',
-            'description' => 'required|max:255',
-
-        ]);
-        
-        $description = Description::create($request->all());
-        $description->save();
-
-        return (new DescriptionResource($description))
-                ->response()
-                ->setStatusCode(201);
-    
-    }
-
-    public function delete($id)
-    {
-        $description = Description::findOrFail($id);
-        $description->is_deleted="1";
-        
-        $description->save();
-
-        return response()->json(null, 204);
-        // return new DescriptionCollection(Description::all());
-    }
-
-        
-    public function update(Request $request, $id)
-        {
-            $this->validate($request, [
-                'internship_id' => 'required|max:255',
-                'description' => 'required|max:255',
-            ]);
-    
-            $description = Description::findOrFail($id);
-            
-            $description->internship_id = request('internship_id');
-            $description->description = request('description');
-            $description->save();
-    
-            return response()->json([
-                'message' => 'Description updated successfully!'
-            ], 200);
-        }
+    public function index() { $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('description.index',$c,array('resource_type'=>'description'));try{$q=Description::where('is_deleted','0');if(Auth::user()->role==='student')$q->whereHas('internship',function($x){$x->where('user_id',Auth::id());});$r=\App\Support\PaginatedJson::response($q->orderBy('id','ASC')->paginate(5),DescriptionResource::class,request(),'description.pagination.index');SessionTracer::leave('description.index',$c,$s,'success',array('resource_type'=>'description'));return $r;}catch(\Throwable $e){SessionTracer::exception('description.index',$c,$s,'description_unexpected',$e);throw $e;} }
+    public function by_internship_id($id) { $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('description.by_internship',$c,array('resource_type'=>'description','resource_id'=>(string)$id));try{$this->assertAccess($id);$r=new DescriptionCollection(Description::where('internship_id',$id)->where('is_deleted','0')->get());SessionTracer::leave('description.by_internship',$c,$s,'success',array('resource_type'=>'description','resource_id'=>(string)$id));return $r;}catch(\Throwable $e){SessionTracer::exception('description.by_internship',$c,$s,'description_unexpected',$e);throw $e;} }
+    public function search($value,$id) { $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('description.search',$c,array('resource_type'=>'description','resource_id'=>(string)$id));try{$this->assertAccess($id);$r=\App\Support\PaginatedJson::response(Description::where('internship_id',$id)->where('is_deleted','0')->where('description','LIKE','%'.$value.'%')->paginate(5),DescriptionResource::class,request(),'description.pagination.search');SessionTracer::leave('description.search',$c,$s,'success',array('resource_type'=>'description','resource_id'=>(string)$id));return $r;}catch(\Throwable $e){SessionTracer::exception('description.search',$c,$s,'description_unexpected',$e);throw $e;} }
+    public function show($id) { $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('description.show',$c,array('resource_type'=>'description','resource_id'=>(string)$id));try{$d=Description::findOrFail($id);$this->assertAccess($d->internship_id);$r=new DescriptionResource($d);SessionTracer::leave('description.show',$c,$s,'success',array('resource_type'=>'description','resource_id'=>(string)$id));return $r;}catch(\Throwable $e){SessionTracer::exception('description.show',$c,$s,'description_unexpected',$e);throw $e;} }
+    public function store(Request $request) { $s=microtime(true);$c=SessionTracer::id($request->header('X-Correlation-ID'));SessionTracer::enter('description.store',$c,array('resource_type'=>'description'));try{$request->validate(array('internship_id'=>'required','description'=>'required|max:255'));$i=Internship::findOrFail($request->input('internship_id'));$this->assertAccess($i->id);abort_unless((int)$i->is_approved===0,403);$d=Description::create(array('internship_id'=>$i->id,'description'=>$request->input('description')));$r=(new DescriptionResource($d))->response()->setStatusCode(201);SessionTracer::leave('description.store',$c,$s,'success',array('resource_type'=>'description'));return $r;}catch(\Throwable $e){SessionTracer::exception('description.store',$c,$s,'description_unexpected',$e);throw $e;} }
+    public function delete($id) { $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('description.delete',$c,array('resource_type'=>'description','resource_id'=>(string)$id));try{$d=Description::findOrFail($id);$i=$this->assertAccess($d->internship_id);abort_unless((int)$i->is_approved===0,403);$d->is_deleted='1';$d->save();SessionTracer::leave('description.delete',$c,$s,'success',array('resource_type'=>'description','resource_id'=>(string)$id));return response()->json(null,204);}catch(\Throwable $e){SessionTracer::exception('description.delete',$c,$s,'description_unexpected',$e);throw $e;} }
+    public function update(Request $request,$id) { $s=microtime(true);$c=SessionTracer::id($request->header('X-Correlation-ID'));SessionTracer::enter('description.update',$c,array('resource_type'=>'description','resource_id'=>(string)$id));try{$d=Description::findOrFail($id);$i=$this->assertAccess($d->internship_id);abort_unless((int)$i->is_approved===0,403);$request->validate(array('description'=>'required|max:255'));$d->description=$request->input('description');$d->save();SessionTracer::leave('description.update',$c,$s,'success',array('resource_type'=>'description','resource_id'=>(string)$id));return response()->json(array('message'=>'Description updated successfully!'),200);}catch(\Throwable $e){SessionTracer::exception('description.update',$c,$s,'description_unexpected',$e);throw $e;} }
+    protected function assertAccess($id) { $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('description.authorization',$c,array('resource_type'=>'description','resource_id'=>(string)$id));try{$i=Internship::findOrFail($id);abort_unless(Auth::user()->role!=='student'||(int)$i->user_id===(int)Auth::id(),403);SessionTracer::leave('description.authorization',$c,$s,'allowed',array('resource_type'=>'description','resource_id'=>(string)$id));return $i;}catch(\Throwable $e){SessionTracer::exception('description.authorization',$c,$s,'authorization_unexpected',$e);throw $e;} }
 }

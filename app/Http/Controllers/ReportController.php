@@ -2,84 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use App\Report;
 use App\Http\Resources\Report as ReportResource;
 use App\Http\Resources\ReportCollection;
+use App\Internship;
+use App\Report;
+use App\Support\SessionTracer;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
+/* security-10032026-Maurice: reports are owner-scoped evidence with immutable approval. */
 class ReportController extends Controller
 {
-    public function index()
-    {
-        return new ReportCollection(Report::where('is_deleted', '=', '0')->orderBy('id', 'ASC')->paginate(5));
-    }
-
-    public function by_internship_id($id)
-    {
-        return new ReportCollection(Report::where('internship_id', '=', $id)->where('is_deleted', '=', '0')->orderBy('description', 'ASC')->paginate(5));
-    }
-
-    public function search($value,$id)
-    {
-        return new ReportCollection(Report::where('internship_id','=',$id)->where('is_deleted','=','0')->where('description', 'LIKE', '%'.$value.'%')->orderBy('description', 'ASC')->paginate(5));
-        
-        
-    }
-
-    public function show($id)
-    {
-        return new ReportResource(Report::findOrFail($id));
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'internship_id' => 'required|max:255',
-            'description' => 'required|max:255',
-
-        ]);
-        
-        $report = Report::create($request->all());
-        $report->save();
-
-        return (new ReportResource($report))
-                ->response()
-                ->setStatusCode(201);
-    
-    }
-
-    public function delete($id)
-    {
-        $report = Report::findOrFail($id);
-        $report->is_deleted="1";
-        
-        $report->save();
-
-        return response()->json(null, 204);
-        // return new ReportCollection(Report::all());
-    }
-
-        
-    public function update(Request $request, $id)
-        {
-            $this->validate($request, [
-                'description' => 'required|max:255',
-            ]);
-    
-            $report = Report::findOrFail($id);
-            
-            $report->description = request('description');
-            $report->date = request('date');
-            $report->hours = request('hours');
-            $report->is_valid = request('is_valid');
-            $report->comment = request('comment');
-            $report->updated_by = request('updated_by');
-
-            $report->save();
-    
-            return response()->json([
-                'message' => 'Report updated successfully!'
-            ], 200);
-        }
+    public function index() { $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('report.index',$c,array('resource_type'=>'report'));try{$q=Report::where('is_deleted','0');if(Auth::user()->role==='student')$q->whereHas('internship',function($x){$x->where('user_id',Auth::id());});$r=new ReportCollection($q->orderBy('id','ASC')->get());SessionTracer::leave('report.index',$c,$s,'success',array('resource_type'=>'report'));return $r;}catch(\Throwable $e){SessionTracer::exception('report.index',$c,$s,'report_unexpected',$e);throw $e;} }
+    public function by_internship_id($id) { $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('report.by_internship',$c,array('resource_type'=>'report','resource_id'=>(string)$id));try{$this->assertInternshipAccess($id);$r=new ReportCollection(Report::where('internship_id',$id)->where('is_deleted','0')->orderBy('description','ASC')->get());SessionTracer::leave('report.by_internship',$c,$s,'success',array('resource_type'=>'report','resource_id'=>(string)$id));return $r;}catch(\Throwable $e){SessionTracer::exception('report.by_internship',$c,$s,'report_unexpected',$e);throw $e;} }
+    public function search($value,$id) { $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('report.search',$c,array('resource_type'=>'report','resource_id'=>(string)$id));try{$this->assertInternshipAccess($id);$r=new ReportCollection(Report::where('internship_id',$id)->where('is_deleted','0')->where('description','LIKE','%'.$value.'%')->get());SessionTracer::leave('report.search',$c,$s,'success',array('resource_type'=>'report','resource_id'=>(string)$id));return $r;}catch(\Throwable $e){SessionTracer::exception('report.search',$c,$s,'report_unexpected',$e);throw $e;} }
+    public function show($id) { $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('report.show',$c,array('resource_type'=>'report','resource_id'=>(string)$id));try{$r=Report::findOrFail($id);$this->assertInternshipAccess($r->internship_id);$result=new ReportResource($r);SessionTracer::leave('report.show',$c,$s,'success',array('resource_type'=>'report','resource_id'=>(string)$id));return $result;}catch(\Throwable $e){SessionTracer::exception('report.show',$c,$s,'report_unexpected',$e);throw $e;} }
+    public function store(Request $request) { $s=microtime(true);$c=SessionTracer::id($request->header('X-Correlation-ID'));SessionTracer::enter('report.store',$c,array('resource_type'=>'report'));try{$i=Internship::findOrFail($request->input('internship_id'));$this->assertOwner($i);abort_unless((int)$i->is_approved===0,403);$this->validateEvidence($request,$i);$r=Report::create(array_merge($request->only(array('internship_id','description','date','hours','comment')),array('is_valid'=>0,'is_deleted'=>0,'updated_by'=>Auth::id())));$result=(new ReportResource($r))->response()->setStatusCode(201);SessionTracer::leave('report.store',$c,$s,'success',array('resource_type'=>'report'));return $result;}catch(\Throwable $e){SessionTracer::exception('report.store',$c,$s,'report_unexpected',$e);throw $e;} }
+    public function delete($id) { $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('report.delete',$c,array('resource_type'=>'report','resource_id'=>(string)$id));try{$r=Report::findOrFail($id);$i=$this->assertInternshipAccess($r->internship_id);abort_unless((int)$i->is_approved===0,403);abort_unless(Auth::user()->role!=='student'||(int)$r->is_valid===0,403);$r->is_deleted='1';$r->updated_by=Auth::id();$r->save();SessionTracer::leave('report.delete',$c,$s,'success',array('resource_type'=>'report','resource_id'=>(string)$id));return response()->json(null,204);}catch(\Throwable $e){SessionTracer::exception('report.delete',$c,$s,'report_unexpected',$e);throw $e;} }
+    public function update(Request $request,$id) { $s=microtime(true);$c=SessionTracer::id($request->header('X-Correlation-ID'));SessionTracer::enter('report.update',$c,array('resource_type'=>'report','resource_id'=>(string)$id));try{$r=Report::findOrFail($id);$i=$this->assertInternshipAccess($r->internship_id);abort_unless((int)$i->is_approved===0,403);abort_unless(Auth::user()->role!=='student'||(int)$r->is_valid===0,403);$this->validateEvidence($request,$i,false);$r->description=$request->input('description',$r->description);$r->date=$request->input('date',$r->date);$r->hours=$request->input('hours',$r->hours);if(Auth::user()->role!=='student')$r->is_valid=$request->input('is_valid',$r->is_valid);$r->comment=$request->input('comment',$r->comment);$r->updated_by=Auth::id();$r->save();SessionTracer::leave('report.update',$c,$s,'success',array('resource_type'=>'report','resource_id'=>(string)$id));return response()->json(array('message'=>'Report updated successfully!'),200);}catch(\Throwable $e){SessionTracer::exception('report.update',$c,$s,'report_unexpected',$e);throw $e;} }
+    protected function assertInternshipAccess($id) { $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('report.authorization',$c,array('resource_type'=>'report','resource_id'=>(string)$id));try{$i=Internship::findOrFail($id);$this->assertOwner($i);SessionTracer::leave('report.authorization',$c,$s,'allowed',array('resource_type'=>'report','resource_id'=>(string)$id));return $i;}catch(\Throwable $e){SessionTracer::exception('report.authorization',$c,$s,'authorization_unexpected',$e);throw $e;} }
+    protected function assertOwner(Internship $internship) { $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('report.owner',$c,array('resource_type'=>'internship','resource_id'=>(string)$internship->id));try{abort_unless(Auth::user()->role!=='student'||(int)$internship->user_id===(int)Auth::id(),403);SessionTracer::leave('report.owner',$c,$s,'allowed',array('resource_type'=>'internship','resource_id'=>(string)$internship->id));return true;}catch(\Throwable $e){SessionTracer::exception('report.owner',$c,$s,'authorization_unexpected',$e);throw $e;} }
+    protected function validateEvidence(Request $request,Internship $internship,$create=true) { $s=microtime(true);$c=SessionTracer::id($request->header('X-Correlation-ID'));SessionTracer::enter('report.validate',$c,array('resource_type'=>'report','resource_id'=>(string)$internship->id));try{$request->validate(array('description'=>'required|max:255','date'=>'required|date','hours'=>'required|numeric|min:0.25|max:24'));$hours=(float)$request->input('hours');if(fmod($hours*4,1.0)!==0.0)throw ValidationException::withMessages(array('hours'=>'Hours must use quarter-hour increments.'));abort_unless($request->input('date')>=$internship->start_date&&$request->input('date')<=$internship->end_date,422);if($create&&Auth::user()->role==='student'&&$request->has('is_valid'))abort(403);SessionTracer::leave('report.validate',$c,$s,'valid',array('resource_type'=>'report','resource_id'=>(string)$internship->id));return true;}catch(\Throwable $e){SessionTracer::exception('report.validate',$c,$s,'report_validation_unexpected',$e);throw $e;} }
 }

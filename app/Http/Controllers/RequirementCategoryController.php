@@ -1,102 +1,19 @@
 <?php
-
 namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-
-use App\RequirementCategory;
 use App\Http\Resources\RequirementCategory as RequirementCategoryResource;
 use App\Http\Resources\RequirementCategoryCollection;
+use App\RequirementCategory;
+use App\Support\SessionTracer;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
+/* security-10032026-Maurice: requirement taxonomy mutations are privileged. */
 class RequirementCategoryController extends Controller
 {
-    public function index()
-    {
-        return new RequirementCategoryCollection(RequirementCategory::where('is_deleted', '=', '0')->orderBy('id', 'ASC')->paginate(5));
-    }
-    public function search($value)
-    {
-        return new RequirementCategoryCollection(RequirementCategory::where('is_deleted','=','0')->where('name', 'LIKE', '%'.$value.'%')->orderBy('name', 'ASC')->paginate(5));
-        
-        
-    }
-
-    public function show($id)
-    {
-        return new RequirementCategoryResource(RequirementCategory::findOrFail($id));
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|max:255',
-
-        ]);
-
-        $requirement_category = RequirementCategory::create($request->all());
-
-        try {
-            $fileExtension = $request->file('file')->getClientOriginalExtension();
-
-            $path = $request->file->move(public_path() . '/uploads',date('mdYHis') . uniqid() . '.' . $fileExtension);
-            
-            $new_path = explode("public",$path)[1];
-    
-            $requirement_category->file = $new_path;
-    
-        } catch (\Throwable $th) {
-            //throw $th;
-        }
-    
-
-        $requirement_category->save();
-
-        return (new RequirementCategoryResource($requirement_category))
-                ->response()
-                ->setStatusCode(201);
-    
-    }
-
-    public function delete($id)
-    {
-        $requirement_category = RequirementCategory::findOrFail($id);
-        $requirement_category->is_deleted="1";
-        
-        $requirement_category->save();
-
-        return response()->json(null, 204);
-        // return new RequirementCategoryCollection(RequirementCategory::all());
-    }
-
-        
-    public function update(Request $request, $id)
-        {
-            $this->validate($request, [
-                'name' => 'required|max:255',
-            ]);
-    
-            $requirement_category = RequirementCategory::findOrFail($id);
-            
-            $requirement_category->name = request('name');
-
-            try {
-                $fileExtension = $request->file('file')->getClientOriginalExtension();
-    
-                $path = $request->file->move(public_path() . '/uploads',date('mdYHis') . uniqid() . '.' . $fileExtension);
-                
-                $new_path = explode("public",$path)[1];
-        
-                $requirement_category->file = $new_path;
-        
-            } catch (\Throwable $th) {
-                //no file uploaded
-            }
-
-            $requirement_category->updated_by = request('updated_by');
-            $requirement_category->save();
-    
-            return response()->json([
-                'message' => 'Requirement Category updated successfully!'
-            ], 200);
-        }
+    public function index(){ $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('requirement_category.index',$c,array('resource_type'=>'requirement_category'));try{$r=new RequirementCategoryCollection(RequirementCategory::where('is_deleted','0')->orderBy('id','ASC')->get());SessionTracer::leave('requirement_category.index',$c,$s,'success',array('resource_type'=>'requirement_category'));return $r;}catch(\Throwable $e){SessionTracer::exception('requirement_category.index',$c,$s,'requirement_category_unexpected',$e);throw $e;} }
+    public function search($value){ $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('requirement_category.search',$c,array('resource_type'=>'requirement_category'));try{$r=new RequirementCategoryCollection(RequirementCategory::where('is_deleted','0')->where('name','LIKE','%'.$value.'%')->orderBy('name','ASC')->get());SessionTracer::leave('requirement_category.search',$c,$s,'success',array('resource_type'=>'requirement_category'));return $r;}catch(\Throwable $e){SessionTracer::exception('requirement_category.search',$c,$s,'requirement_category_unexpected',$e);throw $e;} }
+    public function show($id){ $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('requirement_category.show',$c,array('resource_type'=>'requirement_category','resource_id'=>(string)$id));try{$r=new RequirementCategoryResource(RequirementCategory::findOrFail($id));SessionTracer::leave('requirement_category.show',$c,$s,'success',array('resource_type'=>'requirement_category','resource_id'=>(string)$id));return $r;}catch(\Throwable $e){SessionTracer::exception('requirement_category.show',$c,$s,'requirement_category_unexpected',$e);throw $e;} }
+    public function store(Request $request){ $s=microtime(true);$c=SessionTracer::id($request->header('X-Correlation-ID'));SessionTracer::enter('requirement_category.store',$c,array('resource_type'=>'requirement_category'));try{abort_unless(in_array(Auth::user()->role,array('coordinator','superuser'),true),403);$request->validate(array('name'=>'required|max:255'));$r=RequirementCategory::create($request->only(array('name')));if($request->hasFile('file'))$r->file=$request->file('file')->store('uploads');$r->updated_by=Auth::id();$r->save();$result=(new RequirementCategoryResource($r))->response()->setStatusCode(201);SessionTracer::leave('requirement_category.store',$c,$s,'success',array('resource_type'=>'requirement_category'));return $result;}catch(\Throwable $e){SessionTracer::exception('requirement_category.store',$c,$s,'requirement_category_unexpected',$e);throw $e;} }
+    public function delete($id){ $s=microtime(true);$c=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('requirement_category.delete',$c,array('resource_type'=>'requirement_category','resource_id'=>(string)$id));try{abort_unless(in_array(Auth::user()->role,array('coordinator','superuser'),true),403);$r=RequirementCategory::findOrFail($id);$r->is_deleted='1';$r->updated_by=Auth::id();$r->save();SessionTracer::leave('requirement_category.delete',$c,$s,'success',array('resource_type'=>'requirement_category','resource_id'=>(string)$id));return response()->json(null,204);}catch(\Throwable $e){SessionTracer::exception('requirement_category.delete',$c,$s,'requirement_category_unexpected',$e);throw $e;} }
+    public function update(Request $request,$id){ $s=microtime(true);$c=SessionTracer::id($request->header('X-Correlation-ID'));SessionTracer::enter('requirement_category.update',$c,array('resource_type'=>'requirement_category','resource_id'=>(string)$id));try{abort_unless(in_array(Auth::user()->role,array('coordinator','superuser'),true),403);$request->validate(array('name'=>'required|max:255'));$r=RequirementCategory::findOrFail($id);$r->name=$request->input('name');if($request->hasFile('file'))$r->file=$request->file('file')->store('uploads');$r->updated_by=Auth::id();$r->save();$result=response()->json(array('message'=>'Requirement Category updated successfully!'),200);SessionTracer::leave('requirement_category.update',$c,$s,'success',array('resource_type'=>'requirement_category','resource_id'=>(string)$id));return $result;}catch(\Throwable $e){SessionTracer::exception('requirement_category.update',$c,$s,'requirement_category_unexpected',$e);throw $e;} }
 }

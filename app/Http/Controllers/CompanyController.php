@@ -10,6 +10,8 @@ use App\Http\Resources\Company as CompanyResource;
 use App\Http\Resources\CompanyCollection;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Support\SessionTracer;
 
 class CompanyController extends Controller
 {
@@ -87,6 +89,8 @@ class CompanyController extends Controller
 
     public function store(Request $request)
     {
+        $started=microtime(true);$correlationId=SessionTracer::id($request->header('X-Correlation-ID'));SessionTracer::enter('company.store',$correlationId,array('resource_type'=>'company'));
+        try { abort_unless(in_array(Auth::user()->role, array('coordinator', 'superuser'), true), 403);
         $request->validate([
             'name' => 'required|max:255',
 
@@ -96,32 +100,40 @@ class CompanyController extends Controller
 
         $company = Company::where('name', '=', $current_name)->where('city', '=', $current_city)->first();
         if (!$company) {
-            $company = Company::create($request->all());
+            $company = Company::create($request->only(array('name','country','province','city','address','location_map','main_branch')));
             $company->save();
 
-            return (new CompanyResource($company))
+            $result=(new CompanyResource($company))
                     ->response()
                     ->setStatusCode(201);
+            SessionTracer::leave('company.store',$correlationId,$started,'success',array('resource_type'=>'company')); return $result;
         }
-        return response()->json([
+        $result=response()->json([
             'message' => 'Company already exists!'
         ], 500);
+        SessionTracer::leave('company.store',$correlationId,$started,'duplicate',array('resource_type'=>'company')); return $result;
 
         
+        } catch (\Throwable $exception) { SessionTracer::exception('company.store',$correlationId,$started,'company_unexpected',$exception); throw $exception; }
     }
 
     public function delete($id)
     {
+        $started=microtime(true);$correlationId=SessionTracer::id(request()->header('X-Correlation-ID'));SessionTracer::enter('company.delete',$correlationId,array('resource_type'=>'company','resource_id'=>(string)$id));
+        try { abort_unless(in_array(Auth::user()->role, array('coordinator', 'superuser'), true), 403);
         $company = Company::findOrFail($id);
         $company->is_deleted="1";
         $company->save();
-        return response()->json(null, 204);
+        $result=response()->json(null, 204); SessionTracer::leave('company.delete',$correlationId,$started,'success',array('resource_type'=>'company','resource_id'=>(string)$id)); return $result;
         // return new CompanyCollection(Company::all());
+        } catch (\Throwable $exception) { SessionTracer::exception('company.delete',$correlationId,$started,'company_unexpected',$exception); throw $exception; }
     }
 
         
     public function update(Request $request, $id)
         {
+            $started=microtime(true);$correlationId=SessionTracer::id($request->header('X-Correlation-ID'));SessionTracer::enter('company.update',$correlationId,array('resource_type'=>'company','resource_id'=>(string)$id));
+            try { abort_unless(in_array(Auth::user()->role, array('coordinator', 'superuser'), true), 403);
             $this->validate($request, [
                 'name' => 'required|max:255',
             ]);
@@ -136,9 +148,11 @@ class CompanyController extends Controller
             $company->location_map = request('location_map');
             $company->save();
     
-            return response()->json([
+            $result=response()->json([
                 'message' => 'Company updated successfully!'
             ], 200);
+            SessionTracer::leave('company.update',$correlationId,$started,'success',array('resource_type'=>'company','resource_id'=>(string)$id)); return $result;
+            } catch (\Throwable $exception) { SessionTracer::exception('company.update',$correlationId,$started,'company_unexpected',$exception); throw $exception; }
         }
 
 }

@@ -48,9 +48,10 @@ class SessionTracer
     protected static function write($event, $operation, $correlationId, array $metadata)
     {
         $record = array('event' => $event, 'operation' => $operation, 'correlation_id' => $correlationId);
-        foreach (array('outcome', 'duration_ms', 'error_category', 'exception_class', 'safe_message', 'stack', 'cause', 'level') as $key) {
+        /* security-10032026-Maurice: only bounded authorization metadata is admitted. */
+        foreach (array('outcome', 'duration_ms', 'error_category', 'exception_class', 'safe_message', 'stack', 'cause', 'level', 'role', 'resource_type', 'resource_id', 'decision', 'status') as $key) {
             if (isset($metadata[$key])) {
-                $record[$key] = $metadata[$key];
+                $record[$key] = in_array($key, array('resource_id', 'status'), true) ? (int) $metadata[$key] : $metadata[$key];
             }
         }
         $path = getenv('HOME') . '/.cache/agent-trace/ojt-tracker-management-system/' . (getenv('AGENT_SESSION_ID') ?: 'default') . '.jsonl';

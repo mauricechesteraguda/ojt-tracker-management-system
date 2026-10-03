@@ -16,7 +16,7 @@ Acceptance boundary: a supported macOS/Linux developer can start the Stage 1 dem
 
 ### REQ-02 — Authentication and preserved roles
 
-Acceptance boundary: the demo accepts the existing `sr_code`/password login shape and preserves guest, student, coordinator, and superuser roles. Role-specific access is explicit and unsupported roles fail closed; no new status or role enum is invented.
+Acceptance boundary: the demo accepts the existing `sr_code`/password login shape and preserves guest, student, coordinator, and superuser roles. Role-specific access is explicit, unsupported/unknown roles fail closed, and every protected API action for an authenticated unknown-role principal returns **403** safe JSON; no new status or role enum is invented.
 
 ### REQ-03 — Deterministic academic provider boundary
 
@@ -28,19 +28,19 @@ Real mode is explicit environment-only opt-in via `ACADEMIC_PROVIDER_MODE`, `ACA
 
 ### REQ-04 — Placement and evidence lifecycle
 
-Acceptance boundary: an authorized student can create an owned placement with required `user_id` and `company_id`, receive requirements for active categories, and manage their own placement-linked descriptions and reports through the approved lifecycle. Before approval, the student may edit or soft-delete their own descriptions/reports; approved records are immutable. Stage 1 lifecycle/completion derives from the approval prerequisites and `is_approved`; the free-string internship `status` is display/backward-compatibility only and must not drive authorization or completion. A report requires a real date within the inclusive internship start/end dates and numeric hours from **0.25 through 24 inclusive** in **0.25-hour increments**. Existing 0/1 flags and the current backend/UI report-field mismatch remain compatibility facts.
+Acceptance boundary: an authorized student can create only an owned placement with server-derived owner fields and required `company_id`, receive requirements for active categories, and manage their own placement-linked descriptions and reports through the approved lifecycle. Before approval, the student may edit or soft-delete their own descriptions/reports; approved records are immutable. Stage 1 lifecycle/completion derives from the approval prerequisites and `is_approved`; the free-string internship `status` is display/backward-compatibility only and must not drive authorization or completion. A report requires a real date within the inclusive internship start/end dates and numeric hours from **0.25 through 24 inclusive** in **0.25-hour increments**. Existing 0/1 flags and the current backend/UI report-field mismatch remain compatibility facts.
 
 ### REQ-05 — Coordinator approval and reportable output
 
-Acceptance boundary: a student can submit eligible evidence for coordinator review; only an authorized coordinator can approve when core placement fields are complete, every active requirement is verified, and at least one non-deleted valid report exists. That report must have a real date within the inclusive internship start/end dates and numeric hours from 0.25 through 24 inclusive in 0.25-hour increments. A successful approval sets/reflects `is_approved` and drives Stage 1 completion; approved records are immutable. An authorized coordinator may explicitly reopen a placement only with a required audit reason, returning it to the unapproved state so the student can make corrections; the same ownership and validation rules then apply. Descriptions are optional narrative and do not gate approval. The free-string internship `status` must not drive authorization or completion. The filtered UI and PDF use identical authorized filter semantics and stable ordering; the PDF contains exactly the same records and key values visible to the requester. No-result UI shows a clear empty state and the valid PDF states `No matching records`; unauthorized records never appear in either output.
+Acceptance boundary: a student can submit eligible evidence for coordinator review but cannot verify, validate, or approve it, and only an authorized coordinator or superuser (with superuser inheriting coordinator permissions) can verify/validate/approve when core placement fields are complete, every active requirement is verified, and at least one non-deleted valid report exists. That report must have a real date within the inclusive internship start/end dates and numeric hours from 0.25 through 24 inclusive in 0.25-hour increments. A successful approval sets/reflects `is_approved` and drives Stage 1 completion; approved records are immutable. An authorized coordinator may explicitly reopen a placement only with a required audit reason, returning it to the unapproved state so the student can make corrections; the same ownership and validation rules then apply. Descriptions are optional narrative and do not gate approval. The free-string internship `status` must not drive authorization or completion. The filtered UI and PDF use identical authorized filter semantics and stable ordering; the PDF contains exactly the same records and key values visible to the requester. No-result UI shows a clear empty state and the valid PDF states `No matching records`; unauthorized records never appear in either output.
 
 ### REQ-06 — Authorization and ownership
 
-Acceptance boundary: backend authorization mirrors the existing frontend RBAC for every protected placement/evidence read and mutation. Unauthenticated API requests return **401**; authenticated-but-forbidden and cross-owner requests, including edits, soft-deletes, and reopen attempts, return **403**; nonexistent resources return **404** without existence disclosure; validation failures return **422** safe JSON errors. A student cannot access another student’s placement or self-approve, approved records cannot be changed without the explicit coordinator reopen flow, and coordinator and superuser permissions remain separate.
+Acceptance boundary: backend authorization mirrors the existing frontend RBAC for every protected placement/evidence/cluster/search read and mutation. Unauthenticated API requests return **401**; authenticated-but-forbidden and cross-owner requests, including edits, soft-deletes, reopen attempts, and student cluster deletion, return **403**; nonexistent resources return **404** without existence disclosure; validation failures return **422** safe JSON errors. Each error response is exactly shaped as `{error:{code,message},correlation_id}` (with safe, non-sensitive values) and does not disclose record existence or PII. Student search returns **200** with own records only; coordinator and superuser may perform authorized global search; no matches return **200** with an empty data collection. A student cannot access another student’s placement or self-approve, approved records cannot be changed without the explicit coordinator reopen flow, and superuser inherits coordinator permissions.
 
 ### REQ-07 — Safe validation, errors, and failure behavior
 
-Acceptance boundary: malformed placement/evidence/filter inputs return **422** safe JSON errors; unauthenticated API access returns **401**; authenticated forbidden/cross-owner access returns **403**; missing resources return **404**. Provider failures, partial failures, concurrency conflicts, empty results, loading states, and session expiry remain bounded, actionable, and non-sensitive. Persistence does not silently create cross-owner or partial unrelated records.
+Acceptance boundary: malformed placement/evidence/filter inputs return **422** safe JSON errors; unauthenticated API access returns **401**; authenticated forbidden/cross-owner access returns **403**; missing resources return **404**. Errors use `{error:{code,message},correlation_id}` and never reveal record existence details or PII. Provider failures, partial failures, concurrency conflicts, empty results, loading states, and session expiry remain bounded, actionable, and non-sensitive. The server derives owner, updater, and role-sensitive fields and rejects or ignores client attempts to escalate them. Persistence does not silently create cross-owner or partial unrelated records.
 
 ### REQ-08 — Security containment and remediation boundary
 
@@ -82,17 +82,19 @@ The CSV contains at least one case for every REQ above. Its `Test Type` vocabula
 | Report date/hour boundary | TC-OJT-0025–TC-OJT-0026; Stage 1 target |
 | Edit/delete/undo/correction | TC-OJT-0010, TC-OJT-0027–TC-OJT-0031; Stage 1 target |
 | Data integrity/concurrency/partial failure/rollback | TC-OJT-0011, TC-OJT-0012; Stage 1 target |
-| Errors/messages | TC-OJT-0013; Stage 1 target |
+| Errors/messages and safe JSON contract | TC-OJT-0013, TC-OJT-0019, TC-OJT-0039; Stage 1 target |
 | Empty/loading/no-results | TC-OJT-0014; Stage 1 target |
 | Integration success/failure/timeout/bad payload | TC-OJT-0015–TC-OJT-0018; Stage 1 target |
-| Roles/permissions and ownership | TC-OJT-0008; Stage 1 target |
-| Security unauthorized/injection/session expiry | TC-OJT-0019, TC-OJT-0021, TC-OJT-0032; Stage 1 target |
-| Regression | TC-OJT-0020, TC-OJT-0023; current characterization plus Stage 1 quality target |
+| Roles/permissions and ownership | TC-OJT-0008, TC-OJT-0028–TC-OJT-0030, TC-OJT-0039; Stage 1 target |
+| Security unauthorized/injection/session expiry and safe error shape | TC-OJT-0013, TC-OJT-0019, TC-OJT-0021, TC-OJT-0032, TC-OJT-0039; Stage 1 target |
+| Search ownership/role scope and empty collection | TC-OJT-0020, TC-OJT-0032; Stage 1 target |
+| Cluster deletion/detachment/soft-delete | TC-OJT-0020; Stage 1 target |
+| Regression | TC-OJT-0020, TC-OJT-0023, TC-OJT-0039; current characterization plus Stage 1 quality target |
 | Compose bootstrap, persistence, idempotence, Passport repeatability, and reset | TC-OJT-0034–TC-OJT-0038; Stage 1 target |
-| Synthetic fixtures/reset | TC-OJT-0033–TC-OJT-0038; Stage 1 target |
+| Synthetic fixtures/reset | TC-OJT-0033–TC-OJT-0039; Stage 1 target |
 | Happy-flow sealing gate | TC-OJT-0024; Stage 1 target |
 
-Genuine N/A categories and reasons: **Automated Test Ref. IDs** are N/A because Ticket 1 must not create tests; **real-provider success beyond explicit opt-in** is N/A for the default demo because only the environment-held opt-in boundary is approved. Compose health, cross-platform report date/hour validation, fake-provider success/failure/timeout/bad-payload cases, student/coordinator edit/reopen cases, filtered UI/PDF parity, no-result output, security cases, and the quality gate are applicable Stage 1 targets, not N/A merely because current implementation is absent.
+Genuine N/A categories and reasons: **Automated Test Ref. IDs** are N/A because documentation tickets must not create tests; **real-provider success beyond explicit opt-in** is N/A for the default demo because only the environment-held opt-in boundary is approved. Compose health, cross-platform report date/hour validation, fake-provider success/failure/timeout/bad-payload cases, student/coordinator edit/reopen cases, search ownership/global scope, cluster detach/soft-delete, unknown-role fail-closed, filtered UI/PDF parity, no-result output, security cases, and the quality gate are applicable Stage 1 targets, not N/A merely because current implementation is absent.
 
 ## Out of scope
 
