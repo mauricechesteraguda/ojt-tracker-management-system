@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# feature-10032026-Maurice
+# Direct no-function authentication adapter; credential values never print.
+set -eu
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --student-sr-code) shift; : "${1:?missing student sr code}" ;;
+        --student-password) shift; export DEMO_STUDENT_PASSWORD=${1:?missing student password} ;;
+        --coordinator-sr-code) shift; : "${1:?missing coordinator sr code}" ;;
+        --coordinator-password) shift; export DEMO_COORDINATOR_PASSWORD=${1:?missing coordinator password} ;;
+        --superuser-sr-code) shift; : "${1:?missing superuser sr code}" ;;
+        --superuser-password) shift; export DEMO_SUPERUSER_PASSWORD=${1:?missing superuser password} ;;
+        *) printf '%s\n' 'event=failure operation=demo-auth status=invalid-argument' >&2; exit 64 ;;
+    esac
+    shift
+done
+export DEMO_ACTION=auth
+exec php scripts/demo-seed.php

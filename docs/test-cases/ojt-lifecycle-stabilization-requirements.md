@@ -46,6 +46,8 @@ Acceptance boundary: runtime secrets are environment/config-backed, synthetic fi
 
 Acceptance boundary: Compose-backed data persists across the supported restart path; migrations/auth initialization/seeders can be rerun without duplicate identities or broken relationships; seeded synthetic student, coordinator, and superuser fixtures are exactly the documented local-only identities `DEMO-STUDENT-001`, `DEMO-COORD-001`, and `DEMO-ADMIN-001`; an explicit local reset deterministically restores those identities and their safe synthetic fixture state without external-provider access. They are never production defaults.
 
+Recommended supported interfaces and invariants for Stage 1 targets: automatic bootstrap on normal `docker compose up`; an explicit `docker compose exec php-fpm demo-reset` command (or equivalent named container command finalized by implementation); exactly three synthetic role identities and a deterministic fixture graph; Passport keys byte-identical across normal bootstrap/restart with a stable OAuth client count; and reset that deterministically recreates database data and OAuth clients without exposing key/client secrets or making provider network calls. If the executable name is not yet implemented, these cases specify the behavior contract while naming `demo-reset` as the preferred command.
+
 ### REQ-10 — Layered local quality gate and operational evidence
 
 Acceptance boundary: the Stage 1 quality gate covers browser happy flow, HTTP/API contracts, domain/service invariants, operational health/reset/idempotence, security regression, structured correlation-safe logging, and the requirements/test/baseline evidence package, completing within ten minutes on a reasonable developer laptop. Future happy-flow documentation becomes sealed only after Compose startup and reset pass, the authoritative browser journey passes, linked API/domain/security/regression tests pass, and the local gate completes under ten minutes, followed by explicit user approval. This ticket documents the gate and does not add test code.
@@ -82,7 +84,8 @@ The CSV contains at least one case for every REQ above. Its `Test Type` vocabula
 | Roles/permissions and ownership | TC-OJT-0008; Stage 1 target |
 | Security unauthorized/injection/session expiry | TC-OJT-0019, TC-OJT-0021, TC-OJT-0032; Stage 1 target |
 | Regression | TC-OJT-0020, TC-OJT-0023; current characterization plus Stage 1 quality target |
-| Synthetic fixtures/reset | TC-OJT-0033; Stage 1 target |
+| Compose bootstrap, persistence, idempotence, Passport repeatability, and reset | TC-OJT-0034–TC-OJT-0038; Stage 1 target |
+| Synthetic fixtures/reset | TC-OJT-0033–TC-OJT-0038; Stage 1 target |
 | Happy-flow sealing gate | TC-OJT-0024; Stage 1 target |
 
 Genuine N/A categories and reasons: **Automated Test Ref. IDs** are N/A because Ticket 1 must not create tests; **real-provider success beyond explicit opt-in** is N/A for the default demo because only the environment-held opt-in boundary is approved. Compose health, cross-platform report date/hour validation, fake-provider success/failure/timeout/bad-payload cases, student/coordinator edit/reopen cases, filtered UI/PDF parity, no-result output, security cases, and the quality gate are applicable Stage 1 targets, not N/A merely because current implementation is absent.

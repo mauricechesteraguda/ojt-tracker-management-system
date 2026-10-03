@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# feature-10032026-Maurice
+# Destructive reset is deliberately restricted to the local fake demo.
+set -eu
+printf '%s\n' 'event=startup operation=demo-reset status=begin' >&2
+[ "${APP_ENV:-local}" = local ] || { printf '%s\n' 'event=failure operation=demo-reset status=nonlocal' >&2; exit 64; }
+[ "${PROVIDER_MODE:-fake}" = fake ] || { printf '%s\n' 'event=failure operation=demo-reset status=provider-not-fake' >&2; exit 65; }
+rm -f /tmp/ojt-demo-bootstrap-complete /tmp/ojt-demo-contract
+printf '%s\n' 'event=operation operation=migrate-fresh status=begin' >&2
+php artisan migrate:fresh --force >/dev/null
+printf '%s\n' 'event=operation operation=seed status=begin' >&2
+php scripts/demo-seed.php >/dev/null
+: > /tmp/ojt-demo-bootstrap-complete
+printf '%s\n' 'event=completion operation=demo-reset status=complete' >&2

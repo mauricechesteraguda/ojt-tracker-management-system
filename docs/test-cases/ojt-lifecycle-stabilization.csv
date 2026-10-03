@@ -248,3 +248,53 @@ TC-OJT-0033,Synthetic local fixtures and deterministic reset,Seed/Reset/Auth Fix
 3. No real PII or secrets are present
 4. Reset deterministically restores the same identities and safe synthetic fixture state
 5. Reset does not call the external provider",,Not Run,High,P1,,,,REQ-09,Positive,
+TC-OJT-0034,Clean Compose bootstrap completes,Compose migration/bootstrap,[Stage 1 target] Prove a clean supported Compose startup migrates and bootstraps a usable demo database,"1. Docker is available
+2. No application database, generated Passport key, or OAuth client state exists
+3. The documented Stage 1 target is automatic bootstrap on normal `docker compose up`","1. Run normal `docker compose up`
+2. Wait for Nginx, PHP-FPM, and MariaDB LTS health/readiness
+3. Inspect migration completion, seeded identities, OAuth clients, and placement-linked fixture graph
+4. Verify the application is reachable",clean Compose project; normal `docker compose up`,"1. [Stage 1 target] Normal `docker compose up` completes migration/bootstrap without undocumented manual reconstruction
+2. Nginx, PHP-FPM, and MariaDB LTS become healthy and the application is reachable
+3. Exactly three synthetic role identities exist: student, coordinator, and admin/superuser
+4. Their deterministic fixture graph and Passport clients are present
+5. No live academic-provider call is made",,Not Run,Critical,P1,,,,REQ-01; REQ-09,Integration,
+TC-OJT-0035,Bootstrap rerun is idempotent,Compose migration/bootstrap,[Stage 1 target] Prove repeating automatic bootstrap does not duplicate fixtures or OAuth clients,"1. A clean bootstrap has completed
+2. The database, synthetic identities, deterministic fixture graph, Passport keys, and OAuth clients are inspectable
+3. Normal `docker compose up` is the supported bootstrap interface","1. Record identity, fixture-graph, Passport-key, and OAuth-client counts and stable identifiers
+2. Run normal `docker compose up` again
+3. Re-run the bootstrap/migration path if the startup contract invokes it
+4. Compare records, relationships, key bytes, and client count",before and after normal `docker compose up` rerun,"1. [Stage 1 target] Bootstrap/migrations complete successfully on repeat
+2. Exactly the same three synthetic role identities and deterministic fixture graph remain; no duplicate fixtures or broken relationships appear
+3. Passport key bytes remain unchanged
+4. OAuth client count and stable client identities remain unchanged
+5. No live academic-provider call is made",,Not Run,High,P1,,,,REQ-09,Regression,
+TC-OJT-0036,Normal restart preserves demo state,Compose restart persistence,[Stage 1 target] Prove supported normal restart preserves database data and authentication state,"1. Bootstrap has completed
+2. A deterministic fixture graph and Passport keys/OAuth clients exist
+3. A normal Compose restart path is available","1. Record fixture graph, synthetic identities, Passport key bytes, and OAuth clients
+2. Stop and start the supported Compose services without deleting volumes
+3. Wait for health/readiness
+4. Reinspect records, relationships, keys, and clients",named database/runtime volumes; normal service restart,"1. [Stage 1 target] Services become healthy after normal restart
+2. The deterministic fixture graph and exactly three synthetic role identities persist byte/record-identically
+3. Passport keys remain byte-identical
+4. OAuth client count and stable client identities remain unchanged
+5. No live academic-provider call is made",,Not Run,High,P1,,,,REQ-09,Regression,
+TC-OJT-0037,Passport keys and clients are safely repeatable,Passport initialization,"[Stage 1 target] Prove Passport initialization is repeatable without rotating keys, duplicating clients, or exposing secrets","1. Clean bootstrap and at least one normal restart have completed
+2. Generated Passport key files and OAuth client records can be compared without printing secret values
+3. Repeat bootstrap behavior is available","1. Hash or byte-compare Passport key files before and after normal bootstrap/restart
+2. Record OAuth client count and non-secret stable identifiers
+3. Repeat the supported bootstrap/restart sequence
+4. Inspect logs, command output, and responses for key/client secrets","key bytes; OAuth client count and stable identifiers","1. [Stage 1 target] Passport public/private key bytes remain identical across normal bootstrap and restart
+2. OAuth client count remains stable and no duplicate clients are created
+3. Key contents, client secrets, and token material are never exposed in logs, output, or responses
+4. The repeat sequence completes without a live academic-provider call",,Not Run,High,P1,,,,REQ-08; REQ-09,Security,
+TC-OJT-0038,Reset is deterministic and fake-mode only,Demo reset,[Stage 1 target] Prove explicit reset recreates local data and clients without provider access or secret disclosure,"1. A bootstrapped Compose demo contains synthetic data, Passport keys, and OAuth clients
+2. The preferred explicit interface is `docker compose exec php-fpm demo-reset` (or an equivalent named container command finalized by implementation)
+3. Network observation is available","1. Record deterministic fixture graph, exactly three identities, Passport key bytes, and OAuth client count
+2. Mutate local demo data without changing the approved contract
+3. Run the named reset command (`demo-reset` preferred)
+4. Repeat reset
+5. Observe provider network traffic and inspect output/logs for secrets",preferred command: `docker compose exec php-fpm demo-reset`; fake/local mode only,"1. [Stage 1 target] Reset recreates the deterministic database fixture graph, exactly three synthetic role identities, and OAuth clients
+2. Repeated reset produces the same records, relationships, key bytes, and client count without duplicates
+3. Reset makes no live academic-provider/network call and remains fake-mode only
+4. Passport key/client secrets are not exposed in output, logs, or responses
+5. Behavior remains the contract even if the final executable name differs from preferred `demo-reset`",,Not Run,Critical,P1,,,,REQ-03; REQ-09,Security,

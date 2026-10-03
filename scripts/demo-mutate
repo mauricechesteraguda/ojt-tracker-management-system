@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# feature-10032026-Maurice
+# Direct no-function deterministic mutation adapter for reset verification.
+set -eu
+export DEMO_ACTION=mutate
+exec php scripts/demo-seed.php

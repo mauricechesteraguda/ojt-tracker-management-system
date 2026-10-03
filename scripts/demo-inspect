@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# feature-10032026-Maurice
+# Direct no-function inspection adapter for the local demo contract.
+set -eu
+export DEMO_ACTION=inspect
+printf '%s\n' 'event=startup operation=demo-inspect status=begin' >&2
+if ! timeout 30 sh -c '
+    attempt=0
+    while :; do
+        attempt=$((attempt + 1))
+        if [ -f /tmp/ojt-demo-bootstrap-complete ] && output=$(php scripts/demo-seed.php 2>/dev/null) && printf '%s\n' "$output" | grep -Eq 'natural_keys=unique'; then
+            printf "%s\n" "event=completion operation=demo-inspect status=complete"
+            printf "%s\n" "$output"
+            exit 0
+        fi
+        logger -t ojt-demo-inspect "event=wait operation=demo-inspect status=retry attempt=$attempt" || :
+        if [ "$attempt" -ge 60 ]; then
+            logger -t ojt-demo-inspect "event=failure operation=demo-inspect status=timeout attempts=$attempt" || :
+            exit 1
+        fi
+    done
+'; then
+    printf '%s\n' 'event=failure operation=demo-inspect status=readiness-timeout' >&2
+    exit 1
+fi

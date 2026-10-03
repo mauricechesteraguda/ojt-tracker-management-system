@@ -25,5 +25,10 @@ if ! php artisan --version >/dev/null; then
     exit 1
 fi
 
+# feature-10032026-Maurice
+# Compose waits for MariaDB health; bootstrap then performs bounded local setup.
+printf '%s\n' 'event=operation component=demo-bootstrap status=begin' >&2
+demo-bootstrap
+
 printf '%s\n' "event=startup component=php-fpm status=ready provider_mode=${PROVIDER_MODE:-fake}" >&2
 exec "$@"
