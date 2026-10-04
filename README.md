@@ -137,17 +137,6 @@ The checked-in browser contract uses the pinned Playwright dependency and the
 isolated runner invoked by the acceptance contract; no external test repository
 or live provider is required.
 
-Last independently verified on 2026-10-04: the full quality gate had two successful runs,
-each under 600 seconds. Ticket10 evidence is ephemeral:
-the command performs ephemeral cleanup of its external manifest, screenshots, traces, and containers;
-no manifest is kept after validation. Final local happy-flow acceptance is sealed on the approved
-basis commit recorded in [the happy-flow contract](docs/happy-flow.md); framework modernization remains
-future work. History rewrite/purge and real credential rotation are not claimed complete and remain
-separate approval-gated operational actions.
-
-See the [local demo runbook](docs/runbooks/local-demo.md), [security containment
-runbook](docs/runbooks/security-containment.md), and [sealed happy-flow
-contract](docs/happy-flow.md) for operational semantics and evidence boundaries.
 
 ```sh
 git clone https://github.com/mauricechesteraguda/ojt-tracker-management-system.git
