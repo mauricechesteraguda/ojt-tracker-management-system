@@ -29,7 +29,7 @@ sequenceDiagram
     Academic-->>App: Deterministic fake profile
     Student->>App: Create owned placement for existing company
     App->>DB: Transactionally create placement and active-category requirements
-    Student->>App: Add descriptions and valid reports; submit evidence
+    Student->>App: Add descriptions and valid reports and submit evidence
     Coordinator->>App: Verify requirements and validate evidence
     Coordinator->>App: Approve eligible placement
     App->>DB: Set is_approved=true, status=approved, append one audit event
