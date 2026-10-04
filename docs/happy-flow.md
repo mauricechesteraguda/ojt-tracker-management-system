@@ -1,6 +1,15 @@
-# OJT happy flow — Candidate — not sealed
+# OJT happy flow — Sealed
 
-**Status: Candidate — not sealed.** This is the authoritative current lifecycle description, aligned with the [README sequence](../README.md#happy-flow). It remains unsealed pending successful Ticket10 evidence and explicit user approval. No QA Actual Result or Status is asserted here.
+**Status: Sealed.** This is the authoritative current lifecycle description, aligned with the [README sequence](../README.md#happy-flow). Final local happy-flow acceptance is sealed; framework modernization remains future work. No QA Actual Result or Status is asserted here.
+
+### Approval record
+
+- **Actor:** Repository owner (explicit approval)
+- **Approved:** 2026-10-04
+- **Acceptance basis commit:** `aaeaf344dbf959083863988c222e1130b0ef3bf3`
+- **Quality evidence:** Precommit and clean-HEAD full quality gates both passed under 600 seconds.
+- **Evidence handling:** Acceptance evidence was ephemeral and cleaned per policy; no evidence is retained.
+- **Outstanding operational actions:** History rewrite/purge and real credential rotation remain separate approval-gated operational actions and do not invalidate this local happy-flow seal.
 
 ```mermaid
 sequenceDiagram
@@ -62,7 +71,7 @@ Each acceptance run should produce `manifest.jsonl` outside the repository. It c
 
 ## Acceptance criteria
 
-Sealing requires a clean checkout with current-tree containment, Compose startup/readiness, deterministic reset/persistence, the synthetic browser journey, linked API/domain/security/regression coverage, secret-safe external artifacts, the aggregate quality gate including forced-failure continuation, and a repeat run within the 600-second bound. A user must explicitly approve the exact revision, command, timestamp, and evidence manifest.
+Sealing requires a clean checkout with current-tree containment, Compose startup/readiness, deterministic reset/persistence, the synthetic browser journey, linked API/domain/security/regression coverage, secret-safe external artifacts, the aggregate quality gate including forced-failure continuation, and a repeat run within the 600-second bound. The repository owner explicitly approved the exact revision, command, timestamp, and evidence manifest on 2026-10-04; evidence was ephemeral and cleaned per policy.
 
 ## Known legacy boundaries
 

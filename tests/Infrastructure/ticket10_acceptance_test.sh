@@ -1,5 +1,5 @@
 #!/bin/sh
-# test-10042026-Maurice: Ticket10 green acceptance and evidence contract.
+# test-10042026-Maurice: Ticket10 green sealed acceptance and evidence contract.
 # Deliberately top-level POSIX shell: no shell functions and no repository output.
 set -eu
 umask 077
@@ -24,8 +24,20 @@ if git -C "$REPO_ROOT" grep -n -I -E '(ACADEMIC_PROVIDER_KEY|api[_-]?key)[[:spac
 grep -q '^/ojt.sql$' "$REPO_ROOT/.gitignore" || { printf '%s\n' 'ticket10: missing SQL ignore rule' >&2; exit 1; }
 grep -q '^/public/uploads/$' "$REPO_ROOT/.gitignore" || { printf '%s\n' 'ticket10: missing upload ignore rule' >&2; exit 1; }
 
-[ -f "$REPO_ROOT/docs/happy-flow.md" ] || { printf '%s\n' 'ticket10: candidate happy-flow document missing' >&2; exit 1; }
-grep -q 'Candidate.*not sealed' "$REPO_ROOT/docs/happy-flow.md" || { printf '%s\n' 'ticket10: happy-flow is not explicitly unsealed' >&2; exit 1; }
+[ -f "$REPO_ROOT/docs/happy-flow.md" ] || { printf '%s\n' 'ticket10: sealed happy-flow document missing' >&2; exit 1; }
+grep -q '^# OJT happy flow — Sealed$' "$REPO_ROOT/docs/happy-flow.md" || { printf '%s\n' 'ticket10: happy-flow is not exactly sealed' >&2; exit 1; }
+grep -q '^\*\*Status: Sealed\.\*\*' "$REPO_ROOT/docs/happy-flow.md" || { printf '%s\n' 'ticket10: happy-flow status is not sealed' >&2; exit 1; }
+grep -q 'repository owner.*explicit approval\|Repository owner.*explicit approval' "$REPO_ROOT/docs/happy-flow.md" || { printf '%s\n' 'ticket10: explicit repository-owner approval missing' >&2; exit 1; }
+grep -q '2026-10-04' "$REPO_ROOT/docs/happy-flow.md" || { printf '%s\n' 'ticket10: approval date missing' >&2; exit 1; }
+grep -q 'aaeaf344dbf959083863988c222e1130b0ef3bf3' "$REPO_ROOT/docs/happy-flow.md" || { printf '%s\n' 'ticket10: acceptance basis commit missing' >&2; exit 1; }
+grep -q 'Precommit.*clean-HEAD.*under 600\|clean-HEAD.*Precommit.*under 600' "$REPO_ROOT/docs/happy-flow.md" || { printf '%s\n' 'ticket10: two under-600 quality-gate statement missing' >&2; exit 1; }
+grep -qi 'ephemeral.*cleaned\|cleaned.*ephemeral' "$REPO_ROOT/docs/happy-flow.md" || { printf '%s\n' 'ticket10: ephemeral cleanup statement missing' >&2; exit 1; }
+grep -qi 'no evidence is retained\|no manifest is kept' "$REPO_ROOT/docs/happy-flow.md" || { printf '%s\n' 'ticket10: no-retained-evidence statement missing' >&2; exit 1; }
+grep -qi 'history rewrite.*separate approval-gated\|credential rotation.*separate approval-gated' "$REPO_ROOT/docs/happy-flow.md" || { printf '%s\n' 'ticket10: outstanding approval-gated actions missing' >&2; exit 1; }
+if grep -qiE 'Candidate.*not sealed|pending.*approval|unapproved|blank seal' "$REPO_ROOT/docs/happy-flow.md"; then
+    printf '%s\n' 'ticket10: happy-flow contains candidate or unapproved seal language' >&2
+    exit 1
+fi
 grep -q 'manifest.jsonl\|contains_secrets' "$REPO_ROOT/docs/happy-flow.md" || { printf '%s\n' 'ticket10: evidence schema missing' >&2; exit 1; }
 [ -f "$REPO_ROOT/docs/runbooks/local-demo.md" ] && [ -f "$REPO_ROOT/docs/runbooks/security-containment.md" ] || { printf '%s\n' 'ticket10: required runbooks missing' >&2; exit 1; }
 grep -q 'docker compose up --build -d' "$REPO_ROOT/README.md" || { printf '%s\n' 'ticket10: README Compose command missing' >&2; exit 1; }
@@ -44,12 +56,12 @@ requirements = open(os.path.join(root, 'docs/test-cases/ojt-lifecycle-stabilizat
 timing = readme[readme.lower().find('last independently verified'):]
 if not re.search(r'Last independently verified on 20\d\d-\d\d-\d\d', timing, re.I):
     raise SystemExit('ticket10: README timing claim is not date-stamped')
-for marker in ('two successful runs', 'each under 600', 'ephemeral', 'clean(?:ed|up)', 'manifest', 'candidate.*not sealed|does not seal|unsealed'):
+for marker in ('two successful runs', 'each under 600', 'ephemeral', 'clean(?:ed|up)', 'manifest', 'sealed', 'no manifest is kept|no evidence is retained'):
     if not re.search(marker, timing, re.I):
         raise SystemExit('ticket10: README timing claim missing explicit ' + marker)
 if re.search(r'\bin\s+\d+(?:\.\d+)?\s*(?:s|sec|seconds)\b|\b\d+(?:\.\d+)?\s*seconds?\s*(?:each|and)', timing, re.I):
     raise SystemExit('ticket10: README timing claim includes exact run durations')
-if re.search(r'permanent|retained|persistent evidence|evidence retained', timing, re.I):
+if re.search(r'permanent|retained evidence|persistent evidence|evidence retained', timing, re.I):
     raise SystemExit('ticket10: README timing claim implies retained evidence')
 if re.search(r'`hash`|"hash"', requirements, re.I) or not re.search(r'`sha256`|"sha256"', requirements, re.I):
     raise SystemExit('ticket10: requirements docs use obsolete hash schema')
@@ -58,11 +70,8 @@ if re.search(r'\bRED\b|planned|when its checked-in.*available', local_demo, re.I
 if not re.search(r'checked-in.*acceptance|acceptance.*checked-in', local_demo, re.I):
     raise SystemExit('ticket10: local-demo does not describe checked-in acceptance')
 PY
-[ "$(grep -ci 'Candidate.*not sealed' "$REPO_ROOT/docs/happy-flow.md")" -gt 0 ] || { printf '%s\n' 'ticket10: candidate is not explicitly unsealed' >&2; exit 1; }
-if grep -q '"approval"[[:space:]]*:' "$REPO_ROOT/docs/happy-flow.md"; then
-    printf '%s\n' 'ticket10: candidate contains an approval record' >&2
-    exit 1
-fi
+[ "$(grep -c '^\*\*Status: Sealed\.\*\*' "$REPO_ROOT/docs/happy-flow.md")" -eq 1 ] || { printf '%s\n' 'ticket10: sealed status is missing or duplicated' >&2; exit 1; }
+[ "$(grep -ci 'repository owner.*explicit approval' "$REPO_ROOT/docs/happy-flow.md")" -gt 0 ] || { printf '%s\n' 'ticket10: approval actor role is missing' >&2; exit 1; }
 
 python3 - "$REPO_ROOT" <<'PY'
 import os, re, subprocess, sys
@@ -223,7 +232,10 @@ docs = open(os.path.join(root, 'docs/happy-flow.md'), encoding='utf-8').read()
 for marker in ('manifest.jsonl', 'one object per artifact row', '"case"', '"artifact"', '"sha256"', '"source"', '"contains_secrets"', '"revision"', '"command"', '"timestamp"'):
     if marker not in docs: raise SystemExit('ticket10: docs schema does not match JSONL row semantics: ' + marker)
 if re.search(r'"artifacts"\s*:', docs): raise SystemExit('ticket10: docs uses aggregate manifest schema instead of JSONL rows')
-if not re.search(r'Candidate.*not sealed', docs, re.I): raise SystemExit('ticket10: candidate is not explicitly unsealed')
-if re.search(r'"approval"\s*:', docs, re.I): raise SystemExit('ticket10: candidate contains an approval record')
+if not re.search(r'^\*\*Status: Sealed\.\*\*', docs, re.I | re.M): raise SystemExit('ticket10: happy-flow is not sealed')
+for marker in (r'repository owner.*explicit approval', r'2026-10-04', r'aaeaf344dbf959083863988c222e1130b0ef3bf3', r'Precommit.*clean-HEAD.*under 600', r'ephemeral.*cleaned', r'no evidence is retained|no manifest is kept', r'history rewrite.*approval-gated', r'credential rotation.*approval-gated'):
+    if not re.search(marker, docs, re.I | re.S): raise SystemExit('ticket10: sealed approval record missing: ' + marker)
+if re.search(r'Candidate.*not sealed|pending.*approval|unapproved', docs, re.I): raise SystemExit('ticket10: stale candidate/unapproved seal language remains')
+if re.search(r'permanent evidence|retained evidence|persistent evidence|evidence retained', docs, re.I): raise SystemExit('ticket10: retained evidence claim remains')
 PY
 printf '%s\n' "ticket10|PASS|elapsed=${ELAPSED}s|evidence=$EVIDENCE_DIR"

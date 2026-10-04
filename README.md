@@ -17,7 +17,7 @@ This repository contains a Laravel monolith for tracking college On-the-Job Trai
 
 This is a portfolio view of the current, tested deployment shape. It documents **legacy runtime stabilization**, not current supported framework modernization.
 
-**Project status:** Legacy stabilization with a tested local Compose contract; modernization and sealed final acceptance remain later milestones.
+**Project status:** Legacy stabilization with a tested local Compose contract; final local happy-flow acceptance is sealed, while framework modernization remains future work.
 
 | Area | Current stack / boundary |
 | --- | --- |
@@ -55,7 +55,7 @@ flowchart LR
 
 ## Happy Flow
 
-This is the tested current contract and will only become sealed after final acceptance.
+This is the tested current contract; final local happy-flow acceptance is sealed. Framework modernization remains future work.
 
 ```mermaid
 sequenceDiagram
@@ -140,12 +140,14 @@ or live provider is required.
 Last independently verified on 2026-10-04: the full quality gate had two successful runs,
 each under 600 seconds. Ticket10 evidence is ephemeral:
 the command performs ephemeral cleanup of its external manifest, screenshots, traces, and containers;
-no manifest is kept after validation and this result does not seal the candidate happy-flow document.
+no manifest is kept after validation. Final local happy-flow acceptance is sealed on the approved
+basis commit recorded in [the happy-flow contract](docs/happy-flow.md); framework modernization remains
+future work. History rewrite/purge and real credential rotation are not claimed complete and remain
+separate approval-gated operational actions.
 
 See the [local demo runbook](docs/runbooks/local-demo.md), [security containment
-runbook](docs/runbooks/security-containment.md), and [candidate happy-flow
-contract](docs/happy-flow.md) for operational semantics, evidence boundaries,
-and the unsealed lifecycle candidate.
+runbook](docs/runbooks/security-containment.md), and [sealed happy-flow
+contract](docs/happy-flow.md) for operational semantics and evidence boundaries.
 
 ```sh
 git clone https://github.com/mauricechesteraguda/ojt-tracker-management-system.git

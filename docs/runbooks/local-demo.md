@@ -59,7 +59,7 @@ The second command is the checked-in Ticket10 acceptance contract. It starts an 
 npx playwright test tests/E2E/ticket10_happy_flow.spec.js --workers=1 --max-failures=1
 ```
 
-The acceptance command is a candidate evidence producer, not a retained-manifest or sealing operation. Do not mark the happy flow sealed or fill QA Actual Result/Status until the required evidence and explicit user approval exist.
+The acceptance command is an ephemeral evidence producer; it is not a retained-manifest operation. The happy flow is locally sealed after the required evidence and explicit repository-owner approval recorded in the [happy-flow contract](../happy-flow.md). QA Actual Result/Status fields remain governed by their existing test records.
 
 ## Troubleshooting
 

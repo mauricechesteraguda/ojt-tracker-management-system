@@ -51,4 +51,4 @@ The only genuine N/A category is **real-provider success beyond explicit opt-in*
 
 ## Open Questions
 
-None. All Ticket 1 open questions are resolved; no unacknowledged questions remain. Future happy-flow sealing still requires the explicit user approval defined by REQ-10.
+None. All Ticket 1 open questions are resolved; no unacknowledged questions remain. The final local happy-flow seal records the explicit repository-owner approval defined by REQ-10; framework modernization and separately approval-gated operational actions remain outside this baseline.
