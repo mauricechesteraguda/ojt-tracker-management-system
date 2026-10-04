@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\batsu_api;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 

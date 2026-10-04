@@ -9,6 +9,8 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Auth\AuthenticationException;
 use App\Support\SessionTracer;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -57,8 +59,14 @@ class Handler extends ExceptionHandler
             if ($request->expectsJson() || $request->is('api/*')) {
                 $prepared = $this->prepareException($exception);
                 $status = $this->isHttpException($prepared) ? (int) $prepared->getStatusCode() : ($prepared instanceof AuthenticationException ? 401 : ($prepared instanceof ModelNotFoundException ? 404 : ($prepared instanceof ValidationException ? 422 : 500)));
-                if (in_array($status, array(401, 403, 404, 409, 422), true)) {
-                    $result = ApiErrorNormalizer::response($request, $status, $status === 422 ? 'validation_error' : ($status === 409 ? 'conflict' : ($status === 404 ? 'not_found' : ($status === 403 ? 'forbidden' : 'unauthenticated'))));
+                /* fix-10042026-Maurice: preserve read-only API collection rejections as safe exact 405s. */
+                $methodNotAllowed = $prepared instanceof MethodNotAllowedHttpException || $status === 405;
+                if ($methodNotAllowed || in_array($status, array(401, 403, 404, 409, 422), true)) {
+                    if ($methodNotAllowed) {
+                        Log::warning('http_method_not_allowed', array('event' => 'http_method_not_allowed', 'category' => 'expected_http_405', 'operation' => 'exception.handler.render', 'status' => 405, 'correlation_id' => $correlationId, 'message_category' => 'method_not_allowed'));
+                    }
+                    $code = $methodNotAllowed ? 'method_not_allowed' : ($status === 422 ? 'validation_error' : ($status === 409 ? 'conflict' : ($status === 404 ? 'not_found' : ($status === 403 ? 'forbidden' : 'unauthenticated'))));
+                    $result = ApiErrorNormalizer::response($request, $methodNotAllowed ? 405 : $status, $code);
                     SessionTracer::leave('exception.handler.render', $correlationId, $started, 'safe_api_error', array('resource_type' => 'api', 'status' => $status)); return $result;
                 }
             }

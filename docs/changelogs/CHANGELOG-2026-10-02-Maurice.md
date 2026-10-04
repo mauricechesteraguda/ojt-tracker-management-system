@@ -17,5 +17,7 @@
 - Docs-only: updated the README with verified capabilities, current Laravel monolith structure, route/auth boundaries, deterministic local demo accounts, Compose readiness semantics, and screenshots of the login, student internship (placement/evidence), and coordinator company (company management) pages; preserved the Mermaid sections.
 
 - Ticket09: added correlation propagation, structured JSON logging, redacted SessionTracer envelopes, JSONL container logs, Nginx access logging, and bounded local quality gate.
+- Ticket10 docs-only: added local demo, security containment, and candidate happy-flow runbooks; linked them from the README with the exact quality and acceptance commands. The happy flow remains unsealed pending evidence and explicit user approval.
+- Ticket10 TC-OJT-0043: normalized read-only lifecycle-event PUT/PATCH/DELETE rejections as exact safe 405 JSON with correlation propagation and expected-warning observability; strengthened unchanged-event coverage.
 
 Author Name: Aguda, Maurice

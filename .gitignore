@@ -16,3 +16,14 @@ yarn-error.log
 
 .serena
 .trailmap/
+
+# security-10042026-Maurice: database dumps are never versioned.
+*.sql
+/ojt.sql
+!database/schema/*.sql
+
+# security-10042026-Maurice: user uploads are runtime data; retain only an intentional placeholder.
+/public/uploads/
+!/public/uploads/
+/public/uploads/*
+!/public/uploads/.gitkeep

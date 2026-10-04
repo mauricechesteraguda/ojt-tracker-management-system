@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # test-10032026-Maurice
+# test-10042026-Maurice: exact lifecycle migration inventory regression guard.
 # Ticket 08 RED contract: approval/reopen lifecycle, immutable approved data,
 # lifecycle events/audit visibility, and approved-only reporting.
 # Mapped to TC0005/0006/0009/0010/0022/0027-0031.
@@ -19,11 +20,16 @@ logger -t ojt-ticket08 "event=startup status=begin test=ticket08_lifecycle_test 
 
 # Static gates deliberately precede Docker and provide the initial RED.
 logger -t ojt-ticket08 'event=major-operation status=check cases=TC0005,TC0006,TC0009,TC0010,TC0022,TC0027,TC0028,TC0029,TC0030,TC0031 assertion=lifecycle-artifacts' || :
-find "$REPO_ROOT/database/migrations" -type f -name '*.php' -print -quit | xargs grep -Elq 'lifecycle.?events|internship_lifecycle_events|create.*events' 2>/dev/null || { printf '%s\n' 'FAIL [TC0005]: lifecycle event migration is missing (Docker not started)' >&2; exit 1; }
-LIFECYCLE_MIGRATION=$(grep -El 'class[[:space:]]+CreateInternshipLifecycleEvents' "$REPO_ROOT/database/migrations"/*.php | head -n 1)
-grep -Eiq 'foreign|check|constraint' "$LIFECYCLE_MIGRATION" || { printf '%s\n' 'FAIL [TC0005]: lifecycle event referential/shape constraints are missing (Docker not started)' >&2; exit 1; }
-grep -Eiq 'trigger|before[[:space:]]+(insert|update|delete)|append.?only' "$LIFECYCLE_MIGRATION" || { printf '%s\n' 'FAIL [TC0005]: lifecycle event append-only DB boundary is missing (Docker not started)' >&2; exit 1; }
-grep -Eiq 'dropIfExists|drop[[:space:]]+trigger|dropTrigger' "$LIFECYCLE_MIGRATION" || { printf '%s\n' 'FAIL [TC0005]: lifecycle event down cleanup is missing (Docker not started)' >&2; exit 1; }
+LIFECYCLE_MIGRATION="$REPO_ROOT/database/migrations/2026_10_04_000001_create_internship_lifecycle_events_table.php"
+[ -f "$LIFECYCLE_MIGRATION" ] || { printf '%s\n' 'FAIL [TC0005]: exact lifecycle event migration is missing (Docker not started)' >&2; exit 1; }
+grep -Eq '^class[[:space:]]+CreateInternshipLifecycleEventsTable[[:space:]]+extends[[:space:]]+Migration' "$LIFECYCLE_MIGRATION" || { printf '%s\n' 'FAIL [TC0005]: lifecycle migration class/schema target is not exact (Docker not started)' >&2; exit 1; }
+grep -Eq "Schema::create\('internship_lifecycle_events'|bigIncrements\('id'\)|unsignedInteger\('internship_id'\)|unsignedInteger\('actor_id'\)|string\('event_type', 16\)|boolean\('from_is_approved'\)|boolean\('to_is_approved'\)|string\('reason', 500\)->nullable" "$LIFECYCLE_MIGRATION" || { printf '%s\n' 'FAIL [TC0005]: lifecycle event schema columns are incomplete (Docker not started)' >&2; exit 1; }
+grep -Fq "foreign('internship_id')->references('id')->on('internships')->onDelete('restrict')" "$LIFECYCLE_MIGRATION" || { printf '%s\n' 'FAIL [TC0005]: internship lifecycle foreign key is missing (Docker not started)' >&2; exit 1; }
+grep -Fq "foreign('actor_id')->references('id')->on('users')->onDelete('restrict')" "$LIFECYCLE_MIGRATION" || { printf '%s\n' 'FAIL [TC0005]: actor lifecycle foreign key is missing (Docker not started)' >&2; exit 1; }
+grep -Fq 'CREATE TRIGGER internship_lifecycle_events_before_insert' "$LIFECYCLE_MIGRATION" || { printf '%s\n' 'FAIL [TC0005]: lifecycle insert trigger is missing (Docker not started)' >&2; exit 1; }
+grep -Fq 'CREATE TRIGGER internship_lifecycle_events_before_update' "$LIFECYCLE_MIGRATION" || { printf '%s\n' 'FAIL [TC0005]: lifecycle update immutability trigger is missing (Docker not started)' >&2; exit 1; }
+grep -Fq 'CREATE TRIGGER internship_lifecycle_events_before_delete' "$LIFECYCLE_MIGRATION" || { printf '%s\n' 'FAIL [TC0005]: lifecycle delete immutability trigger is missing (Docker not started)' >&2; exit 1; }
+grep -Fq 'DROP TRIGGER IF EXISTS internship_lifecycle_events_before_insert' "$LIFECYCLE_MIGRATION" || { printf '%s\n' 'FAIL [TC0005]: lifecycle down cleanup is missing (Docker not started)' >&2; exit 1; }
 [ -f "$REPO_ROOT/app/InternshipLifecycleEvent.php" ] || { printf '%s\n' 'FAIL [TC0005]: lifecycle event model is missing (Docker not started)' >&2; exit 1; }
 grep -Eiq 'approve|reopen' "$REPO_ROOT/routes/api.php" || { printf '%s\n' 'FAIL [TC0006]: approve/reopen routes are missing (Docker not started)' >&2; exit 1; }
 grep -Eiq 'events|lifecycle' "$REPO_ROOT/routes/api.php" || { printf '%s\n' 'FAIL [TC0005]: lifecycle event read route is missing (Docker not started)' >&2; exit 1; }

@@ -121,7 +121,31 @@ Requires Docker with Compose. The default setup generates local app/database sec
 
 ### Local quality gate
 
-Run the bounded sequential contract suite with `sh tests/quality-gate.sh`.
+Run the bounded sequential contract suite with:
+
+```sh
+sh tests/quality-gate.sh
+```
+
+The Ticket10 candidate acceptance command is:
+
+```sh
+sh tests/Infrastructure/ticket10_acceptance_test.sh
+```
+
+The checked-in browser contract uses the pinned Playwright dependency and the
+isolated runner invoked by the acceptance contract; no external test repository
+or live provider is required.
+
+Last independently verified on 2026-10-04: the full quality gate had two successful runs,
+each under 600 seconds. Ticket10 evidence is ephemeral:
+the command performs ephemeral cleanup of its external manifest, screenshots, traces, and containers;
+no manifest is kept after validation and this result does not seal the candidate happy-flow document.
+
+See the [local demo runbook](docs/runbooks/local-demo.md), [security containment
+runbook](docs/runbooks/security-containment.md), and [candidate happy-flow
+contract](docs/happy-flow.md) for operational semantics, evidence boundaries,
+and the unsealed lifecycle candidate.
 
 ```sh
 git clone https://github.com/mauricechesteraguda/ojt-tracker-management-system.git
@@ -172,7 +196,7 @@ The current API is organized into high-level resource groups rather than the obs
 - Reporting: `POST /api/internships/report` for JSON and `POST /api/internships/report/pdf` for PDF; results are approved-only.
 - Academic data: `POST /api/academic/profile` uses the configured fake provider by default.
 
-The checked-in automated validation is fail-fast Compose/shell contract coverage. Playwright was used only to capture the README screenshots; it is not a checked-in test stack.
+The checked-in automated validation is fail-fast Compose/shell contract coverage plus the pinned Playwright Ticket10 acceptance stack.
 
 ## Contribution
 
