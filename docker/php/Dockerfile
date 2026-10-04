@@ -44,6 +44,11 @@ RUN mkdir -p storage bootstrap/cache \
     && chmod 0755 /usr/local/bin/ojt-php-entrypoint /usr/local/bin/demo-bootstrap /usr/local/bin/demo-reset /usr/local/bin/demo-inspect /usr/local/bin/demo-auth-contract /usr/local/bin/demo-mutate \
     && chown -R app:app /var/www/html
 
+# observability-10042026-Maurice: suppress native FPM notices/access lines so
+# application stderr remains a JSONL stream; Laravel errors remain structured.
+RUN sed -i 's|^;\?error_log[[:space:]]*=.*|error_log = /dev/null|' /usr/local/etc/php-fpm.conf \
+    && printf '%s\n' '[www]' 'access.log = /dev/null' 'catch_workers_output = yes' > /usr/local/etc/php-fpm.d/zz-ojt-logging.conf
+
 USER app
 ENTRYPOINT ["/usr/local/bin/ojt-php-entrypoint"]
 CMD ["php-fpm", "-F"]

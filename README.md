@@ -119,6 +119,10 @@ These screenshots show visible application pages without embedding demo credenti
 
 Requires Docker with Compose. The default setup generates local app/database secrets and synthetic fixtures; no live provider credentials are required.
 
+### Local quality gate
+
+Run the bounded sequential contract suite with `sh tests/quality-gate.sh`.
+
 ```sh
 git clone https://github.com/mauricechesteraguda/ojt-tracker-management-system.git
 cd ojt-tracker-management-system

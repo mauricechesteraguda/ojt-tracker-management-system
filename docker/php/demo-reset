@@ -1,15 +1,28 @@
 #!/bin/sh
 
 # feature-10032026-Maurice
+# observability/fix-10042026-Maurice: every subprocess failure is explicit.
 # Destructive reset is deliberately restricted to the local fake demo.
 set -eu
-printf '%s\n' 'event=startup operation=demo-reset status=begin' >&2
-[ "${APP_ENV:-local}" = local ] || { printf '%s\n' 'event=failure operation=demo-reset status=nonlocal' >&2; exit 64; }
-[ "${PROVIDER_MODE:-fake}" = fake ] || { printf '%s\n' 'event=failure operation=demo-reset status=provider-not-fake' >&2; exit 65; }
-rm -f /tmp/ojt-demo-bootstrap-complete /tmp/ojt-demo-contract
-printf '%s\n' 'event=operation operation=migrate-fresh status=begin' >&2
-php artisan migrate:fresh --force >/dev/null
-printf '%s\n' 'event=operation operation=seed status=begin' >&2
-php scripts/demo-seed.php >/dev/null
-: > /tmp/ojt-demo-bootstrap-complete
-printf '%s\n' 'event=completion operation=demo-reset status=complete' >&2
+printf '%s\n' '{"timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","level":"info","event":"startup","component":"demo-reset","operation":"reset","status":"begin"}' >&2
+[ "${APP_ENV:-local}" = local ] || { printf '%s\n' '{"timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","level":"error","event":"failure","component":"demo-reset","operation":"reset","status":"nonlocal","correlation_id":null,"exception_class":"RuntimeException","error_class":"RuntimeException","error_category":"configuration_failure","message_category":"unsafe_mode","stack":"redacted","cause":"none","remediation":"use_local_environment"}' >&2; exit 64; }
+[ "${PROVIDER_MODE:-fake}" = fake ] || { printf '%s\n' '{"timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","level":"error","event":"failure","component":"demo-reset","operation":"reset","status":"provider-not-fake","correlation_id":null,"exception_class":"RuntimeException","error_class":"RuntimeException","error_category":"configuration_failure","message_category":"provider_mode","stack":"redacted","cause":"none","remediation":"use_fake_provider"}' >&2; exit 65; }
+if ! rm -f /tmp/ojt-demo-bootstrap-complete /tmp/ojt-demo-contract; then
+    printf '%s\n' '{"timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","level":"error","event":"failure","component":"demo-reset","operation":"cleanup","status":"cleanup-failed","correlation_id":null,"exception_class":"RuntimeException","error_category":"reset_cleanup_failure","message_category":"cleanup_failed","stack":"redacted","cause":"none","remediation":"inspect_runtime_storage"}' >&2
+    exit 1
+fi
+printf '%s\n' '{"timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","level":"info","event":"operation","component":"demo-reset","operation":"migrate-fresh","status":"begin"}' >&2
+if ! php artisan migrate:fresh --force >/dev/null 2>&1; then
+    printf '%s\n' '{"timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","level":"error","event":"failure","component":"demo-reset","operation":"migrate-fresh","status":"migration-failed","correlation_id":null,"exception_class":"RuntimeException","error_category":"migration_failure","message_category":"migration_failed","stack":"redacted","cause":"none","remediation":"inspect_database_migrations"}' >&2
+    exit 1
+fi
+printf '%s\n' '{"timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","level":"info","event":"operation","component":"demo-reset","operation":"seed","status":"begin"}' >&2
+if ! php scripts/demo-seed.php >/dev/null 2>&1; then
+    printf '%s\n' '{"timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","level":"error","event":"failure","component":"demo-reset","operation":"seed","status":"seed-failed","correlation_id":null,"exception_class":"RuntimeException","error_category":"seed_failure","message_category":"seed_failed","stack":"redacted","cause":"none","remediation":"inspect_seed_contract"}' >&2
+    exit 1
+fi
+if ! : > /tmp/ojt-demo-bootstrap-complete; then
+    printf '%s\n' '{"timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","level":"error","event":"failure","component":"demo-reset","operation":"completion-marker","status":"marker-failed","correlation_id":null,"exception_class":"RuntimeException","error_category":"completion_failure","message_category":"marker_failed","stack":"redacted","cause":"none","remediation":"inspect_runtime_storage"}' >&2
+    exit 1
+fi
+printf '%s\n' '{"timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","level":"info","event":"completion","component":"demo-reset","operation":"reset","status":"complete"}' >&2

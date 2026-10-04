@@ -7,10 +7,12 @@ RUN mkdir -p /var/cache/nginx /var/log/nginx /var/lib/nginx /tmp/nginx \
     && sed -i '/^[[:space:]]*user[[:space:]]/d; /^[[:space:]]*pid[[:space:]]/d' /etc/nginx/nginx.conf
 
 COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY docker/nginx/entrypoint.sh /usr/local/bin/ojt-nginx-entrypoint
 COPY . /var/www/html
 RUN chown -R nginx:nginx /var/www/html
+RUN chmod 0755 /usr/local/bin/ojt-nginx-entrypoint
 
 WORKDIR /var/www/html
 
 USER nginx
-ENTRYPOINT ["nginx", "-g", "pid /tmp/nginx/nginx.pid; daemon off;"]
+ENTRYPOINT ["/usr/local/bin/ojt-nginx-entrypoint"]

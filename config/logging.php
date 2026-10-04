@@ -1,7 +1,6 @@
 <?php
 
 use Monolog\Handler\StreamHandler;
-use Monolog\Handler\SyslogUdpHandler;
 
 return [
 
@@ -36,56 +35,81 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['daily'],
+            'channels' => ['stderr', 'structured_file'],
+        ],
+
+        'structured_file' => [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'formatter' => App\Logging\JsonFormatter::class,
+            'tap' => [App\Logging\ConfigureStructuredLogging::class],
+            'level' => 'debug',
+            'with' => ['stream' => storage_path('logs/laravel.log')],
         ],
 
         'single' => [
-            'driver' => 'single',
-            'path' => storage_path('logs/laravel.log'),
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'formatter' => App\Logging\JsonFormatter::class,
+            'tap' => [App\Logging\ConfigureStructuredLogging::class],
             'level' => 'debug',
+            'with' => ['stream' => 'php://stderr'],
         ],
 
         'daily' => [
-            'driver' => 'daily',
-            'path' => storage_path('logs/laravel.log'),
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'formatter' => App\Logging\JsonFormatter::class,
+            'tap' => [App\Logging\ConfigureStructuredLogging::class],
             'level' => 'debug',
-            'days' => 14,
+            'with' => ['stream' => 'php://stderr'],
         ],
 
         'slack' => [
-            'driver' => 'slack',
-            'url' => env('LOG_SLACK_WEBHOOK_URL'),
-            'username' => 'Laravel Log',
-            'emoji' => ':boom:',
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'formatter' => App\Logging\JsonFormatter::class,
+            'tap' => [App\Logging\ConfigureStructuredLogging::class],
             'level' => 'critical',
+            'with' => ['stream' => 'php://stderr'],
         ],
 
         'papertrail' => [
-            'driver'  => 'monolog',
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'formatter' => App\Logging\JsonFormatter::class,
+            'tap' => [App\Logging\ConfigureStructuredLogging::class],
             'level' => 'debug',
-            'handler' => SyslogUdpHandler::class,
-            'handler_with' => [
-                'host' => env('PAPERTRAIL_URL'),
-                'port' => env('PAPERTRAIL_PORT'),
-            ],
+            'with' => ['stream' => 'php://stderr'],
         ],
 
         'stderr' => [
             'driver' => 'monolog',
             'handler' => StreamHandler::class,
+            'formatter' => App\Logging\JsonFormatter::class,
+            'level' => 'debug',
+            'tap' => [App\Logging\ConfigureStructuredLogging::class],
             'with' => [
                 'stream' => 'php://stderr',
             ],
         ],
 
         'syslog' => [
-            'driver' => 'syslog',
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'formatter' => App\Logging\JsonFormatter::class,
+            'tap' => [App\Logging\ConfigureStructuredLogging::class],
             'level' => 'debug',
+            'with' => ['stream' => 'php://stderr'],
         ],
 
         'errorlog' => [
-            'driver' => 'errorlog',
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'formatter' => App\Logging\JsonFormatter::class,
+            'tap' => [App\Logging\ConfigureStructuredLogging::class],
             'level' => 'debug',
+            'with' => ['stream' => 'php://stderr'],
         ],
     ],
 

@@ -448,3 +448,37 @@ TC-OJT-0039,Authenticated unknown-role fail-closed,Authorization,"[Stage 1 targe
 4. No create, update, delete, verify, validate, approve, search, filter, cluster-detach, or cluster-soft-delete side effect occurs
 5. Missing/malformed/injection-like filters do not reach an authorized query or renderer
 6. The server ignores/rejects client-supplied owner/updater/role-sensitive escalation fields",,Not Run,High,P1,,,,REQ-02; REQ-06; REQ-07,Regression,
+TC-OJT-0040,Structured JSON observability and secret-safe traces,Operational observability,"[Stage 1 target] Verify application, startup, HTTP, trace, container, and artifact logs are structured and safe across normal, invalid-credential, and unexpected-failure paths","1. Compose/application, startup, HTTP, trace, and container log collection is available
+2. A correlation ID can be supplied and captured
+3. Invalid credentials and a deterministic unexpected failure can be exercised","1. Start the supported stack and capture every nonempty application/startup/container log line, traces, and generated diagnostic artifacts
+2. Exercise a healthy request, an HTTP request with X-Correlation-ID, invalid credentials, and an unexpected failure
+3. Parse each nonempty line as JSON and inspect required fields and correlation propagation
+4. Search logs, traces, and artifacts for secrets, credentials, raw payloads, PII, and demo credentials","required fields=timestamp,level,event,component_or_operation,status; HTTP correlation_id=provided value; forbidden patterns=secret,password,token,api_key,raw payload,email,phone,address,demo credentials","1. Every nonempty application/startup log line is valid JSON with timestamp, level, event, component or operation, and status
+2. HTTP events contain correlation_id, and the supplied ID is unchanged through request, response, logs, and traces
+3. Unexpected ERROR events contain exception_class, error_category, safe message_category, stack, and cause without raw exception messages or payloads
+4. Invalid credentials produce only the approved WARN/INFO observability level and safe category/message; they do not produce ERROR or credential disclosure
+5. Logs, traces, container output, and artifacts contain none of: secrets, passwords, tokens, api_key values, raw request/provider payloads, email, phone, address, or published demo credentials
+6. Missing/invalid observability data or leaked forbidden content fails the case",,Not Run,Critical,P1,,,,REQ-03; REQ-07; REQ-08; REQ-10,Security,
+TC-OJT-0041,Startup bootstrap and reset failure observability,Operational startup/reset,"[Stage 1 target] Verify startup, readiness, migration, seed, and reset failures are bounded, nonzero, structured, remediable, and secret-safe","1. Supported Compose startup, bootstrap, readiness, migration, seed, and reset commands are documented
+2. Fault injection or deterministic invalid configuration can select each failure mode
+3. Temporary log capture is available outside the repository","1. Run startup with invalid provider mode
+2. Run startup with missing app secret and missing database secret, one at a time
+3. Inject readiness, migration, seed, and reset failures
+4. Capture exit status, elapsed time, structured startup events, stack/cause fields, remediation category, and all output
+5. Run a healthy startup and inspect initialization, completion, and readiness events",invalid provider mode; missing APP_KEY/DB secret; readiness/migration/seed/reset fault; bounded timeout=600 seconds,"1. Each invalid configuration or injected startup/bootstrap/reset failure exits nonzero within a bounded interval and does not hang
+2. Failure output contains structured ERROR startup events with a safe remediation category; exception class, stack, and cause are present where applicable
+3. No secret, password, token, api_key, raw payload, email, phone, address, demo credential, or other sensitive value appears in logs, traces, container output, or artifacts
+4. Healthy startup emits structured initialization and completion events plus a readiness event
+5. Migration and seed failures are distinguishable and actionable without leaking configuration values
+6. Any zero exit on failure, unbounded/hanging path, missing required event, unsafe stack/message, or secret leakage fails the case",,Not Run,Critical,P1,,,,REQ-08; REQ-09; REQ-10,Integration,
+TC-OJT-0042,Aggregate local quality gate,Quality gate,[Stage 1 target] Verify one documented aggregate command executes the full local quality gate deterministically and reports every suite,"1. The documented aggregate command and suite commands are available
+2. Compose config validation and the Ticket02 compose_contract plus Ticket03–Ticket09 suites are available
+3. A writable temporary directory outside the repository is available","1. Run the documented aggregate command from a clean checkout
+2. Confirm Compose config validation runs first, followed by Ticket02 compose_contract and Ticket03–Ticket09 sequentially
+3. Force one early suite failure and verify each suite uses fail-fast/max1 while the aggregate continues
+4. Inspect the final summary, exit status, elapsed time, temporary logs, repository tree, and hidden files
+5. Repeat with all suites passing","command=the single documented aggregate gate; suites=Compose config, Ticket02, Ticket03, Ticket04, Ticket05, Ticket06, Ticket07, Ticket08, Ticket09; max_elapsed=600 seconds","1. One documented command runs Compose config validation, Ticket02 compose_contract, and Ticket03–Ticket09 in sequence
+2. Each suite is fail-fast/max1; the aggregate continues after a suite failure and summarizes every suite outcome
+3. The aggregate exits nonzero if any suite fails or total elapsed time exceeds 600 seconds, and exits zero only when all suites pass within the limit
+4. Temporary logs are deterministic, uniquely scoped, and stored outside the repository; no hidden or untracked artifacts are created in the repository
+5. The summary identifies each suite, status, and elapsed time, and reruns produce the same ordering and contract",,Not Run,Critical,P1,,,,REQ-01; REQ-10,Regression,

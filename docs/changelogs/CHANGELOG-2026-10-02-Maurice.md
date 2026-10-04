@@ -16,4 +16,6 @@
 - Added the evidence-led current baseline, risks, coverage summary, and open questions.
 - Docs-only: updated the README with verified capabilities, current Laravel monolith structure, route/auth boundaries, deterministic local demo accounts, Compose readiness semantics, and screenshots of the login, student internship (placement/evidence), and coordinator company (company management) pages; preserved the Mermaid sections.
 
+- Ticket09: added correlation propagation, structured JSON logging, redacted SessionTracer envelopes, JSONL container logs, Nginx access logging, and bounded local quality gate.
+
 Author Name: Aguda, Maurice
