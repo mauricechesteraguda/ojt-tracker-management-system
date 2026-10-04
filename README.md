@@ -53,58 +53,7 @@ flowchart LR
     FP -. explicit opt-in .-> Real[Real academic provider]
 ```
 
-## Happy Flow
 
-This is the tested current contract; final local happy-flow acceptance is sealed. Framework modernization remains future work.
-
-```mermaid
-sequenceDiagram
-    participant Ops as Operator
-    participant Compose as Docker Compose
-    participant Browser
-    participant Web as Nginx
-    participant App as PHP-FPM
-    participant DB as MariaDB
-    participant Academic as Fake academic provider
-    participant Student
-    participant Coordinator
-    participant Report as Shared reporting
-
-    Ops->>Compose: One-command start of services and health checks
-    Compose->>DB: Start MariaDB and wait for healthy status
-    Compose->>App: Start PHP-FPM after MariaDB is healthy
-    App->>DB: entrypoint/demo-bootstrap runs migrations
-    App->>DB: demo-seed initializes Passport and synthetic fixtures
-    Compose->>App: Check PHP-FPM health
-    Compose->>Web: Start Nginx and check /healthz and /login
-    Student->>Web: Log in with seeded student account
-    Web->>App: Forward application request
-    App->>Academic: Fetch academic profile
-    Academic-->>App: Return deterministic fake profile
-    Student->>Web: Create placement
-    Web->>App: Forward placement request
-    App->>DB: Transaction: placement + automatic requirements
-    DB-->>App: Commit active placement
-    Student->>Web: Submit evidence
-    Web->>App: Forward evidence request
-    Coordinator->>Web: Verify evidence and validate report
-    Web->>App: Forward review request
-    Coordinator->>Web: Approve placement
-    Web->>App: Forward approval request
-    App->>DB: Lock approval and append audit event
-    Coordinator->>Report: Request approved-only filtered report
-    Report-->>Coordinator: JSON and PDF with parity
-    alt Correction required
-        Coordinator->>Web: Reopen with correction reason
-        Web->>App: Forward reopen request
-        App->>DB: Record reopen audit event
-        Student->>Web: Correct and resubmit evidence
-        Web->>App: Forward correction request
-        Coordinator->>Web: Reverify and reapprove
-        Web->>App: Forward reapproval request
-        App->>DB: Lock reapproval and append audit event
-    end
-```
 
 ## Sample Screenshots
 
